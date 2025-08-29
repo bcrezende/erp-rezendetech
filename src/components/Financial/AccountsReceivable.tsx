@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../Auth/AuthProvider';
-import { Plus, Search, Edit, Trash2, Banknote, AlertTriangle, Calendar, Filter, Eye, CheckCircle, Repeat, X } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Banknote, AlertTriangle, Calendar, Filter, Eye, CheckCircle, Repeat, X, CalendarDays } from 'lucide-react';
 import { Database } from '../../types/supabase';
 
 type Transaction = Database['public']['Tables']['transacoes']['Row'];
@@ -30,6 +30,10 @@ const AccountsReceivable: React.FC<AccountsReceivableProps> = () => {
     vencimento: 'all'
   });
 
+  const [dateFilter, setDateFilter] = useState({
+    startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
+    endDate: new Date().toISOString().split('T')[0]
+  });
   const [formData, setFormData] = useState<Partial<TransactionInsert>>({
     valor: 0,
     tipo: 'receita',
@@ -53,7 +57,7 @@ const AccountsReceivable: React.FC<AccountsReceivableProps> = () => {
     if (profile?.id_empresa) {
       loadData();
     }
-  }, [profile]);
+  }, [profile, dateFilter]);
 
   const loadData = async () => {
     try {
@@ -71,6 +75,8 @@ const AccountsReceivable: React.FC<AccountsReceivableProps> = () => {
           .select('*')
           .eq('id_empresa', profile.id_empresa)
           .eq('tipo', 'receita')
+          .gte('data_transacao', dateFilter.startDate)
+          .lte('data_transacao', dateFilter.endDate)
           .order('data_vencimento', { ascending: true }),
         supabase
           .from('categorias')
@@ -483,6 +489,51 @@ const AccountsReceivable: React.FC<AccountsReceivableProps> = () => {
       </div>
 
       {/* Filters */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            <CalendarDays className="h-5 w-6 text-green-600" />
+            <div>
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900">Filtro de Período</h3>
+              <p className="text-xs sm:text-sm text-gray-600">Selecione o período para análise</p>
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
+          <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
+            <label className="text-sm font-medium text-gray-700">De:</label>
+            <input
+              type="date"
+              value={dateFilter.startDate}
+              onChange={(e) => setDateFilter({ ...dateFilter, startDate: e.target.value })}
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent w-full sm:w-auto"
+            />
+          </div>
+          <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
+            <label className="text-sm font-medium text-gray-700">Até:</label>
+            <input
+              type="date"
+              value={dateFilter.endDate}
+              onChange={(e) => setDateFilter({ ...dateFilter, endDate: e.target.value })}
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent w-full sm:w-auto"
+            />
+          </div>
+          <button
+            onClick={() => {
+              const today = new Date();
+              const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+              setDateFilter({
+                startDate: firstDay.toISOString().split('T')[0],
+                endDate: today.toISOString().split('T')[0]
+              });
+            }}
+            className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm w-full sm:w-auto whitespace-nowrap"
+          >
+            Mês Atual
+          </button>
+        </div>
+      </div>
+
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex flex-wrap items-center gap-4">
           <div className="relative flex-1 min-w-64">
