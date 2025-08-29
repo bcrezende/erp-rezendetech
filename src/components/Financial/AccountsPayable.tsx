@@ -60,6 +60,7 @@ const AccountsPayable: React.FC<AccountsPayableProps> = () => {
   }, [profile, dateFilter]);
 
   const loadData = async () => {
+    try {
       const [transactionsRes, categoriesRes, pessoasRes] = await Promise.all([
         supabase
           .from('transacoes')
