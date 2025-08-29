@@ -113,9 +113,9 @@ const CashPositionCard: React.FC<CashPositionCardProps> = ({ dateFilter }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2 sm:space-x-3">
           <div className={`p-3 rounded-full ${
             cashPosition.caixaAtual >= 0 ? 'bg-blue-50' : 'bg-orange-50'
           }`}>
@@ -124,8 +124,8 @@ const CashPositionCard: React.FC<CashPositionCardProps> = ({ dateFilter }) => {
             }`} />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Caixa Atual</h3>
-            <p className="text-sm text-gray-600">Receitas pagas - Despesas pagas</p>
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900">Caixa Atual</h3>
+            <p className="text-xs sm:text-sm text-gray-600">Receitas pagas - Despesas pagas</p>
           </div>
         </div>
       </div>

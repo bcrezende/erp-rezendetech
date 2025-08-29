@@ -4,12 +4,31 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <link rel="manifest" href="/manifest.json" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="description" content="Sistema ERP completo com agente IA integrado via WhatsApp" />
     <meta name="theme-color" content="#1E40AF" />
     <title>Sistema ERP Integrado - Gestão Empresarial Completa</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    
+    <style>
+      /* Prevent zoom on input focus on iOS */
+      @media screen and (-webkit-min-device-pixel-ratio: 0) {
+        select, textarea, input[type="text"], input[type="password"], 
+        input[type="datetime"], input[type="datetime-local"], 
+        input[type="date"], input[type="month"], input[type="time"], 
+        input[type="week"], input[type="number"], input[type="email"], 
+        input[type="url"], input[type="search"], input[type="tel"] {
+          font-size: 16px !important;
+        }
+      }
+    </style>
   </head>
-  <body>
+  <body class="safe-top safe-bottom">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

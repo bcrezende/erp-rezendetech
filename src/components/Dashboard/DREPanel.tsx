@@ -360,15 +360,15 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2 sm:space-x-3">
           <BarChart3 className="h-6 w-6 text-blue-600" />
-          <h3 className="text-lg font-semibold text-gray-900">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900">
             Demonstrativo do Resultado do Exercício (DRE)
           </h3>
         </div>
-        <div className="text-sm text-gray-600">
+        <div className="text-xs sm:text-sm text-gray-600 text-right">
           Período: {dreData.period}
         </div>
       </div>

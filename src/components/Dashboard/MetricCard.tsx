@@ -32,19 +32,19 @@ const MetricCard: React.FC<MetricCardProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between">
         <div className="flex-1">
-          <h3 className="text-sm font-medium text-gray-600 mb-2">{title}</h3>
-          <p className="text-3xl font-bold text-gray-900 mb-1">{value}</p>
+          <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-2">{title}</h3>
+          <p className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{value}</p>
           {change && (
-            <p className={`text-sm font-medium ${changeColorClasses[changeType]}`}>
+            <p className={`text-xs sm:text-sm font-medium ${changeColorClasses[changeType]}`}>
               {change}
             </p>
           )}
         </div>
-        <div className={`p-3 rounded-full ${colorClasses[color]}`}>
-          <Icon size={24} />
+        <div className={`p-2 sm:p-3 rounded-full ${colorClasses[color]}`}>
+          <Icon size={20} className="sm:w-6 sm:h-6" />
         </div>
       </div>
     </div>

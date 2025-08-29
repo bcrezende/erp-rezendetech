@@ -127,30 +127,35 @@ const EstimatePanel: React.FC<EstimatePanelProps> = ({ dateFilter }) => {
   ];
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-gray-900">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900">
           Estimativa de Resultado Mensal
         </h3>
-        <div className="flex items-center text-sm text-gray-500">
+        <div className="flex items-center text-xs sm:text-sm text-gray-500">
           <Calendar size={16} className="mr-1" />
-          {new Date(dateFilter.startDate).toLocaleDateString('pt-BR')} - {new Date(dateFilter.endDate).toLocaleDateString('pt-BR')}
+          <span className="hidden sm:inline">
+            {new Date(dateFilter.startDate).toLocaleDateString('pt-BR')} - {new Date(dateFilter.endDate).toLocaleDateString('pt-BR')}
+          </span>
+          <span className="sm:hidden">
+            Período
+          </span>
         </div>
       </div>
 
       {/* Progresso do Mês */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-gray-600">
+          <span className="text-xs sm:text-sm font-medium text-gray-600">
             Progresso do Mês
           </span>
-          <span className="text-sm font-semibold text-gray-900">
+          <span className="text-xs sm:text-sm font-semibold text-gray-900">
             {estimateData.daysElapsed} de {estimateData.totalDays} dias ({progressPercentage.toFixed(1)}%)
           </span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-3">
+        <div className="w-full bg-gray-200 rounded-full h-2 sm:h-3">
           <div 
-            className="bg-blue-600 h-3 rounded-full transition-all duration-500 ease-out"
+            className="bg-blue-600 h-2 sm:h-3 rounded-full transition-all duration-500 ease-out"
             style={{ width: `${progressPercentage}%` }}
           />
         </div>
@@ -158,7 +163,7 @@ const EstimatePanel: React.FC<EstimatePanelProps> = ({ dateFilter }) => {
 
       {/* Tabela de Estimativas */}
       <div className="space-y-4">
-        <div className="grid grid-cols-3 gap-4 text-sm font-medium text-gray-600 pb-2 border-b border-gray-200">
+        <div className="grid grid-cols-3 gap-2 sm:gap-4 text-xs sm:text-sm font-medium text-gray-600 pb-2 border-b border-gray-200">
           <span>Categoria</span>
           <span className="text-right">Atual</span>
           <span className="text-right">Estimativa</span>
@@ -182,23 +187,23 @@ const EstimatePanel: React.FC<EstimatePanelProps> = ({ dateFilter }) => {
           return (
             <div 
               key={item.label}
-              className={`grid grid-cols-3 gap-4 p-4 rounded-lg border ${
+              className={`grid grid-cols-3 gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg border ${
                 bgColorClasses[item.color as keyof typeof bgColorClasses]
               }`}
             >
-              <span className="font-semibold text-gray-900">
+              <span className="text-sm sm:text-base font-semibold text-gray-900">
                 {item.label}
               </span>
-              <span className={`text-right font-bold ${
+              <span className={`text-right text-sm sm:text-base font-bold ${
                 colorClasses[item.color as keyof typeof colorClasses]
               }`}>
                 {formatCurrency(item.current)}
               </span>
-              <span className={`text-right font-bold ${
+              <span className={`text-right text-sm sm:text-base font-bold ${
                 colorClasses[item.color as keyof typeof colorClasses]
               }`}>
                 {formatCurrency(item.estimated)}
-                <div className="flex items-center justify-end mt-1">
+                <div className="flex items-center justify-end mt-1 hidden sm:flex">
                   <TrendingUp size={12} className="mr-1" />
                   <span className="text-xs">
                     {item.current > 0 ? 
@@ -214,16 +219,16 @@ const EstimatePanel: React.FC<EstimatePanelProps> = ({ dateFilter }) => {
       </div>
 
       {/* Insight */}
-      <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-        <h4 className="font-semibold text-gray-900 mb-2">Análise Rápida</h4>
-        <div className="space-y-1 text-sm text-gray-600">
+      <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-gray-50 rounded-lg">
+        <h4 className="text-sm sm:text-base font-semibold text-gray-900 mb-2">Análise Rápida</h4>
+        <div className="space-y-1 text-xs sm:text-sm text-gray-600">
           <p>
             • Base de cálculo: {estimateData.daysElapsed} dias decorridos de {estimateData.totalDays} dias no período
           </p>
-          <p>
+          <p className="hidden sm:block">
             • Média diária de receita: {formatCurrency(estimateData.daysElapsed > 0 ? estimateData.currentRevenue / estimateData.daysElapsed : 0)}
           </p>
-          <p>
+          <p className="hidden sm:block">
             • Média diária de despesas: {formatCurrency(estimateData.daysElapsed > 0 ? estimateData.currentExpenses / estimateData.daysElapsed : 0)}
           </p>
           <p className={`font-medium ${

@@ -3,9 +3,15 @@
   "short_name": "ERP System",
   "description": "Sistema ERP completo com agente IA integrado",
   "start_url": "/",
-  "display": "standalone",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone", "minimal-ui"],
   "theme_color": "#1E40AF",
   "background_color": "#ffffff",
+  "orientation": "portrait",
+  "prefer_related_applications": false,
+  "scope": "/",
+  "lang": "pt-BR",
+  "dir": "ltr",
   "icons": [
     {
       "src": "/icon-192.png",

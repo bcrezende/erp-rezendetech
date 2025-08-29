@@ -104,39 +104,39 @@ const CashFlowPanel: React.FC<CashFlowPanelProps> = ({ dateFilter }) => {
   }, [cashFlowData]);
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-gray-900">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900">
           Fluxo de Caixa
         </h3>
-        <div className="text-sm text-gray-500">
+        <div className="text-xs sm:text-sm text-gray-500 text-right">
           {new Date(dateFilter.startDate).toLocaleDateString('pt-BR')} - {new Date(dateFilter.endDate).toLocaleDateString('pt-BR')}
         </div>
       </div>
 
       {/* Resumo Geral */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
+        <div className="bg-green-50 p-3 sm:p-4 rounded-lg border border-green-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-green-800">Total Entradas</p>
-              <p className="text-2xl font-bold text-green-900">
+              <p className="text-xs sm:text-sm font-medium text-green-800">Total Entradas</p>
+              <p className="text-lg sm:text-2xl font-bold text-green-900">
                 {formatCurrency(totals.income)}
               </p>
             </div>
-            <TrendingUp className="text-green-600" size={24} />
+            <TrendingUp className="text-green-600" size={20} />
           </div>
         </div>
 
-        <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+        <div className="bg-red-50 p-3 sm:p-4 rounded-lg border border-red-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-red-800">Total Saídas</p>
-              <p className="text-2xl font-bold text-red-900">
+              <p className="text-xs sm:text-sm font-medium text-red-800">Total Saídas</p>
+              <p className="text-lg sm:text-2xl font-bold text-red-900">
                 {formatCurrency(totals.expenses)}
               </p>
             </div>
-            <TrendingDown className="text-red-600" size={24} />
+            <TrendingDown className="text-red-600" size={20} />
           </div>
         </div>
 
@@ -145,14 +145,19 @@ const CashFlowPanel: React.FC<CashFlowPanelProps> = ({ dateFilter }) => {
             ? 'bg-blue-50 border-blue-200' 
             : 'bg-orange-50 border-orange-200'
         }`}>
+        <div className={`p-3 sm:p-4 rounded-lg border ${
+          totals.balance >= 0 
+            ? 'bg-blue-50 border-blue-200' 
+            : 'bg-orange-50 border-orange-200'
+        }`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className={`text-sm font-medium ${
+              <p className={`text-xs sm:text-sm font-medium ${
                 totals.balance >= 0 ? 'text-blue-800' : 'text-orange-800'
               }`}>
                 Saldo Líquido
               </p>
-              <p className={`text-2xl font-bold ${
+              <p className={`text-lg sm:text-2xl font-bold ${
                 totals.balance >= 0 ? 'text-blue-900' : 'text-orange-900'
               }`}>
                 {formatCurrency(totals.balance)}
@@ -163,8 +168,8 @@ const CashFlowPanel: React.FC<CashFlowPanelProps> = ({ dateFilter }) => {
       </div>
 
       {/* Detalhamento por Data */}
-      <div className="space-y-2 max-h-80 overflow-y-auto">
-        <div className="grid grid-cols-4 gap-4 text-sm font-medium text-gray-600 pb-2 border-b border-gray-200">
+      <div className="space-y-2 max-h-60 sm:max-h-80 overflow-y-auto">
+        <div className="grid grid-cols-4 gap-2 sm:gap-4 text-xs sm:text-sm font-medium text-gray-600 pb-2 border-b border-gray-200">
           <span>Data</span>
           <span className="text-right">Entradas</span>
           <span className="text-right">Saídas</span>
@@ -172,14 +177,14 @@ const CashFlowPanel: React.FC<CashFlowPanelProps> = ({ dateFilter }) => {
         </div>
 
         {cashFlowData.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-6 sm:py-8 text-gray-500 text-sm">
             Nenhuma movimentação encontrada neste período
           </div>
         ) : (
           cashFlowData.map((day) => (
             <div 
               key={day.date}
-              className="grid grid-cols-4 gap-4 py-3 px-2 rounded-lg hover:bg-gray-50 text-sm"
+              className="grid grid-cols-4 gap-2 sm:gap-4 py-2 sm:py-3 px-1 sm:px-2 rounded-lg hover:bg-gray-50 text-xs sm:text-sm"
             >
               <span className="font-medium text-gray-900">
                 {formatDate(day.date)}

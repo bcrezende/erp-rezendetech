@@ -3,10 +3,12 @@
   "short_name": "Chat IA",
   "description": "Chat inteligente para gestão financeira empresarial",
   "start_url": "/chat.html",
-  "display": "standalone",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone", "minimal-ui"],
   "theme_color": "#1E40AF",
   "background_color": "#ffffff",
   "orientation": "portrait",
+  "prefer_related_applications": false,
   "scope": "/",
   "icons": [
     {
@@ -23,6 +25,8 @@
     }
   ],
   "categories": ["finance", "business", "productivity"],
+  "lang": "pt-BR",
+  "dir": "ltr",
   "shortcuts": [
     {
       "name": "Novo Lançamento",

@@ -27,11 +27,13 @@ import {
   BarChart3,
   LogOut,
   AlertCircle,
-  Calendar
+  Calendar,
+  Menu
 } from 'lucide-react';
 
 const AppContent: React.FC = () => {
   const [currentPage, setCurrentPage] = useState('dashboard');
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const { user, profile, loading, signOut, supabase } = useAuth();
   const [dateFilter, setDateFilter] = useState({
     startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
@@ -310,14 +312,77 @@ const AppContent: React.FC = () => {
   const { title, subtitle } = getPageTitle(currentPage);
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} profile={profile || {}} />
+    <div className={`flex h-screen bg-gray-50 ${isMobileSidebarOpen ? 'overflow-hidden' : ''}`}>
+      <Sidebar 
+        currentPage={currentPage} 
+        onNavigate={setCurrentPage} 
+        profile={profile || {}} 
+        mobileOpen={isMobileSidebarOpen}
+        onClose={() => setIsMobileSidebarOpen(false)}
+      />
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+        <div className="bg-white shadow-sm border-b border-gray-200 px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
+            <div className="flex items-center space-x-3">
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setIsMobileSidebarOpen(true)}
+                className="p-2 rounded-lg hover:bg-gray-100 transition-colors md:hidden"
+              >
+                <Menu size={20} className="text-gray-600" />
+              </button>
+              
+              <div>
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">{title}</h2>
+                {subtitle && (
+                  <p className="text-xs sm:text-sm text-gray-600 mt-1">{subtitle}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <div className="text-right hidden sm:block">
+                <p className="text-sm font-medium text-gray-900">{profile?.nome_completo}</p>
+                <p className="text-xs text-gray-500">{profile?.empresas?.nome}</p>
+              </div>
+              
+              {/* Mobile User Avatar */}
+              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center sm:hidden">
+                <span className="text-white text-xs font-medium">
+                  {profile?.nome_completo?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'U'}
+                </span>
+              </div>
+              
+              <button
+                onClick={handleSignOut}
+                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <LogOut size={18} className="sm:w-5 sm:h-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+          {renderPageContent()}
+        </main>
+      </div>
+    </div>
+  );
+};
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppProvider>
+        <AppContent />
+      </AppProvider>
+    </AuthProvider>
+  );
+}
+
+export default App;
               {subtitle && (
                 <p className="text-sm text-gray-600 mt-1">{subtitle}</p>
               )}
