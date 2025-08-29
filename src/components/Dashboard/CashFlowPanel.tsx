@@ -140,11 +140,6 @@ const CashFlowPanel: React.FC<CashFlowPanelProps> = ({ dateFilter }) => {
           </div>
         </div>
 
-        <div className={`p-4 rounded-lg border ${
-          totals.balance >= 0 
-            ? 'bg-blue-50 border-blue-200' 
-            : 'bg-orange-50 border-orange-200'
-        }`}>
         <div className={`p-3 sm:p-4 rounded-lg border ${
           totals.balance >= 0 
             ? 'bg-blue-50 border-blue-200' 
