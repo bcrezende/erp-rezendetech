@@ -1,0 +1,52 @@
+{
+  "name": "Assistente Financeiro IA",
+  "short_name": "Chat IA",
+  "description": "Chat inteligente para gestão financeira empresarial",
+  "start_url": "/chat.html",
+  "display": "standalone",
+  "theme_color": "#1E40AF",
+  "background_color": "#ffffff",
+  "orientation": "portrait",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png", 
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["finance", "business", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Novo Lançamento",
+      "short_name": "Lançamento",
+      "description": "Registrar nova receita ou despesa",
+      "url": "/chat.html?action=new-transaction",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Consultar Saldo",
+      "short_name": "Saldo",
+      "description": "Ver saldo atual e indicadores",
+      "url": "/chat.html?action=check-balance",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
