@@ -193,30 +193,30 @@ const AppContent: React.FC = () => {
             {/* Filtro Global de Data */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
+                <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-3">
                   <Calendar className="h-6 w-6 text-blue-600" />
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900">Filtro de Período</h3>
                     <p className="text-sm text-gray-600">Selecione o período para análise</p>
                   </div>
                 </div>
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center space-x-2">
+                <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
+                  <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
                     <label className="text-sm font-medium text-gray-700">De:</label>
                     <input
                       type="date"
                       value={dateFilter.startDate}
                       onChange={(e) => setDateFilter({ ...dateFilter, startDate: e.target.value })}
-                      className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-auto"
                     />
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
                     <label className="text-sm font-medium text-gray-700">Até:</label>
                     <input
                       type="date"
                       value={dateFilter.endDate}
                       onChange={(e) => setDateFilter({ ...dateFilter, endDate: e.target.value })}
-                      className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-auto"
                     />
                   </div>
                   <button
@@ -228,7 +228,7 @@ const AppContent: React.FC = () => {
                         endDate: today.toISOString().split('T')[0]
                       });
                     }}
-                    className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                    className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm w-full sm:w-auto whitespace-nowrap"
                   >
                     Mês Atual
                   </button>
