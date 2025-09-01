@@ -50,6 +50,12 @@ const AccountsPayable: React.FC = () => {
     status: 'pendente',
     origem: 'manual',
     observacoes: '',
+    e_recorrente: false,
+    tipo_recorrencia: null,
+    numero_parcelas: null,
+    data_inicio_recorrencia: null,
+    valor_parcela: null,
+    ativa_recorrencia: true,
   });
 
   useEffect(() => {
@@ -174,6 +180,12 @@ const AccountsPayable: React.FC = () => {
       status: transaction.status,
       origem: transaction.origem,
       observacoes: transaction.observacoes,
+      e_recorrente: transaction.e_recorrente,
+      tipo_recorrencia: transaction.tipo_recorrencia,
+      numero_parcelas: transaction.numero_parcelas,
+      data_inicio_recorrencia: transaction.data_inicio_recorrencia,
+      valor_parcela: transaction.valor_parcela,
+      ativa_recorrencia: transaction.ativa_recorrencia,
     });
     setShowForm(true);
   };
@@ -208,6 +220,12 @@ const AccountsPayable: React.FC = () => {
       status: 'pendente',
       origem: 'manual',
       observacoes: '',
+      e_recorrente: false,
+      tipo_recorrencia: null,
+      numero_parcelas: null,
+      data_inicio_recorrencia: null,
+      valor_parcela: null,
+      ativa_recorrencia: true,
     });
     setEditingTransaction(null);
     setShowForm(false);
@@ -717,6 +735,111 @@ const AccountsPayable: React.FC = () => {
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
                     placeholder="Observações adicionais sobre a conta..."
                   />
+                </div>
+
+                {/* Seção de Recorrência */}
+                <div className="md:col-span-2">
+                  <div className="border border-gray-200 rounded-lg p-4">
+                    <div className="flex items-center space-x-2 mb-4">
+                      <input
+                        type="checkbox"
+                        id="e_recorrente"
+                        checked={formData.e_recorrente || false}
+                        onChange={(e) => setFormData({ 
+                          ...formData, 
+                          e_recorrente: e.target.checked,
+                          tipo_recorrencia: e.target.checked ? 'parcelada' : null,
+                          numero_parcelas: e.target.checked ? 2 : null,
+                          valor_parcela: e.target.checked ? Number(formData.valor) : null,
+                          data_inicio_recorrencia: e.target.checked ? formData.data_transacao : null
+                        })}
+                        className="rounded border-gray-300 text-red-600 focus:ring-red-500"
+                      />
+                      <label htmlFor="e_recorrente" className="text-sm font-medium text-gray-700">
+                        Despesa Recorrente
+                      </label>
+                    </div>
+
+                    {formData.e_recorrente && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Tipo de Recorrência *
+                          </label>
+                          <select
+                            required={formData.e_recorrente}
+                            value={formData.tipo_recorrencia || ''}
+                            onChange={(e) => setFormData({ ...formData, tipo_recorrencia: e.target.value })}
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                          >
+                            <option value="">Selecione o tipo</option>
+                            <option value="parcelada">Parcelada (número fixo de parcelas)</option>
+                            <option value="assinatura">Assinatura (recorrência contínua)</option>
+                          </select>
+                        </div>
+
+                        {formData.tipo_recorrencia === 'parcelada' && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Número de Parcelas *
+                            </label>
+                            <input
+                              type="number"
+                              min="2"
+                              max="60"
+                              required={formData.tipo_recorrencia === 'parcelada'}
+                              value={formData.numero_parcelas || ''}
+                              onChange={(e) => {
+                                const parcelas = Number(e.target.value);
+                                setFormData({ 
+                                  ...formData, 
+                                  numero_parcelas: parcelas,
+                                  valor_parcela: parcelas > 0 ? Number(formData.valor) / parcelas : null
+                                });
+                              }}
+                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                              placeholder="Ex: 12"
+                            />
+                          </div>
+                        )}
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Data de Início da Recorrência *
+                          </label>
+                          <input
+                            type="date"
+                            required={formData.e_recorrente}
+                            value={formData.data_inicio_recorrencia || ''}
+                            onChange={(e) => setFormData({ ...formData, data_inicio_recorrencia: e.target.value })}
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Valor por Parcela
+                          </label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={formData.valor_parcela || ''}
+                            onChange={(e) => setFormData({ ...formData, valor_parcela: Number(e.target.value) })}
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent bg-gray-50"
+                            disabled
+                            placeholder="Calculado automaticamente"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            {formData.tipo_recorrencia === 'parcelada' && formData.numero_parcelas 
+                              ? `Valor total ÷ ${formData.numero_parcelas} parcelas`
+                              : 'Valor igual ao total para assinaturas'
+                            }
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
