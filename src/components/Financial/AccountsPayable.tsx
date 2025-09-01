@@ -335,7 +335,7 @@ const AccountsPayable: React.FC = () => {
       // Soft delete - marcar como inativo
       const { error } = await supabase
         .from('transacoes')
-        .update({ ativo: false })
+        .delete()
         .eq('id', id);
 
       if (error) throw error;
