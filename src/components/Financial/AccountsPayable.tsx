@@ -19,7 +19,9 @@ const AccountsPayable: React.FC = () => {
     categoria: 'all',
     pessoa: 'all',
     periodo: 'all',
-    status: 'all' // Adicionado filtro de status
+    status: 'all',
+    dataInicio: '',
+    dataFim: ''
   });
 
   useEffect(() => {
@@ -176,7 +178,20 @@ const AccountsPayable: React.FC = () => {
       matchesPeriod = diffDays >= 0 && diffDays <= 7;
     }
 
-    return matchesSearch && matchesCategory && matchesPessoa && matchesPeriod;
+    // Filtro por data personalizada
+    let matchesDateRange = true;
+    if (filters.dataInicio && filters.dataFim) {
+      const transactionDate = transaction.data_vencimento || transaction.data_transacao;
+      matchesDateRange = transactionDate >= filters.dataInicio && transactionDate <= filters.dataFim;
+    } else if (filters.dataInicio) {
+      const transactionDate = transaction.data_vencimento || transaction.data_transacao;
+      matchesDateRange = transactionDate >= filters.dataInicio;
+    } else if (filters.dataFim) {
+      const transactionDate = transaction.data_vencimento || transaction.data_transacao;
+      matchesDateRange = transactionDate <= filters.dataFim;
+    }
+
+    return matchesSearch && matchesCategory && matchesPessoa && matchesPeriod && matchesDateRange;
   });
 
   const totals = filteredTransactions.reduce((acc, transaction) => {
@@ -327,13 +342,33 @@ const AccountsPayable: React.FC = () => {
             <option value="proximos7">Próximos 7 dias</option>
           </select>
 
+          <div className="flex items-center space-x-2">
+            <input
+              type="date"
+              value={filters.dataInicio}
+              onChange={(e) => setFilters({ ...filters, dataInicio: e.target.value })}
+              className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Data início"
+            />
+            <span className="text-gray-500">até</span>
+            <input
+              type="date"
+              value={filters.dataFim}
+              onChange={(e) => setFilters({ ...filters, dataFim: e.target.value })}
+              className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Data fim"
+            />
+          </div>
+
           <button
             onClick={() => {
               setFilters({
                 categoria: 'all',
                 pessoa: 'all',
                 periodo: 'all',
-                status: 'pendente'
+                status: 'pendente',
+                dataInicio: '',
+                dataFim: ''
               });
               setSearchTerm('');
               console.log('🔄 AccountsPayable: Filters cleared, reloading data...');
@@ -382,7 +417,9 @@ const AccountsPayable: React.FC = () => {
                             categoria: 'all',
                             pessoa: 'all',
                             periodo: 'all',
-                            status: 'pendente'
+                            status: 'pendente',
+                            dataInicio: '',
+                            dataFim: ''
                           });
                           setSearchTerm('');
                           console.log('🔄 AccountsPayable: Clearing filters from empty state...');
