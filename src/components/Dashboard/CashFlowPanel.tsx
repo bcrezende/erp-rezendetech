@@ -110,7 +110,7 @@ const CashFlowPanel: React.FC<CashFlowPanelProps> = ({ dateFilter }) => {
           Fluxo de Caixa
         </h3>
         <div className="text-xs sm:text-sm text-gray-500 text-right">
-          {new Date(dateFilter.startDate).toLocaleDateString('pt-BR')} - {new Date(dateFilter.endDate).toLocaleDateString('pt-BR')}
+          Todas as Movimentações
         </div>
       </div>
 
