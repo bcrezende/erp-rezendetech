@@ -1,24 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../Auth/AuthProvider';
-import { Plus, Search, Edit, Trash2, DollarSign, TrendingUp, TrendingDown, Filter, Calendar } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, DollarSign, TrendingUp, TrendingDown, Filter, Calendar, Eye, X } from 'lucide-react';
 import { Database } from '../../types/supabase';
 
 type Transaction = Database['public']['Tables']['transacoes']['Row'];
 type TransactionInsert = Database['public']['Tables']['transacoes']['Insert'];
 type Category = Database['public']['Tables']['categorias']['Row'];
-type Client = Database['public']['Tables']['clientes']['Row'];
-type Supplier = Database['public']['Tables']['fornecedores']['Row'];
+type Pessoa = Database['public']['Tables']['pessoas']['Row'];
 
 const TransactionsManager: React.FC = () => {
   const { supabase, profile } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [clients, setClients] = useState<Client[]>([]);
-  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [pessoas, setPessoas] = useState<Pessoa[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const [viewingTransaction, setViewingTransaction] = useState<Transaction | null>(null);
   const [filters, setFilters] = useState({
     tipo: 'all',
     status: 'all',
@@ -30,9 +29,9 @@ const TransactionsManager: React.FC = () => {
     tipo: 'receita',
     descricao: '',
     data_transacao: new Date().toISOString().split('T')[0],
+    data_vencimento: new Date().toISOString().split('T')[0],
     id_categoria: '',
-    id_cliente: '',
-    id_fornecedor: '',
+    id_pessoa: '',
     status: 'concluida',
     origem: 'manual',
     observacoes: '',
@@ -47,32 +46,60 @@ const TransactionsManager: React.FC = () => {
   const loadData = async () => {
     try {
       if (!profile?.id || !profile?.id_empresa) {
+        console.log('❌ No profile or company ID found');
         setTransactions([]);
         setCategories([]);
-        setClients([]);
-        setSuppliers([]);
+        setPessoas([]);
         setLoading(false);
         return;
       }
 
-      const [transactionsRes, categoriesRes, clientsRes, suppliersRes] = await Promise.all([
-        supabase.from('transacoes').select('*').eq('id_empresa', profile.id_empresa).order('data_transacao', { ascending: false }),
-        supabase.from('categorias').select('*').eq('id_empresa', profile.id_empresa).eq('ativo', true).order('nome'),
-        supabase.from('clientes').select('*').eq('id_empresa', profile.id_empresa).eq('ativo', true).order('nome'),
-        supabase.from('fornecedores').select('*').eq('id_empresa', profile.id_empresa).eq('ativo', true).order('nome')
+      console.log('🔍 Loading transactions data for company:', profile.id_empresa);
+
+      const [transactionsRes, categoriesRes, pessoasRes] = await Promise.all([
+        supabase
+          .from('transacoes')
+          .select('*')
+          .eq('id_empresa', profile.id_empresa)
+          .order('data_transacao', { ascending: false }),
+        supabase
+          .from('categorias')
+          .select('*')
+          .eq('id_empresa', profile.id_empresa)
+          .eq('ativo', true)
+          .order('nome'),
+        supabase
+          .from('pessoas')
+          .select('*')
+          .eq('id_empresa', profile.id_empresa)
+          .eq('ativo', true)
+          .order('nome_razao_social')
       ]);
 
-      if (transactionsRes.error) throw transactionsRes.error;
-      if (categoriesRes.error) throw categoriesRes.error;
-      if (clientsRes.error) throw clientsRes.error;
-      if (suppliersRes.error) throw suppliersRes.error;
+      if (transactionsRes.error) {
+        console.error('❌ Error loading transactions:', transactionsRes.error);
+        throw transactionsRes.error;
+      }
+      if (categoriesRes.error) {
+        console.error('❌ Error loading categories:', categoriesRes.error);
+        throw categoriesRes.error;
+      }
+      if (pessoasRes.error) {
+        console.error('❌ Error loading pessoas:', pessoasRes.error);
+        throw pessoasRes.error;
+      }
+
+      console.log('✅ Data loaded successfully:', {
+        transactions: transactionsRes.data?.length || 0,
+        categories: categoriesRes.data?.length || 0,
+        pessoas: pessoasRes.data?.length || 0
+      });
 
       setTransactions(transactionsRes.data || []);
       setCategories(categoriesRes.data || []);
-      setClients(clientsRes.data || []);
-      setSuppliers(suppliersRes.data || []);
+      setPessoas(pessoasRes.data || []);
     } catch (error) {
-      console.error('Error loading data:', error);
+      console.error('❌ Error loading data:', error);
     } finally {
       setLoading(false);
     }
@@ -88,8 +115,7 @@ const TransactionsManager: React.FC = () => {
         id_empresa: profile.id_empresa,
         valor: Number(formData.valor),
         id_categoria: formData.id_categoria || null,
-        id_cliente: formData.id_cliente || null,
-        id_fornecedor: formData.id_fornecedor || null,
+        id_pessoa: formData.id_pessoa || null,
       };
 
       if (editingTransaction) {
@@ -99,18 +125,21 @@ const TransactionsManager: React.FC = () => {
           .eq('id', editingTransaction.id);
 
         if (error) throw error;
+        alert('Transação atualizada com sucesso!');
       } else {
         const { error } = await supabase
           .from('transacoes')
           .insert(transactionData);
 
         if (error) throw error;
+        alert('Transação criada com sucesso!');
       }
 
       await loadData();
       resetForm();
     } catch (error) {
       console.error('Error saving transaction:', error);
+      alert('Erro ao salvar transação. Tente novamente.');
     }
   };
 
@@ -121,9 +150,9 @@ const TransactionsManager: React.FC = () => {
       tipo: transaction.tipo,
       descricao: transaction.descricao,
       data_transacao: transaction.data_transacao,
+      data_vencimento: transaction.data_vencimento || transaction.data_transacao,
       id_categoria: transaction.id_categoria || '',
-      id_cliente: transaction.id_cliente || '',
-      id_fornecedor: transaction.id_fornecedor || '',
+      id_pessoa: transaction.id_pessoa || '',
       status: transaction.status,
       origem: transaction.origem,
       observacoes: transaction.observacoes,
@@ -132,7 +161,7 @@ const TransactionsManager: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Tem certeza que deseja excluir esta transação?')) return;
+    if (!confirm('Tem certeza que deseja excluir esta transação? Esta ação não pode ser desfeita.')) return;
 
     try {
       const { error } = await supabase
@@ -142,8 +171,10 @@ const TransactionsManager: React.FC = () => {
 
       if (error) throw error;
       await loadData();
+      alert('Transação excluída com sucesso!');
     } catch (error) {
       console.error('Error deleting transaction:', error);
+      alert('Erro ao excluir transação. Tente novamente.');
     }
   };
 
@@ -153,9 +184,9 @@ const TransactionsManager: React.FC = () => {
       tipo: 'receita',
       descricao: '',
       data_transacao: new Date().toISOString().split('T')[0],
+      data_vencimento: new Date().toISOString().split('T')[0],
       id_categoria: '',
-      id_cliente: '',
-      id_fornecedor: '',
+      id_pessoa: '',
       status: 'concluida',
       origem: 'manual',
       observacoes: '',
@@ -181,21 +212,41 @@ const TransactionsManager: React.FC = () => {
     return category?.nome || '-';
   };
 
-  const getClientName = (id: string | null) => {
+  const getPessoaName = (id: string | null) => {
     if (!id) return '-';
-    const client = clients.find(c => c.id === id);
-    return client?.nome || '-';
+    const pessoa = pessoas.find(p => p.id === id);
+    return pessoa?.nome_razao_social || '-';
   };
 
-  const getSupplierName = (id: string | null) => {
-    if (!id) return '-';
-    const supplier = suppliers.find(s => s.id === id);
-    return supplier?.nome || '-';
+  const getStatusColor = (status: string) => {
+    const colors = {
+      pendente: 'bg-yellow-100 text-yellow-700',
+      concluida: 'bg-green-100 text-green-700',
+      pago: 'bg-green-100 text-green-700',
+      recebido: 'bg-green-100 text-green-700',
+      vencido: 'bg-red-100 text-red-700',
+      cancelado: 'bg-gray-100 text-gray-700'
+    };
+    return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-700';
+  };
+
+  const getStatusLabel = (status: string) => {
+    const labels = {
+      pendente: 'Pendente',
+      concluida: 'Concluída',
+      pago: 'Pago',
+      recebido: 'Recebido',
+      vencido: 'Vencido',
+      cancelado: 'Cancelado'
+    };
+    return labels[status as keyof typeof labels] || status;
   };
 
   const filteredTransactions = transactions.filter(transaction => {
     const matchesSearch = transaction.descricao.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         getCategoryName(transaction.id_categoria).toLowerCase().includes(searchTerm.toLowerCase());
+                         getCategoryName(transaction.id_categoria).toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         getPessoaName(transaction.id_pessoa).toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         transaction.id_sequencial?.toString().includes(searchTerm);
     
     const matchesType = filters.tipo === 'all' || transaction.tipo === filters.tipo;
     const matchesStatus = filters.status === 'all' || transaction.status === filters.status;
@@ -205,7 +256,7 @@ const TransactionsManager: React.FC = () => {
   });
 
   const totals = filteredTransactions.reduce((acc, transaction) => {
-    if (transaction.status === 'concluida') {
+    if (['concluida', 'pago', 'recebido'].includes(transaction.status)) {
       if (transaction.tipo === 'receita') {
         acc.receitas += transaction.valor;
       } else if (transaction.tipo === 'despesa') {
@@ -221,6 +272,7 @@ const TransactionsManager: React.FC = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent" />
+        <p className="ml-3 text-gray-600">Carregando transações...</p>
       </div>
     );
   }
@@ -245,6 +297,21 @@ const TransactionsManager: React.FC = () => {
         </button>
       </div>
 
+      {/* Debug Info */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <h4 className="font-semibold text-yellow-900 mb-2">🔍 Debug Info</h4>
+          <div className="text-sm text-yellow-800 space-y-1">
+            <p>• Total de transações carregadas: {transactions.length}</p>
+            <p>• Transações após filtros: {filteredTransactions.length}</p>
+            <p>• Empresa ID: {profile?.id_empresa}</p>
+            <p>• Usuário ID: {profile?.id}</p>
+            <p>• Categorias carregadas: {categories.length}</p>
+            <p>• Pessoas carregadas: {pessoas.length}</p>
+          </div>
+        </div>
+      )}
+
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -253,6 +320,9 @@ const TransactionsManager: React.FC = () => {
               <p className="text-sm font-medium text-gray-600">Total Receitas</p>
               <p className="text-3xl font-bold text-green-600">
                 {formatCurrency(totals.receitas)}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                {filteredTransactions.filter(t => t.tipo === 'receita' && ['concluida', 'pago', 'recebido'].includes(t.status)).length} transação(ões)
               </p>
             </div>
             <div className="p-3 bg-green-50 rounded-full">
@@ -267,6 +337,9 @@ const TransactionsManager: React.FC = () => {
               <p className="text-sm font-medium text-gray-600">Total Despesas</p>
               <p className="text-3xl font-bold text-red-600">
                 {formatCurrency(totals.despesas)}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                {filteredTransactions.filter(t => t.tipo === 'despesa' && ['concluida', 'pago', 'recebido'].includes(t.status)).length} transação(ões)
               </p>
             </div>
             <div className="p-3 bg-red-50 rounded-full">
@@ -283,6 +356,9 @@ const TransactionsManager: React.FC = () => {
                 saldo >= 0 ? 'text-blue-600' : 'text-orange-600'
               }`}>
                 {formatCurrency(saldo)}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                {filteredTransactions.length} transação(ões) total
               </p>
             </div>
             <div className={`p-3 rounded-full ${
@@ -327,8 +403,11 @@ const TransactionsManager: React.FC = () => {
           >
             <option value="all">Todos os status</option>
             <option value="concluida">Concluída</option>
+            <option value="pago">Pago</option>
+            <option value="recebido">Recebido</option>
             <option value="pendente">Pendente</option>
-            <option value="cancelada">Cancelada</option>
+            <option value="vencido">Vencido</option>
+            <option value="cancelado">Cancelado</option>
           </select>
 
           <select
@@ -343,6 +422,21 @@ const TransactionsManager: React.FC = () => {
               </option>
             ))}
           </select>
+
+          <button
+            onClick={() => {
+              setFilters({
+                tipo: 'all',
+                status: 'all',
+                categoria: 'all',
+                periodo: 'all'
+              });
+              setSearchTerm('');
+            }}
+            className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            Limpar Filtros
+          </button>
         </div>
       </div>
 
@@ -352,8 +446,10 @@ const TransactionsManager: React.FC = () => {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
+                <th className="text-left p-4 font-medium text-gray-600">#</th>
                 <th className="text-left p-4 font-medium text-gray-600">Data</th>
                 <th className="text-left p-4 font-medium text-gray-600">Descrição</th>
+                <th className="text-left p-4 font-medium text-gray-600">Pessoa</th>
                 <th className="text-left p-4 font-medium text-gray-600">Categoria</th>
                 <th className="text-left p-4 font-medium text-gray-600">Tipo</th>
                 <th className="text-right p-4 font-medium text-gray-600">Valor</th>
@@ -364,22 +460,64 @@ const TransactionsManager: React.FC = () => {
             <tbody>
               {filteredTransactions.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-12 text-gray-500">
+                  <td colSpan={9} className="text-center py-12 text-gray-500">
                     <DollarSign className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                    <p>Nenhuma transação encontrada</p>
+                    <p className="text-lg font-medium">
+                      {transactions.length === 0 ? 'Nenhuma transação encontrada' : 'Nenhuma transação corresponde aos filtros'}
+                    </p>
+                    <p className="text-sm">
+                      {transactions.length === 0 
+                        ? 'Clique em "Nova Transação" para começar' 
+                        : 'Tente ajustar os filtros ou limpar a busca'
+                      }
+                    </p>
+                    {transactions.length > 0 && (
+                      <button
+                        onClick={() => {
+                          setFilters({
+                            tipo: 'all',
+                            status: 'all',
+                            categoria: 'all',
+                            periodo: 'all'
+                          });
+                          setSearchTerm('');
+                        }}
+                        className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        Limpar Filtros
+                      </button>
+                    )}
                   </td>
                 </tr>
               ) : (
                 filteredTransactions.map((transaction) => (
                   <tr key={transaction.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    <td className="p-4 font-medium text-gray-900">
+                      #{transaction.id_sequencial}
+                    </td>
                     <td className="p-4 text-gray-900">
-                      {formatDate(transaction.data_transacao)}
+                      <div>
+                        <p className="font-medium">{formatDate(transaction.data_transacao)}</p>
+                        {transaction.data_vencimento && transaction.data_vencimento !== transaction.data_transacao && (
+                          <p className="text-xs text-gray-500">
+                            Venc: {formatDate(transaction.data_vencimento)}
+                          </p>
+                        )}
+                      </div>
                     </td>
                     <td className="p-4">
-                      <div>
-                        <p className="font-medium text-gray-900">{transaction.descricao}</p>
-                        <p className="text-sm text-gray-500">ID: {transaction.id_sequencial}</p>
+                      <div className="max-w-xs">
+                        <p className="font-medium text-gray-900 truncate">{transaction.descricao}</p>
+                        <p className="text-sm text-gray-500">
+                          {transaction.origem === 'whatsapp_ia' ? '🤖 WhatsApp IA' : 
+                           transaction.origem === 'api' ? '🔗 API' : '✏️ Manual'}
+                        </p>
                       </div>
+                    </td>
+                    <td className="p-4">
+                      <span className="text-gray-900 truncate block max-w-32">
+                        {transaction.nome_razao_social || getPessoaName(transaction.id_pessoa)}
+                      </span>
                     </td>
                     <td className="p-4">
                       <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
@@ -406,19 +544,18 @@ const TransactionsManager: React.FC = () => {
                       {formatCurrency(transaction.valor)}
                     </td>
                     <td className="p-4 text-center">
-                      <span className={`px-2 py-1 rounded-full text-sm ${
-                        transaction.status === 'concluida'
-                          ? 'bg-green-100 text-green-700'
-                          : transaction.status === 'pendente'
-                          ? 'bg-yellow-100 text-yellow-700'
-                          : 'bg-red-100 text-red-700'
-                      }`}>
-                        {transaction.status === 'concluida' ? 'Concluída' :
-                         transaction.status === 'pendente' ? 'Pendente' : 'Cancelada'}
+                      <span className={`px-2 py-1 rounded-full text-sm font-medium ${getStatusColor(transaction.status)}`}>
+                        {getStatusLabel(transaction.status)}
                       </span>
                     </td>
                     <td className="p-4 text-center">
                       <div className="flex items-center justify-center space-x-2">
+                        <button
+                          onClick={() => setViewingTransaction(transaction)}
+                          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        >
+                          <Eye size={16} />
+                        </button>
                         <button
                           onClick={() => handleEdit(transaction)}
                           className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
@@ -493,18 +630,31 @@ const TransactionsManager: React.FC = () => {
                     value={formData.descricao || ''}
                     onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Descrição da transação"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Data *
+                    Data da Transação *
                   </label>
                   <input
                     type="date"
                     required
                     value={formData.data_transacao || ''}
                     onChange={(e) => setFormData({ ...formData, data_transacao: e.target.value })}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Data de Vencimento
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.data_vencimento || ''}
+                    onChange={(e) => setFormData({ ...formData, data_vencimento: e.target.value })}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
@@ -565,12 +715,15 @@ const TransactionsManager: React.FC = () => {
                   </label>
                   <select
                     value={formData.status || ''}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value as 'pendente' | 'concluida' | 'cancelada' })}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="concluida">Concluída</option>
+                    <option value="pago">Pago</option>
+                    <option value="recebido">Recebido</option>
                     <option value="pendente">Pendente</option>
-                    <option value="cancelada">Cancelada</option>
+                    <option value="vencido">Vencido</option>
+                    <option value="cancelado">Cancelado</option>
                   </select>
                 </div>
 
@@ -583,6 +736,7 @@ const TransactionsManager: React.FC = () => {
                     value={formData.observacoes || ''}
                     onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Observações adicionais sobre a transação..."
                   />
                 </div>
               </div>
@@ -603,6 +757,115 @@ const TransactionsManager: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* View Transaction Modal */}
+      {viewingTransaction && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Detalhes da Transação #{viewingTransaction.id_sequencial}
+                </h2>
+                <button
+                  onClick={() => setViewingTransaction(null)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-600">Tipo</label>
+                  <div className="flex items-center space-x-2">
+                    {viewingTransaction.tipo === 'receita' ? (
+                      <TrendingUp size={20} className="text-green-600" />
+                    ) : (
+                      <TrendingDown size={20} className="text-red-600" />
+                    )}
+                    <span className={`text-lg font-semibold capitalize ${
+                      viewingTransaction.tipo === 'receita' ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {viewingTransaction.tipo}
+                    </span>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600">Valor</label>
+                  <p className={`text-2xl font-bold ${
+                    viewingTransaction.tipo === 'receita' ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {formatCurrency(viewingTransaction.valor)}
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600">Status</label>
+                  <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(viewingTransaction.status)}`}>
+                    {getStatusLabel(viewingTransaction.status)}
+                  </span>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600">Data da Transação</label>
+                  <p className="text-lg font-semibold text-gray-900">{formatDate(viewingTransaction.data_transacao)}</p>
+                </div>
+                {viewingTransaction.data_vencimento && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600">Data de Vencimento</label>
+                    <p className="text-lg font-semibold text-gray-900">{formatDate(viewingTransaction.data_vencimento)}</p>
+                  </div>
+                )}
+                <div>
+                  <label className="block text-sm font-medium text-gray-600">Categoria</label>
+                  <p className="text-lg font-semibold text-gray-900">{getCategoryName(viewingTransaction.id_categoria)}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600">Pessoa</label>
+                  <p className="text-lg font-semibold text-gray-900">
+                    {viewingTransaction.nome_razao_social || getPessoaName(viewingTransaction.id_pessoa)}
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600">Origem</label>
+                  <p className="text-lg font-semibold text-gray-900">
+                    {viewingTransaction.origem === 'whatsapp_ia' ? '🤖 WhatsApp IA' : 
+                     viewingTransaction.origem === 'api' ? '🔗 API' : '✏️ Manual'}
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-2">Descrição</label>
+                <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{viewingTransaction.descricao}</p>
+              </div>
+
+              {viewingTransaction.observacoes && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-2">Observações</label>
+                  <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{viewingTransaction.observacoes}</p>
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
+                <div>
+                  <label className="block text-sm font-medium text-gray-600">Criado em</label>
+                  <p className="text-sm text-gray-900">
+                    {new Date(viewingTransaction.criado_em).toLocaleDateString('pt-BR')} às {new Date(viewingTransaction.criado_em).toLocaleTimeString('pt-BR')}
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600">Atualizado em</label>
+                  <p className="text-sm text-gray-900">
+                    {new Date(viewingTransaction.atualizado_em).toLocaleDateString('pt-BR')} às {new Date(viewingTransaction.atualizado_em).toLocaleTimeString('pt-BR')}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
