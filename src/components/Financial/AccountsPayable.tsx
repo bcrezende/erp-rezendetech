@@ -149,48 +149,155 @@ const AccountsPayable: React.FC = () => {
     if (!profile?.id_empresa) return;
 
     try {
-      const transactionData = {
-        valor: Number(formData.valor),
-        tipo: formData.tipo,
-        descricao: formData.descricao,
-        data_transacao: formData.data_transacao,
-        data_vencimento: formData.data_vencimento,
-        id_categoria: formData.id_categoria || null,
-        id_pessoa: formData.id_pessoa || null,
-        status: formData.status,
-        origem: formData.origem,
-        observacoes: formData.observacoes,
-        e_recorrente: formData.tipo_despesa === 'recorrente',
-        tipo_recorrencia: formData.tipo_despesa === 'recorrente' ? formData.tipo_recorrencia : null,
-        numero_parcelas: formData.tipo_despesa === 'recorrente' ? formData.numero_parcelas : null,
-        data_inicio_recorrencia: formData.tipo_despesa === 'recorrente' ? formData.data_inicio_recorrencia : null,
-        valor_parcela: formData.tipo_despesa === 'recorrente' && formData.tipo_recorrencia === 'parcelada' 
-          ? Number(formData.valor) / Number(formData.numero_parcelas) 
-          : null,
-        ativa_recorrencia: formData.tipo_despesa === 'recorrente',
-        id_empresa: profile.id_empresa,
-      };
-
-      let error;
-      
       if (editingTransaction) {
-        // Atualizar transação existente
+        // Atualizar transação existente - preservar campos de recorrência originais
+        const transactionData = {
+          valor: Number(formData.valor),
+          tipo: formData.tipo,
+          descricao: formData.descricao,
+          data_transacao: formData.data_transacao,
+          data_vencimento: formData.data_vencimento,
+          id_categoria: formData.id_categoria || null,
+          id_pessoa: formData.id_pessoa || null,
+          status: formData.status,
+          origem: formData.origem,
+          observacoes: formData.observacoes,
+          // Preservar campos de recorrência originais
+          e_recorrente: editingTransaction.e_recorrente,
+          tipo_recorrencia: editingTransaction.tipo_recorrencia,
+          numero_parcelas: editingTransaction.numero_parcelas,
+          parcela_atual: editingTransaction.parcela_atual,
+          data_inicio_recorrencia: editingTransaction.data_inicio_recorrencia,
+          valor_parcela: editingTransaction.valor_parcela,
+          ativa_recorrencia: editingTransaction.ativa_recorrencia,
+          id_transacao_pai: editingTransaction.id_transacao_pai,
+        };
+
         const { error: updateError } = await supabase
           .from('transacoes')
           .update(transactionData)
           .eq('id', editingTransaction.id);
-        error = updateError;
+        
+        if (updateError) throw updateError;
       } else {
         // Criar nova transação
-        const { error: insertError } = await supabase
-          .from('transacoes')
-          .insert(transactionData);
-        error = insertError;
-      }
+        if (formData.tipo_despesa === 'recorrente') {
+          // DESPESA RECORRENTE - Criar múltiplas transações
+          const valorParcela = Number(formData.valor) / Number(formData.numero_parcelas);
+          const dataInicio = new Date(formData.data_inicio_recorrencia);
+          
+          // Criar transação principal (primeira parcela)
+          const transacaoPrincipal = {
+            id_empresa: profile.id_empresa,
+            valor: valorParcela,
+            tipo: 'despesa',
+            descricao: `${formData.descricao} (Parcela 1/${formData.numero_parcelas})`,
+            data_transacao: formData.data_inicio_recorrencia,
+            data_vencimento: formData.data_inicio_recorrencia,
+            id_categoria: formData.id_categoria || null,
+            id_pessoa: formData.id_pessoa || null,
+            status: formData.status,
+            origem: 'manual',
+            observacoes: formData.observacoes,
+            e_recorrente: true,
+            tipo_recorrencia: formData.tipo_recorrencia,
+            numero_parcelas: Number(formData.numero_parcelas),
+            parcela_atual: 1,
+            data_inicio_recorrencia: formData.data_inicio_recorrencia,
+            valor_parcela: valorParcela,
+            ativa_recorrencia: true, // Transação principal
+            id_transacao_pai: null
+          };
 
-      if (error) throw error;
-      
-      alert(editingTransaction ? 'Transação atualizada com sucesso!' : 'Nova conta a pagar criada com sucesso!');
+          // Inserir transação principal
+          const { data: transacaoResult, error: principalError } = await supabase
+            .from('transacoes')
+            .insert(transacaoPrincipal)
+            .select()
+            .single();
+
+          if (principalError) throw principalError;
+
+          // Criar transações filhas (parcelas restantes)
+          const transacoesFilhas = [];
+          for (let i = 2; i <= Number(formData.numero_parcelas); i++) {
+            const dataVencimento = new Date(dataInicio);
+            
+            if (formData.tipo_recorrencia === 'parcelada') {
+              // Para parcelada, adicionar meses sequenciais
+              dataVencimento.setMonth(dataVencimento.getMonth() + (i - 1));
+            } else if (formData.tipo_recorrencia === 'assinatura') {
+              // Para assinatura, adicionar meses sequenciais
+              dataVencimento.setMonth(dataVencimento.getMonth() + (i - 1));
+            }
+
+            const transacaoFilha = {
+              id_empresa: profile.id_empresa,
+              valor: valorParcela,
+              tipo: 'despesa',
+              descricao: `${formData.descricao} (Parcela ${i}/${formData.numero_parcelas})`,
+              data_transacao: dataVencimento.toISOString().split('T')[0],
+              data_vencimento: dataVencimento.toISOString().split('T')[0],
+              id_categoria: formData.id_categoria || null,
+              id_pessoa: formData.id_pessoa || null,
+              status: 'pendente', // Parcelas futuras sempre começam como pendente
+              origem: 'manual',
+              observacoes: formData.observacoes,
+              e_recorrente: true,
+              tipo_recorrencia: formData.tipo_recorrencia,
+              numero_parcelas: Number(formData.numero_parcelas),
+              parcela_atual: i,
+              data_inicio_recorrencia: formData.data_inicio_recorrencia,
+              valor_parcela: valorParcela,
+              ativa_recorrencia: false, // Transações filhas
+              id_transacao_pai: transacaoResult.id
+            };
+
+            transacoesFilhas.push(transacaoFilha);
+          }
+
+          // Inserir todas as transações filhas em lote
+          if (transacoesFilhas.length > 0) {
+            const { error: filhasError } = await supabase
+              .from('transacoes')
+              .insert(transacoesFilhas);
+
+            if (filhasError) throw filhasError;
+          }
+
+          alert(`Despesa recorrente criada com sucesso! ${formData.numero_parcelas} parcelas de ${formatCurrency(valorParcela)} cada.`);
+        } else {
+          // DESPESA NORMAL - Criar transação única
+          const transactionData = {
+            id_empresa: profile.id_empresa,
+            valor: Number(formData.valor),
+            tipo: 'despesa',
+            descricao: formData.descricao,
+            data_transacao: formData.data_transacao,
+            data_vencimento: formData.data_vencimento,
+            id_categoria: formData.id_categoria || null,
+            id_pessoa: formData.id_pessoa || null,
+            status: formData.status,
+            origem: 'manual',
+            observacoes: formData.observacoes,
+            e_recorrente: false,
+            tipo_recorrencia: null,
+            numero_parcelas: null,
+            parcela_atual: null,
+            data_inicio_recorrencia: null,
+            valor_parcela: null,
+            ativa_recorrencia: false,
+            id_transacao_pai: null
+          };
+
+          const { error: insertError } = await supabase
+            .from('transacoes')
+            .insert(transactionData);
+
+          if (insertError) throw insertError;
+          alert('Conta a pagar criada com sucesso!');
+        }
+      }
 
       await loadData();
       resetForm();
