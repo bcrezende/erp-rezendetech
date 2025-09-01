@@ -102,7 +102,9 @@ const CashPositionCard: React.FC<CashPositionCardProps> = ({ dateFilter }) => {
   }, [transactions, categories]);
 
   function formatDate(dateString: string) {
-    return new Date(dateString).toLocaleDateString('pt-BR');
+    const [year, month, day] = dateString.split('-');
+    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    return date.toLocaleDateString('pt-BR');
   }
 
   const formatCurrency = (value: number) => {

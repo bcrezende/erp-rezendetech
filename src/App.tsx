@@ -138,6 +138,7 @@ const AppContent: React.FC = () => {
               <CashFlowPanel />
             </div>
             <PendingAccountsPanel dateFilter={dateFilter} />
+            <PendingAccountsPanel dateFilter={dateFilter} />
 
             <EstimatePanel dateFilter={dateFilter} />
           </div>

@@ -103,6 +103,12 @@ const EstimatePanel: React.FC<EstimatePanelProps> = ({ dateFilter }) => {
     }).format(value);
   };
 
+  const formatDate = (dateString: string) => {
+    const [year, month, day] = dateString.split('-');
+    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    return date.toLocaleDateString('pt-BR');
+  };
+
   const progressPercentage = (estimateData.daysElapsed / estimateData.totalDays) * 100;
 
   const estimateItems = [
