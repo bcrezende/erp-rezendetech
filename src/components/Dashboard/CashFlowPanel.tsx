@@ -18,13 +18,14 @@ const CashFlowPanel: React.FC = () => {
         return;
       }
 
-      console.log('🔍 Loading cash flow transactions for period:', dateFilter);
+      console.log('🔍 Loading cash flow transactions');
 
       const { data, error } = await supabase
         .from('transacoes')
         .select('*')
         .eq('id_empresa', profile.id_empresa)
-        .in('status', ['concluida', 'pago', 'recebido', 'concluída']);
+        .in('status', ['concluida', 'pago', 'recebido', 'concluída'])
+        .order('data_transacao', { ascending: true });
 
       if (error) throw error;
       
@@ -37,7 +38,7 @@ const CashFlowPanel: React.FC = () => {
   };
 
   const cashFlowData = useMemo((): CashFlowData[] => {
-    // Agrupa transações por data dentro do período filtrado
+    // Agrupa transações por data
     const transactionsByDate = transactions
       .reduce((acc, transaction) => {
         const dateKey = transaction.data_transacao;
@@ -160,10 +161,10 @@ const CashFlowPanel: React.FC = () => {
 
         {cashFlowData.length === 0 ? (
           <div className="text-center py-6 sm:py-8 text-gray-500 text-sm">
-            Nenhuma movimentação encontrada neste período
+            Nenhuma movimentação encontrada
           </div>
         ) : (
-          cashFlowData.map((day) => (
+          cashFlowData.slice(-30).map((day) => (
             <div 
               key={day.date}
               className="grid grid-cols-4 gap-2 sm:gap-4 py-2 sm:py-3 px-1 sm:px-2 rounded-lg hover:bg-gray-50 text-xs sm:text-sm"
