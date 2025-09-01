@@ -16,6 +16,7 @@ import CashFlowPanel from './components/Dashboard/CashFlowPanel';
 import EstimatePanel from './components/Dashboard/EstimatePanel';
 import UserSettings from './components/Settings/UserSettings';
 import RemindersManager from './components/Reminders/RemindersManager';
+import PendingAccountsPanel from './components/Dashboard/PendingAccountsPanel';
 import CompanyRegistrationForm from './components/Company/CompanyRegistrationForm';
 import { 
   DollarSign, 
@@ -38,7 +39,7 @@ const AppContent: React.FC = () => {
   const getInitialMonthDateRange = () => {
     const today = new Date();
     const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0); // Day 0 of next month is last day of current month
+    const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
     return {
       startDate: firstDayOfMonth.toISOString().split('T')[0],
@@ -136,9 +137,7 @@ const AppContent: React.FC = () => {
               <DREPanel dateFilter={dateFilter} />
               <CashFlowPanel />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <PendingAccountsPanel dateFilter={dateFilter} />
-            </div>
+            <PendingAccountsPanel dateFilter={dateFilter} />
 
             <EstimatePanel dateFilter={dateFilter} />
           </div>

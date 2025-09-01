@@ -1,5 +1,3 @@
-```typescript
-// src/components/Dashboard/PendingAccountsPanel.tsx
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../Auth/AuthProvider';
 import MetricCard from './MetricCard';
@@ -23,7 +21,7 @@ const PendingAccountsPanel: React.FC<PendingAccountsPanelProps> = ({ dateFilter 
 
   useEffect(() => {
     loadPendingAccounts();
-  }, [dateFilter, profile]); // Re-fetch when dateFilter or profile changes
+  }, [dateFilter, profile]);
 
   const loadPendingAccounts = async () => {
     setLoading(true);
@@ -97,18 +95,17 @@ const PendingAccountsPanel: React.FC<PendingAccountsPanelProps> = ({ dateFilter 
         value={formatCurrency(pendingReceivables)}
         icon={DollarSign}
         color="orange"
-        changeType="neutral" // No change calculation for this card
+        changeType="neutral"
       />
       <MetricCard
         title="Contas a Pagar Pendentes"
         value={formatCurrency(pendingPayables)}
         icon={Clock}
         color="red"
-        changeType="neutral" // No change calculation for this card
+        changeType="neutral"
       />
     </div>
   );
 };
 
 export default PendingAccountsPanel;
-```
