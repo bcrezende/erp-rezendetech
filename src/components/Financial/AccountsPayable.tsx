@@ -340,8 +340,6 @@ const AccountsPayable: React.FC = () => {
           <Plus size={20} />
           <span>Nova Conta a Pagar</span>
         </button>
-        </div>
-      </div>
 
       {/* Debug Info - Sempre visível para diagnóstico */}
       {/* Summary Cards */}
