@@ -273,7 +273,7 @@ const TransactionsManager: React.FC = () => {
   });
 
   const totals = filteredTransactions.reduce((acc, transaction) => {
-    if (['concluida', 'pago', 'recebido', 'concluída'].includes(transaction.status)) {
+    if (['concluida', 'pago', 'recebido'].includes(transaction.status)) {
       if (transaction.tipo === 'receita') {
         acc.receitas += transaction.valor;
       } else if (transaction.tipo === 'despesa') {
@@ -347,7 +347,7 @@ const TransactionsManager: React.FC = () => {
                 {formatCurrency(totals.receitas)}
               </p>
               <p className="text-xs text-gray-500 mt-1">
-                {filteredTransactions.filter(t => t.tipo === 'receita' && ['concluida', 'pago', 'recebido', 'concluída'].includes(t.status)).length} transação(ões)
+                {filteredTransactions.filter(t => t.tipo === 'receita' && ['concluida', 'pago', 'recebido'].includes(t.status)).length} transação(ões)
               </p>
             </div>
             <div className="p-3 bg-green-50 rounded-full">
@@ -364,7 +364,7 @@ const TransactionsManager: React.FC = () => {
                 {formatCurrency(totals.despesas)}
               </p>
               <p className="text-xs text-gray-500 mt-1">
-                {filteredTransactions.filter(t => t.tipo === 'despesa' && ['concluida', 'pago', 'recebido', 'concluída'].includes(t.status)).length} transação(ões)
+                {filteredTransactions.filter(t => t.tipo === 'despesa' && ['concluida', 'pago', 'recebido'].includes(t.status)).length} transação(ões)
               </p>
             </div>
             <div className="p-3 bg-red-50 rounded-full">

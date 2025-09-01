@@ -70,25 +70,12 @@ const AppContent: React.FC = () => {
         .from('transacoes')
         .select('*')
         .eq('id_empresa', profile.id_empresa)
-        .in('status', ['concluida', 'pago', 'recebido', 'concluída'])
+        .in('status', ['concluida', 'pago', 'recebido'])
         .gte('data_transacao', dateFilter.startDate)
         .lte('data_transacao', dateFilter.endDate);
 
       if (transacoesError) throw transacoesError;
 
-      console.log('📊 Dashboard: Transações carregadas para cálculo:', {
-        total: transacoes?.length || 0,
-        periodo: `${dateFilter.startDate} até ${dateFilter.endDate}`,
-        statusFiltrados: ['concluida', 'pago', 'recebido', 'concluída'],
-        transacoesPorStatus: transacoes?.reduce((acc, t) => {
-          acc[t.status] = (acc[t.status] || 0) + 1;
-          return acc;
-        }, {} as Record<string, number>),
-        valorPorTipo: {
-          receitas: transacoes?.filter(t => t.tipo === 'receita').reduce((sum, t) => sum + t.valor, 0) || 0,
-          despesas: transacoes?.filter(t => t.tipo === 'despesa').reduce((sum, t) => sum + t.valor, 0) || 0
-        }
-      });
 
       // Calcular métricas
       const receitas = transacoes?.filter(t => t.tipo === 'receita').reduce((sum, t) => sum + t.valor, 0) || 0;
@@ -100,7 +87,7 @@ const AppContent: React.FC = () => {
         despesas,
         saldo,
         periodo: `${dateFilter.startDate} até ${dateFilter.endDate}`,
-        transacoesFiltradas: transacoes?.length || 0,
+        transacoesFiltradas: transacoes,
         totalTransacoes: transacoes?.length || 0
       });
 
