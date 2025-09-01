@@ -115,31 +115,6 @@ const AccountsPayable: React.FC = () => {
             status: filters.status
           }
         }
-        e_recorrente: transaction.e_recorrente || false,
-        tipo_recorrencia: transaction.tipo_recorrencia || '',
-        numero_parcelas: transaction.numero_parcelas || 1,
-        data_inicio_recorrencia: transaction.data_inicio_recorrencia || transaction.data_transacao,
-      });
-
-      setTransactions(transactionsRes.data || []);
-      setCategories(categoriesRes.data || []);
-      setPessoas(pessoasRes.data || []);
-    } catch (error) {
-      console.error('❌ AccountsPayable: Error loading data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleEdit = (transaction: Transaction) => {
-    setEditingTransaction(transaction);
-    setFormData({
-      valor: transaction.valor,
-      tipo: transaction.tipo,
-      descricao: transaction.descricao,
-      data_transacao: transaction.data_transacao,
-      data_vencimento: transaction.data_vencimento || transaction.data_transacao,
-      id_categoria: transaction.id_categoria || '',
       id_pessoa: transaction.id_pessoa || '',
       status: transaction.status,
       origem: transaction.origem,
