@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../Auth/AuthProvider';
-import { CreditCard, Search, Calendar, AlertTriangle, DollarSign, User, Tag, Eye, X, Filter, Edit, Plus } from 'lucide-react';
+import { CreditCard, Search, Calendar, AlertTriangle, DollarSign, User, Tag, Eye, X, Filter, Edit, Plus, Trash2 } from 'lucide-react';
 import { Database } from '../../types/supabase';
 
 type Transaction = Database['public']['Tables']['transacoes']['Row'];
@@ -340,7 +340,7 @@ const AccountsPayable: React.FC = () => {
 
       if (error) throw error;
       
-      await loadAccountsPayable();
+      await loadData();
       alert('Conta a pagar excluída com sucesso!');
     } catch (error) {
       console.error('Error deleting account payable:', error);
@@ -805,6 +805,12 @@ const AccountsPayable: React.FC = () => {
                           className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                         >
                           <Edit size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(transaction.id)}
+                          className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        >
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </td>
