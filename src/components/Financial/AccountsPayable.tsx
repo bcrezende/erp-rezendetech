@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../Auth/AuthProvider';
-import { CreditCard, Search, Calendar, AlertTriangle, DollarSign, User, Tag, Eye, X, Filter, Edit, Plus, Trash2 } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, CreditCard, Calendar, DollarSign, Clock, CheckCircle, AlertCircle, Eye, X } from 'lucide-react';
 import { Database } from '../../types/supabase';
 
 type Transaction = Database['public']['Tables']['transacoes']['Row'];
+type TransactionInsert = Database['public']['Tables']['transacoes']['Insert'];
 type Category = Database['public']['Tables']['categorias']['Row'];
 type Pessoa = Database['public']['Tables']['pessoas']['Row'];
 
@@ -14,21 +15,33 @@ const AccountsPayable: React.FC = () => {
   const [pessoas, setPessoas] = useState<Pessoa[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [viewingTransaction, setViewingTransaction] = useState<Transaction | null>(null);
-  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const [viewingTransaction, setViewingTransaction] = useState<Transaction | null>(null);
   const [filters, setFilters] = useState({
+    status: 'all',
     categoria: 'all',
     pessoa: 'all',
-    periodo: 'all',
-    status: 'pendente',
-    dataInicio: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-    dataFim: new Date().toISOString().split('T')[0]
+    periodo: 'current-month'
   });
-  const [formData, setFormData] = useState<Partial<any>>({
+
+  // Calcular período do mês atual (01 ao último dia)
+  const getCurrentMonthPeriod = () => {
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    
+    return {
+      startDate: firstDay.toISOString().split('T')[0],
+      endDate: lastDay.toISOString().split('T')[0]
+    };
+  };
+
+  const [dateFilter, setDateFilter] = useState(getCurrentMonthPeriod());
+
+  const [formData, setFormData] = useState<Partial<TransactionInsert>>({
     valor: 0,
     tipo: 'despesa',
-    tipo_despesa: 'normal', // normal ou recorrente
     descricao: '',
     data_transacao: new Date().toISOString().split('T')[0],
     data_vencimento: new Date().toISOString().split('T')[0],
@@ -37,21 +50,17 @@ const AccountsPayable: React.FC = () => {
     status: 'pendente',
     origem: 'manual',
     observacoes: '',
-    tipo_recorrencia: '',
-    numero_parcelas: 1,
-    data_inicio_recorrencia: new Date().toISOString().split('T')[0],
   });
 
   useEffect(() => {
     if (profile?.id_empresa) {
       loadData();
     }
-  }, [profile, filters.dataInicio, filters.dataFim, filters.status]);
+  }, [profile, dateFilter]);
 
   const loadData = async () => {
     try {
       if (!profile?.id || !profile?.id_empresa) {
-        console.log('❌ AccountsPayable: No profile or company ID found', { profile });
         setTransactions([]);
         setCategories([]);
         setPessoas([]);
@@ -59,16 +68,14 @@ const AccountsPayable: React.FC = () => {
         return;
       }
 
-      console.log('🔍 AccountsPayable: Loading data for company:', profile.id_empresa);
-
       const [transactionsRes, categoriesRes, pessoasRes] = await Promise.all([
         supabase
           .from('transacoes')
           .select('*')
           .eq('id_empresa', profile.id_empresa)
           .eq('tipo', 'despesa')
-          .gte('data_transacao', filters.dataInicio)
-          .lte('data_transacao', filters.dataFim)
+          .gte('data_vencimento', dateFilter.startDate)
+          .lte('data_vencimento', dateFilter.endDate)
           .order('data_vencimento', { ascending: true }),
         supabase
           .from('categorias')
@@ -86,51 +93,79 @@ const AccountsPayable: React.FC = () => {
           .order('nome_razao_social')
       ]);
 
-      if (transactionsRes.error) {
-        console.error('❌ AccountsPayable: Error loading transactions:', transactionsRes.error);
-        throw transactionsRes.error;
-      }
-      if (categoriesRes.error) {
-        console.error('❌ AccountsPayable: Error loading categories:', categoriesRes.error);
-        throw categoriesRes.error;
-      }
-      if (pessoasRes.error) {
-        console.error('❌ AccountsPayable: Error loading pessoas:', pessoasRes.error);
-        throw pessoasRes.error;
-      }
-
-      console.log('✅ AccountsPayable: Raw data loaded:', {
-        allTransactions: transactionsRes.data?.length || 0,
-        categories: categoriesRes.data?.length || 0,
-        pessoas: pessoasRes.data?.length || 0,
-        filtros: filters,
-        transactionsData: transactionsRes.data?.slice(0, 3),
-        query: {
-          table: 'transacoes',
-          filters: { 
-            id_empresa: profile.id_empresa,
-            tipo: 'despesa',
-            data_inicio: filters.dataInicio,
-            data_fim: filters.dataFim,
-            status: filters.status
-          }
-        }
-      });
+      if (transactionsRes.error) throw transactionsRes.error;
+      if (categoriesRes.error) throw categoriesRes.error;
+      if (pessoasRes.error) throw pessoasRes.error;
 
       setTransactions(transactionsRes.data || []);
       setCategories(categoriesRes.data || []);
       setPessoas(pessoasRes.data || []);
     } catch (error) {
-      console.error('❌ AccountsPayable: Error loading data:', error);
+      console.error('Error loading accounts payable data:', error);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!profile?.id_empresa) return;
+
+    try {
+      const transactionData = {
+        ...formData,
+        id_empresa: profile.id_empresa,
+        valor: Number(formData.valor),
+        tipo: 'despesa' as const,
+        id_categoria: formData.id_categoria || null,
+        id_pessoa: formData.id_pessoa || null,
+      };
+
+      if (editingTransaction) {
+        const { error } = await supabase
+          .from('transacoes')
+          .update(transactionData)
+          .eq('id', editingTransaction.id);
+
+        if (error) throw error;
+        alert('Conta a pagar atualizada com sucesso!');
+      } else {
+        const { error } = await supabase
+          .from('transacoes')
+          .insert(transactionData);
+
+        if (error) throw error;
+        alert('Conta a pagar criada com sucesso!');
+      }
+
+      await loadData();
+      resetForm();
+    } catch (error) {
+      console.error('Error saving transaction:', error);
+      alert('Erro ao salvar conta a pagar. Tente novamente.');
+    }
+  };
+
+  const handleStatusChange = async (transactionId: string, newStatus: string) => {
+    try {
+      const { error } = await supabase
+        .from('transacoes')
+        .update({ status: newStatus })
+        .eq('id', transactionId);
+
+      if (error) throw error;
+      await loadData();
+    } catch (error) {
+      console.error('Error updating status:', error);
+      alert('Erro ao atualizar status da conta.');
+    }
+  };
+
   const handleEdit = (transaction: Transaction) => {
+    setEditingTransaction(transaction);
     setFormData({
       valor: transaction.valor,
-      tipo: transaction.tipo,
+      tipo: 'despesa',
       descricao: transaction.descricao,
       data_transacao: transaction.data_transacao,
       data_vencimento: transaction.data_vencimento || transaction.data_transacao,
@@ -140,170 +175,24 @@ const AccountsPayable: React.FC = () => {
       origem: transaction.origem,
       observacoes: transaction.observacoes,
     });
-    setEditingTransaction(transaction);
     setShowForm(true);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!profile?.id_empresa) return;
+  const handleDelete = async (id: string) => {
+    if (!confirm('Tem certeza que deseja excluir esta conta a pagar? Esta ação não pode ser desfeita.')) return;
 
     try {
-      if (editingTransaction) {
-        // Atualizar transação existente - preservar campos de recorrência originais
-        const transactionData = {
-          valor: Number(formData.valor),
-          tipo: formData.tipo,
-          descricao: formData.descricao,
-          data_transacao: formData.data_transacao,
-          data_vencimento: formData.data_vencimento,
-          id_categoria: formData.id_categoria || null,
-          id_pessoa: formData.id_pessoa || null,
-          status: formData.status,
-          origem: formData.origem,
-          observacoes: formData.observacoes,
-          // Preservar campos de recorrência originais
-          e_recorrente: editingTransaction.e_recorrente,
-          tipo_recorrencia: editingTransaction.tipo_recorrencia,
-          numero_parcelas: editingTransaction.numero_parcelas,
-          parcela_atual: editingTransaction.parcela_atual,
-          data_inicio_recorrencia: editingTransaction.data_inicio_recorrencia,
-          valor_parcela: editingTransaction.valor_parcela,
-          ativa_recorrencia: editingTransaction.ativa_recorrencia,
-          id_transacao_pai: editingTransaction.id_transacao_pai,
-        };
+      const { error } = await supabase
+        .from('transacoes')
+        .delete()
+        .eq('id', id);
 
-        const { error: updateError } = await supabase
-          .from('transacoes')
-          .update(transactionData)
-          .eq('id', editingTransaction.id);
-        
-        if (updateError) throw updateError;
-      } else {
-        // Criar nova transação
-        if (formData.tipo_despesa === 'recorrente') {
-          // DESPESA RECORRENTE - Criar múltiplas transações
-          const valorParcela = Number(formData.valor) / Number(formData.numero_parcelas);
-          const dataInicio = new Date(formData.data_inicio_recorrencia);
-          
-          // Criar transação principal (primeira parcela)
-          const transacaoPrincipal = {
-            id_empresa: profile.id_empresa,
-            valor: valorParcela,
-            tipo: 'despesa',
-            descricao: `${formData.descricao} (Parcela 1/${formData.numero_parcelas})`,
-            data_transacao: formData.data_inicio_recorrencia,
-            data_vencimento: formData.data_inicio_recorrencia,
-            id_categoria: formData.id_categoria || null,
-            id_pessoa: formData.id_pessoa || null,
-            status: formData.status,
-            origem: 'manual',
-            observacoes: formData.observacoes,
-            e_recorrente: true,
-            tipo_recorrencia: formData.tipo_recorrencia,
-            numero_parcelas: Number(formData.numero_parcelas),
-            parcela_atual: 1,
-            data_inicio_recorrencia: formData.data_inicio_recorrencia,
-            valor_parcela: valorParcela,
-            ativa_recorrencia: true, // Transação principal
-            id_transacao_pai: null
-          };
-
-          // Inserir transação principal
-          const { data: transacaoResult, error: principalError } = await supabase
-            .from('transacoes')
-            .insert(transacaoPrincipal)
-            .select()
-            .single();
-
-          if (principalError) throw principalError;
-
-          // Criar transações filhas (parcelas restantes)
-          const transacoesFilhas = [];
-          for (let i = 2; i <= Number(formData.numero_parcelas); i++) {
-            const dataVencimento = new Date(dataInicio);
-            
-            if (formData.tipo_recorrencia === 'parcelada') {
-              // Para parcelada, adicionar meses sequenciais
-              dataVencimento.setMonth(dataVencimento.getMonth() + (i - 1));
-            } else if (formData.tipo_recorrencia === 'assinatura') {
-              // Para assinatura, adicionar meses sequenciais
-              dataVencimento.setMonth(dataVencimento.getMonth() + (i - 1));
-            }
-
-            const transacaoFilha = {
-              id_empresa: profile.id_empresa,
-              valor: valorParcela,
-              tipo: 'despesa',
-              descricao: `${formData.descricao} (Parcela ${i}/${formData.numero_parcelas})`,
-              data_transacao: dataVencimento.toISOString().split('T')[0],
-              data_vencimento: dataVencimento.toISOString().split('T')[0],
-              id_categoria: formData.id_categoria || null,
-              id_pessoa: formData.id_pessoa || null,
-              status: 'pendente', // Parcelas futuras sempre começam como pendente
-              origem: 'manual',
-              observacoes: formData.observacoes,
-              e_recorrente: true,
-              tipo_recorrencia: formData.tipo_recorrencia,
-              numero_parcelas: Number(formData.numero_parcelas),
-              parcela_atual: i,
-              data_inicio_recorrencia: formData.data_inicio_recorrencia,
-              valor_parcela: valorParcela,
-              ativa_recorrencia: false, // Transações filhas
-              id_transacao_pai: transacaoResult.id
-            };
-
-            transacoesFilhas.push(transacaoFilha);
-          }
-
-          // Inserir todas as transações filhas em lote
-          if (transacoesFilhas.length > 0) {
-            const { error: filhasError } = await supabase
-              .from('transacoes')
-              .insert(transacoesFilhas);
-
-            if (filhasError) throw filhasError;
-          }
-
-          alert(`Despesa recorrente criada com sucesso! ${formData.numero_parcelas} parcelas de ${formatCurrency(valorParcela)} cada.`);
-        } else {
-          // DESPESA NORMAL - Criar transação única
-          const transactionData = {
-            id_empresa: profile.id_empresa,
-            valor: Number(formData.valor),
-            tipo: 'despesa',
-            descricao: formData.descricao,
-            data_transacao: formData.data_transacao,
-            data_vencimento: formData.data_vencimento,
-            id_categoria: formData.id_categoria || null,
-            id_pessoa: formData.id_pessoa || null,
-            status: formData.status,
-            origem: 'manual',
-            observacoes: formData.observacoes,
-            e_recorrente: false,
-            tipo_recorrencia: null,
-            numero_parcelas: null,
-            parcela_atual: null,
-            data_inicio_recorrencia: null,
-            valor_parcela: null,
-            ativa_recorrencia: false,
-            id_transacao_pai: null
-          };
-
-          const { error: insertError } = await supabase
-            .from('transacoes')
-            .insert(transactionData);
-
-          if (insertError) throw insertError;
-          alert('Conta a pagar criada com sucesso!');
-        }
-      }
-
+      if (error) throw error;
       await loadData();
-      resetForm();
+      alert('Conta a pagar excluída com sucesso!');
     } catch (error) {
-      console.error('Error saving transaction:', error);
-      alert(`Erro ao ${editingTransaction ? 'atualizar' : 'criar'} transação. Tente novamente.`);
+      console.error('Error deleting transaction:', error);
+      alert('Erro ao excluir conta a pagar. Tente novamente.');
     }
   };
 
@@ -311,7 +200,6 @@ const AccountsPayable: React.FC = () => {
     setFormData({
       valor: 0,
       tipo: 'despesa',
-      tipo_despesa: 'normal',
       descricao: '',
       data_transacao: new Date().toISOString().split('T')[0],
       data_vencimento: new Date().toISOString().split('T')[0],
@@ -320,44 +208,9 @@ const AccountsPayable: React.FC = () => {
       status: 'pendente',
       origem: 'manual',
       observacoes: '',
-      tipo_recorrencia: '',
-      numero_parcelas: 1,
-      data_inicio_recorrencia: new Date().toISOString().split('T')[0],
     });
     setEditingTransaction(null);
     setShowForm(false);
-  };
-
-  const handleDelete = async (id: string) => {
-    if (!confirm('Tem certeza que deseja excluir esta conta a pagar? Esta ação não pode ser desfeita.')) return;
-
-    try {
-      // Soft delete - marcar como inativo
-      const { error } = await supabase
-        .from('transacoes')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-      
-      await loadData();
-      alert('Conta a pagar excluída com sucesso!');
-    } catch (error) {
-      console.error('Error deleting account payable:', error);
-      alert('Erro ao excluir conta a pagar. Tente novamente.');
-    }
-  };
-
-  const getCategoryName = (categoryId: string | null) => {
-    if (!categoryId) return 'Sem categoria';
-    const category = categories.find(c => c.id === categoryId);
-    return category?.nome || 'Categoria não encontrada';
-  };
-
-  const getPessoaName = (pessoaId: string | null) => {
-    if (!pessoaId) return 'Sem fornecedor';
-    const pessoa = pessoas.find(p => p.id === pessoaId);
-    return pessoa?.nome_razao_social || 'Fornecedor não encontrado';
   };
 
   const formatCurrency = (value: number) => {
@@ -371,100 +224,74 @@ const AccountsPayable: React.FC = () => {
     return new Date(dateString).toLocaleDateString('pt-BR');
   };
 
-  const isOverdue = (transaction: Transaction) => {
-    const today = new Date();
-    const dueDate = new Date(transaction.data_vencimento || transaction.data_transacao);
-    return dueDate < today;
+  const getCategoryName = (id: string | null) => {
+    if (!id) return '-';
+    const category = categories.find(c => c.id === id);
+    return category?.nome || '-';
   };
 
-  const getDaysOverdue = (transaction: Transaction) => {
-    const today = new Date();
-    const dueDate = new Date(transaction.data_vencimento || transaction.data_transacao);
-    const diffTime = today.getTime() - dueDate.getTime();
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const getPessoaName = (id: string | null) => {
+    if (!id) return '-';
+    const pessoa = pessoas.find(p => p.id === id);
+    return pessoa?.nome_razao_social || '-';
   };
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pendente':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'pago':
-        return 'bg-green-100 text-green-800';
-      case 'vencido':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
+    const colors = {
+      pendente: 'bg-yellow-100 text-yellow-700',
+      pago: 'bg-green-100 text-green-700',
+      vencido: 'bg-red-100 text-red-700',
+      cancelado: 'bg-gray-100 text-gray-700'
+    };
+    return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-700';
   };
 
   const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'pendente':
-        return 'Pendente';
-      case 'pago':
-        return 'Pago';
-      case 'concluida':
-        return 'Concluída';
-      case 'vencido':
-        return 'Vencido';
-      case 'cancelado':
-        return 'Cancelado';
-      default:
-        return status;
-    }
+    const labels = {
+      pendente: 'Pendente',
+      pago: 'Pago',
+      vencido: 'Vencido',
+      cancelado: 'Cancelado'
+    };
+    return labels[status as keyof typeof labels] || status;
+  };
+
+  const isOverdue = (dueDate: string, status: string) => {
+    if (status !== 'pendente') return false;
+    const today = new Date().toISOString().split('T')[0];
+    return dueDate < today;
   };
 
   const filteredTransactions = transactions.filter(transaction => {
     const matchesSearch = transaction.descricao.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          getCategoryName(transaction.id_categoria).toLowerCase().includes(searchTerm.toLowerCase()) ||
                          getPessoaName(transaction.id_pessoa).toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (transaction.nome_razao_social && transaction.nome_razao_social.toLowerCase().includes(searchTerm.toLowerCase())) ||
                          transaction.id_sequencial?.toString().includes(searchTerm);
     
+    const matchesStatus = filters.status === 'all' || transaction.status === filters.status;
     const matchesCategory = filters.categoria === 'all' || transaction.id_categoria === filters.categoria;
     const matchesPessoa = filters.pessoa === 'all' || transaction.id_pessoa === filters.pessoa;
-    
-    // Filtro de status
-    let matchesStatus = true;
-    if (filters.status !== 'all') {
-      matchesStatus = transaction.status === filters.status;
-    }
-    
-    let matchesPeriod = true;
-    if (filters.periodo === 'vencidas') {
-      matchesPeriod = isOverdue(transaction);
-    } else if (filters.periodo === 'hoje') {
-      const today = new Date().toISOString().split('T')[0];
-      const dueDate = transaction.data_vencimento || transaction.data_transacao;
-      matchesPeriod = dueDate === today;
-    } else if (filters.periodo === 'proximos7') {
-      const today = new Date();
-      const dueDate = new Date(transaction.data_vencimento || transaction.data_transacao);
-      const diffDays = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-      matchesPeriod = diffDays >= 0 && diffDays <= 7;
-    }
 
-    return matchesSearch && matchesCategory && matchesPessoa && matchesPeriod && matchesStatus;
+    return matchesSearch && matchesStatus && matchesCategory && matchesPessoa;
   });
 
   const totals = filteredTransactions.reduce((acc, transaction) => {
     acc.total += transaction.valor;
-    if (isOverdue(transaction)) {
-      acc.overdue += transaction.valor;
-      acc.overdueCount += 1;
-    }
     if (transaction.status === 'pendente') {
-      acc.pending += transaction.valor;
-      acc.pendingCount += 1;
+      acc.pendente += transaction.valor;
+      if (isOverdue(transaction.data_vencimento || transaction.data_transacao, transaction.status)) {
+        acc.vencido += transaction.valor;
+      }
+    } else if (transaction.status === 'pago') {
+      acc.pago += transaction.valor;
     }
     return acc;
-  }, { total: 0, overdue: 0, overdueCount: 0, pending: 0, pendingCount: 0 });
+  }, { total: 0, pendente: 0, pago: 0, vencido: 0 });
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent" />
-        <p className="ml-3 text-gray-600">Carregando contas a pagar...</p>
       </div>
     );
   }
@@ -481,63 +308,65 @@ const AccountsPayable: React.FC = () => {
           </div>
         </div>
         <button
-          onClick={() => {
-            setFormData({
-              valor: 0,
-              tipo: 'despesa',
-              tipo_despesa: 'normal',
-              descricao: '',
-              data_transacao: new Date().toISOString().split('T')[0],
-              data_vencimento: new Date().toISOString().split('T')[0],
-              id_categoria: '',
-              id_pessoa: '',
-              status: 'pendente',
-              origem: 'manual',
-              observacoes: '',
-            });
-            setEditingTransaction(null);
-            setShowForm(true);
-          }}
+          onClick={() => setShowForm(true)}
           className="flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
         >
           <Plus size={20} />
-          <span>Nova Conta a Pagar</span>
+          <span>Nova Conta</span>
         </button>
       </div>
 
-      {/* Debug Info - Sempre visível para diagnóstico */}
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
+      {/* Date Filter */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <Calendar className="h-6 w-6 text-red-600" />
             <div>
-              <p className="text-sm font-medium text-gray-600">Total a Pagar</p>
-              <p className="text-3xl font-bold text-red-600">
-                {formatCurrency(totals.total)}
-              </p>
-              <p className="text-xs text-gray-500 mt-1">
-                {filteredTransactions.length} conta(s)
-              </p>
-            </div>
-            <div className="p-3 bg-red-50 rounded-full">
-              <CreditCard className="text-red-600" size={24} />
+              <h3 className="text-lg font-semibold text-gray-900">Período de Análise</h3>
+              <p className="text-sm text-gray-600">Mês atual completo</p>
             </div>
           </div>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <label className="text-sm font-medium text-gray-700">De:</label>
+              <input
+                type="date"
+                value={dateFilter.startDate}
+                onChange={(e) => setDateFilter({ ...dateFilter, startDate: e.target.value })}
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              />
+            </div>
+            <div className="flex items-center space-x-2">
+              <label className="text-sm font-medium text-gray-700">Até:</label>
+              <input
+                type="date"
+                value={dateFilter.endDate}
+                onChange={(e) => setDateFilter({ ...dateFilter, endDate: e.target.value })}
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              />
+            </div>
+            <button
+              onClick={() => setDateFilter(getCurrentMonthPeriod())}
+              className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm whitespace-nowrap"
+            >
+              Mês Atual
+            </button>
+          </div>
         </div>
+      </div>
 
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Vencidas</p>
-              <p className="text-3xl font-bold text-orange-600">
-                {formatCurrency(totals.overdue)}
-              </p>
-              <p className="text-xs text-gray-500 mt-1">
-                {totals.overdueCount} conta(s)
+              <p className="text-sm font-medium text-gray-600">Total Geral</p>
+              <p className="text-3xl font-bold text-gray-900">
+                {formatCurrency(totals.total)}
               </p>
             </div>
-            <div className="p-3 bg-orange-50 rounded-full">
-              <AlertTriangle className="text-orange-600" size={24} />
+            <div className="p-3 bg-gray-50 rounded-full">
+              <DollarSign className="text-gray-600" size={24} />
             </div>
           </div>
         </div>
@@ -547,14 +376,39 @@ const AccountsPayable: React.FC = () => {
             <div>
               <p className="text-sm font-medium text-gray-600">Pendentes</p>
               <p className="text-3xl font-bold text-yellow-600">
-                {formatCurrency(totals.pending)}
-              </p>
-              <p className="text-xs text-gray-500 mt-1">
-                {totals.pendingCount} conta(s)
+                {formatCurrency(totals.pendente)}
               </p>
             </div>
             <div className="p-3 bg-yellow-50 rounded-full">
-              <Calendar className="text-yellow-600" size={24} />
+              <Clock className="text-yellow-600" size={24} />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Pagas</p>
+              <p className="text-3xl font-bold text-green-600">
+                {formatCurrency(totals.pago)}
+              </p>
+            </div>
+            <div className="p-3 bg-green-50 rounded-full">
+              <CheckCircle className="text-green-600" size={24} />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Vencidas</p>
+              <p className="text-3xl font-bold text-red-600">
+                {formatCurrency(totals.vencido)}
+              </p>
+            </div>
+            <div className="p-3 bg-red-50 rounded-full">
+              <AlertCircle className="text-red-600" size={24} />
             </div>
           </div>
         </div>
@@ -562,14 +416,6 @@ const AccountsPayable: React.FC = () => {
 
       {/* Filters */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Filtros</h3>
-          <div className="flex items-center space-x-2 text-sm text-gray-600">
-            <Calendar size={16} />
-            <span>Período: {new Date(filters.dataInicio).toLocaleDateString('pt-BR')} - {new Date(filters.dataFim).toLocaleDateString('pt-BR')}</span>
-          </div>
-        </div>
-        
         <div className="flex flex-wrap items-center gap-4">
           <div className="relative flex-1 min-w-64">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
@@ -578,27 +424,26 @@ const AccountsPayable: React.FC = () => {
               placeholder="Buscar contas a pagar..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
             />
           </div>
 
           <select
             value={filters.status}
             onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
           >
+            <option value="all">Todos os status</option>
             <option value="pendente">Pendente</option>
             <option value="pago">Pago</option>
-            <option value="concluida">Concluída</option>
             <option value="vencido">Vencido</option>
             <option value="cancelado">Cancelado</option>
-            <option value="all">Todos os status</option>
           </select>
 
           <select
             value={filters.categoria}
             onChange={(e) => setFilters({ ...filters, categoria: e.target.value })}
-            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
           >
             <option value="all">Todas as categorias</option>
             {categories.map(category => (
@@ -611,7 +456,7 @@ const AccountsPayable: React.FC = () => {
           <select
             value={filters.pessoa}
             onChange={(e) => setFilters({ ...filters, pessoa: e.target.value })}
-            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
           >
             <option value="all">Todos os fornecedores</option>
             {pessoas.map(pessoa => (
@@ -620,76 +465,10 @@ const AccountsPayable: React.FC = () => {
               </option>
             ))}
           </select>
-
-          <select
-            value={filters.periodo}
-            onChange={(e) => setFilters({ ...filters, periodo: e.target.value })}
-            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="all">Todos os períodos</option>
-            <option value="vencidas">Vencidas</option>
-            <option value="hoje">Vencem hoje</option>
-            <option value="proximos7">Próximos 7 dias</option>
-          </select>
-
-          <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
-            <label className="text-sm font-medium text-gray-700 whitespace-nowrap">Período:</label>
-            <div className="flex items-center space-x-2">
-              <label className="text-sm text-gray-600">De:</label>
-              <input
-                type="date"
-                value={filters.dataInicio}
-                onChange={(e) => setFilters({ ...filters, dataInicio: e.target.value })}
-                className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-              />
-            </div>
-            <div className="flex items-center space-x-2">
-              <label className="text-sm text-gray-600">Até:</label>
-              <input
-                type="date"
-                value={filters.dataFim}
-                onChange={(e) => setFilters({ ...filters, dataFim: e.target.value })}
-                className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-              />
-            </div>
-          </div>
-
-          <button
-            onClick={() => {
-              const today = new Date();
-              const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-              setFilters({
-                ...filters,
-                dataInicio: firstDay.toISOString().split('T')[0],
-                dataFim: today.toISOString().split('T')[0]
-              });
-            }}
-            className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm whitespace-nowrap"
-          >
-            Mês Atual
-          </button>
-
-          <button
-            onClick={() => {
-              setFilters({
-                categoria: 'all',
-                pessoa: 'all',
-                periodo: 'all',
-                status: 'pendente',
-                dataInicio: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-                dataFim: new Date().toISOString().split('T')[0]
-              });
-              setSearchTerm('');
-              console.log('🔄 AccountsPayable: Filters cleared');
-            }}
-            className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-          >
-            Limpar Filtros
-          </button>
         </div>
       </div>
 
-      {/* Accounts Payable Table */}
+      {/* Transactions Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -700,8 +479,8 @@ const AccountsPayable: React.FC = () => {
                 <th className="text-left p-4 font-medium text-gray-600">Fornecedor</th>
                 <th className="text-left p-4 font-medium text-gray-600">Categoria</th>
                 <th className="text-left p-4 font-medium text-gray-600">Vencimento</th>
-                <th className="text-center p-4 font-medium text-gray-600">Status</th>
                 <th className="text-right p-4 font-medium text-gray-600">Valor</th>
+                <th className="text-center p-4 font-medium text-gray-600">Status</th>
                 <th className="text-center p-4 font-medium text-gray-600">Ações</th>
               </tr>
             </thead>
@@ -710,34 +489,8 @@ const AccountsPayable: React.FC = () => {
                 <tr>
                   <td colSpan={8} className="text-center py-12 text-gray-500">
                     <CreditCard className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                    <p className="text-lg font-medium">
-                      {transactions.length === 0 ? 'Nenhuma despesa encontrada' : 'Nenhuma despesa corresponde aos filtros'}
-                    </p>
-                    <p className="text-sm">
-                      {transactions.length === 0 
-                        ? 'Nenhuma despesa encontrada no período selecionado' 
-                        : 'Tente ajustar os filtros ou limpar a busca'
-                      }
-                    </p>
-                    {transactions.length > 0 && (
-                      <button
-                        onClick={() => {
-                          setFilters({
-                            categoria: 'all',
-                            pessoa: 'all',
-                            periodo: 'all',
-                            status: 'pendente',
-                            dataInicio: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-                            dataFim: new Date().toISOString().split('T')[0]
-                          });
-                          setSearchTerm('');
-                          console.log('🔄 AccountsPayable: Clearing filters from empty state...');
-                        }}
-                        className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                      >
-                        Limpar Filtros
-                      </button>
-                    )}
+                    <p>Nenhuma conta a pagar encontrada</p>
+                    <p className="text-sm">Clique em "Nova Conta" para começar</p>
                   </td>
                 </tr>
               ) : (
@@ -745,7 +498,9 @@ const AccountsPayable: React.FC = () => {
                   <tr 
                     key={transaction.id} 
                     className={`border-b border-gray-100 hover:bg-gray-50 ${
-                      isOverdue(transaction) ? 'bg-red-50' : ''
+                      isOverdue(transaction.data_vencimento || transaction.data_transacao, transaction.status) 
+                        ? 'bg-red-50' 
+                        : ''
                     }`}
                   >
                     <td className="p-4 font-medium text-gray-900">
@@ -760,10 +515,8 @@ const AccountsPayable: React.FC = () => {
                         </p>
                       </div>
                     </td>
-                    <td className="p-4">
-                      <span className="text-gray-900 truncate block max-w-32">
-                        {transaction.nome_razao_social || getPessoaName(transaction.id_pessoa)}
-                      </span>
+                    <td className="p-4 text-gray-900">
+                      {transaction.nome_razao_social || getPessoaName(transaction.id_pessoa)}
                     </td>
                     <td className="p-4">
                       <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
@@ -773,24 +526,31 @@ const AccountsPayable: React.FC = () => {
                     <td className="p-4">
                       <div>
                         <p className={`font-medium ${
-                          isOverdue(transaction) ? 'text-red-600' : 'text-gray-900'
+                          isOverdue(transaction.data_vencimento || transaction.data_transacao, transaction.status)
+                            ? 'text-red-600' 
+                            : 'text-gray-900'
                         }`}>
                           {formatDate(transaction.data_vencimento || transaction.data_transacao)}
                         </p>
-                        {isOverdue(transaction) && (
-                          <p className="text-xs text-red-600 font-medium">
-                            {getDaysOverdue(transaction)} dias em atraso
-                          </p>
+                        {isOverdue(transaction.data_vencimento || transaction.data_transacao, transaction.status) && (
+                          <p className="text-xs text-red-600 font-medium">Vencida</p>
                         )}
                       </div>
                     </td>
-                    <td className="p-4 text-center">
-                      <span className={`px-2 py-1 rounded-full text-sm font-medium ${getStatusColor(transaction.status)}`}>
-                        {getStatusLabel(transaction.status)}
-                      </span>
-                    </td>
                     <td className="p-4 text-right font-semibold text-red-600">
                       {formatCurrency(transaction.valor)}
+                    </td>
+                    <td className="p-4 text-center">
+                      <select
+                        value={transaction.status}
+                        onChange={(e) => handleStatusChange(transaction.id, e.target.value)}
+                        className={`px-2 py-1 rounded-full text-sm font-medium border-0 ${getStatusColor(transaction.status)}`}
+                      >
+                        <option value="pendente">Pendente</option>
+                        <option value="pago">Pago</option>
+                        <option value="vencido">Vencido</option>
+                        <option value="cancelado">Cancelado</option>
+                      </select>
                     </td>
                     <td className="p-4 text-center">
                       <div className="flex items-center justify-center space-x-2">
@@ -822,63 +582,17 @@ const AccountsPayable: React.FC = () => {
         </div>
       </div>
 
-      {/* Edit Form Modal */}
+      {/* Form Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <h2 className="text-xl font-semibold text-gray-900">
-                {editingTransaction ? `Editar Despesa #${editingTransaction.id_sequencial}` : 'Nova Conta a Pagar'}
+                {editingTransaction ? 'Editar Conta a Pagar' : 'Nova Conta a Pagar'}
               </h2>
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              {/* Seleção do Tipo de Despesa */}
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Tipo de Despesa</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <label className="flex items-center space-x-3 p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-white transition-colors">
-                    <input
-                      type="radio"
-                      name="tipo_despesa"
-                      value="normal"
-                      checked={formData.tipo_despesa === 'normal'}
-                      onChange={(e) => setFormData({ 
-                        ...formData, 
-                        tipo_despesa: e.target.value,
-                        tipo_recorrencia: '',
-                        numero_parcelas: 1
-                      })}
-                      className="text-blue-600 focus:ring-blue-500"
-                    />
-                    <div>
-                      <span className="font-medium text-gray-900">💰 Despesa Normal</span>
-                      <p className="text-sm text-gray-600">Despesa única, sem repetição</p>
-                    </div>
-                  </label>
-                  
-                  <label className="flex items-center space-x-3 p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-white transition-colors">
-                    <input
-                      type="radio"
-                      name="tipo_despesa"
-                      value="recorrente"
-                      checked={formData.tipo_despesa === 'recorrente'}
-                      onChange={(e) => setFormData({ 
-                        ...formData, 
-                        tipo_despesa: e.target.value,
-                        tipo_recorrencia: 'parcelada',
-                        numero_parcelas: 2
-                      })}
-                      className="text-purple-600 focus:ring-purple-500"
-                    />
-                    <div>
-                      <span className="font-medium text-gray-900">🔄 Despesa Recorrente</span>
-                      <p className="text-sm text-gray-600">Parcelada ou assinatura mensal</p>
-                    </div>
-                  </label>
-                </div>
-              </div>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -891,23 +605,21 @@ const AccountsPayable: React.FC = () => {
                     required
                     value={formData.valor || ''}
                     onChange={(e) => setFormData({ ...formData, valor: Number(e.target.value) })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Status *
+                    Status
                   </label>
                   <select
-                    required
                     value={formData.status || ''}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   >
                     <option value="pendente">Pendente</option>
                     <option value="pago">Pago</option>
-                    <option value="concluida">Concluída</option>
                     <option value="vencido">Vencido</option>
                     <option value="cancelado">Cancelado</option>
                   </select>
@@ -922,7 +634,7 @@ const AccountsPayable: React.FC = () => {
                     required
                     value={formData.descricao || ''}
                     onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
                     placeholder="Descrição da despesa"
                   />
                 </div>
@@ -936,19 +648,20 @@ const AccountsPayable: React.FC = () => {
                     required
                     value={formData.data_transacao || ''}
                     onChange={(e) => setFormData({ ...formData, data_transacao: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Data de Vencimento
+                    Data de Vencimento *
                   </label>
                   <input
                     type="date"
+                    required
                     value={formData.data_vencimento || ''}
                     onChange={(e) => setFormData({ ...formData, data_vencimento: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   />
                 </div>
 
@@ -959,7 +672,7 @@ const AccountsPayable: React.FC = () => {
                   <select
                     value={formData.id_pessoa || ''}
                     onChange={(e) => setFormData({ ...formData, id_pessoa: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   >
                     <option value="">Selecione um fornecedor</option>
                     {pessoas.map(pessoa => (
@@ -977,7 +690,7 @@ const AccountsPayable: React.FC = () => {
                   <select
                     value={formData.id_categoria || ''}
                     onChange={(e) => setFormData({ ...formData, id_categoria: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   >
                     <option value="">Selecione uma categoria</option>
                     {categories.map(category => (
@@ -991,89 +704,6 @@ const AccountsPayable: React.FC = () => {
                   </select>
                 </div>
 
-                {formData.tipo_despesa === 'recorrente' && (
-                  <>
-                    <div className="md:col-span-2">
-                      <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                        <h4 className="font-semibold text-purple-900 mb-2">⚙️ Configuração de Recorrência</h4>
-                        <p className="text-sm text-purple-800">
-                          Configure como esta despesa se repetirá ao longo do tempo
-                        </p>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Tipo de Recorrência *
-                      </label>
-                      <select
-                        required={formData.tipo_despesa === 'recorrente'}
-                        value={formData.tipo_recorrencia || ''}
-                        onChange={(e) => setFormData({ ...formData, tipo_recorrencia: e.target.value })}
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      >
-                        <option value="">Selecione o tipo</option>
-                        <option value="parcelada">Parcelada</option>
-                        <option value="assinatura">Assinatura (Mensal)</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {formData.tipo_recorrencia === 'assinatura' ? 'Meses de Duração' : 'Número de Parcelas'} *
-                      </label>
-                      <input
-                        type="number"
-                        min="2"
-                        max="60"
-                        required={formData.tipo_despesa === 'recorrente'}
-                        value={formData.numero_parcelas || ''}
-                        onChange={(e) => setFormData({ ...formData, numero_parcelas: Number(e.target.value) })}
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Data de Início da Recorrência *
-                      </label>
-                      <input
-                        type="date"
-                        required={formData.tipo_despesa === 'recorrente'}
-                        value={formData.data_inicio_recorrencia || ''}
-                        onChange={(e) => setFormData({ ...formData, data_inicio_recorrencia: e.target.value })}
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-
-                    {formData.tipo_recorrencia === 'parcelada' && formData.numero_parcelas && (
-                      <div className="md:col-span-2">
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                          <h4 className="text-sm font-medium text-blue-800 mb-2">Resumo do Parcelamento</h4>
-                          <div className="text-sm text-blue-700">
-                            <p>Valor total: <strong>{formatCurrency(Number(formData.valor) || 0)}</strong></p>
-                            <p>Número de parcelas: <strong>{formData.numero_parcelas}</strong></p>
-                            <p>Valor por parcela: <strong>{formatCurrency((Number(formData.valor) || 0) / Number(formData.numero_parcelas))}</strong></p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {formData.tipo_recorrencia === 'assinatura' && (
-                      <div className="md:col-span-2">
-                        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                          <h4 className="text-sm font-medium text-green-800 mb-2">Resumo da Assinatura</h4>
-                          <div className="text-sm text-green-700">
-                            <p>Valor mensal: <strong>{formatCurrency(Number(formData.valor) || 0)}</strong></p>
-                            <p>Duração: <strong>{formData.numero_parcelas} meses</strong></p>
-                            <p>Total: <strong>{formatCurrency((Number(formData.valor) || 0) * Number(formData.numero_parcelas))}</strong></p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </>
-                )}
-
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Observações
@@ -1082,8 +712,8 @@ const AccountsPayable: React.FC = () => {
                     rows={3}
                     value={formData.observacoes || ''}
                     onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Observações adicionais sobre a despesa..."
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    placeholder="Observações adicionais sobre a conta..."
                   />
                 </div>
               </div>
@@ -1098,9 +728,9 @@ const AccountsPayable: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                 >
-                  {editingTransaction ? 'Atualizar' : 'Criar'} Despesa
+                  {editingTransaction ? 'Atualizar' : 'Criar'} Conta
                 </button>
               </div>
             </form>
@@ -1115,7 +745,7 @@ const AccountsPayable: React.FC = () => {
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-gray-900">
-                  Conta a Pagar #{viewingTransaction.id_sequencial}
+                  Detalhes da Conta a Pagar #{viewingTransaction.id_sequencial}
                 </h2>
                 <button
                   onClick={() => setViewingTransaction(null)}
@@ -1129,10 +759,6 @@ const AccountsPayable: React.FC = () => {
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-600">Descrição</label>
-                  <p className="text-lg font-semibold text-gray-900">{viewingTransaction.descricao}</p>
-                </div>
-                <div>
                   <label className="block text-sm font-medium text-gray-600">Valor</label>
                   <p className="text-2xl font-bold text-red-600">{formatCurrency(viewingTransaction.valor)}</p>
                 </div>
@@ -1143,14 +769,16 @@ const AccountsPayable: React.FC = () => {
                   </span>
                 </div>
                 <div>
+                  <label className="block text-sm font-medium text-gray-600">Data da Transação</label>
+                  <p className="text-lg font-semibold text-gray-900">{formatDate(viewingTransaction.data_transacao)}</p>
+                </div>
+                <div>
                   <label className="block text-sm font-medium text-gray-600">Data de Vencimento</label>
                   <p className="text-lg font-semibold text-gray-900">
                     {formatDate(viewingTransaction.data_vencimento || viewingTransaction.data_transacao)}
                   </p>
-                  {isOverdue(viewingTransaction) && (
-                    <p className="text-sm text-red-600 font-medium">
-                      ⚠️ {getDaysOverdue(viewingTransaction)} dias em atraso
-                    </p>
+                  {isOverdue(viewingTransaction.data_vencimento || viewingTransaction.data_transacao, viewingTransaction.status) && (
+                    <p className="text-sm text-red-600 font-medium">⚠️ Vencida</p>
                   )}
                 </div>
                 <div>
@@ -1163,17 +791,11 @@ const AccountsPayable: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-600">Categoria</label>
                   <p className="text-lg font-semibold text-gray-900">{getCategoryName(viewingTransaction.id_categoria)}</p>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600">Data da Transação</label>
-                  <p className="text-lg font-semibold text-gray-900">{formatDate(viewingTransaction.data_transacao)}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600">Origem</label>
-                  <p className="text-lg font-semibold text-gray-900">
-                    {viewingTransaction.origem === 'whatsapp_ia' ? '🤖 WhatsApp IA' : 
-                     viewingTransaction.origem === 'api' ? '🔗 API' : '✏️ Manual'}
-                  </p>
-                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-2">Descrição</label>
+                <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{viewingTransaction.descricao}</p>
               </div>
 
               {viewingTransaction.observacoes && (
