@@ -47,6 +47,7 @@ const AccountsPayable: React.FC = () => {
           .select('*')
           .eq('id_empresa', profile.id_empresa)
           .eq('tipo', 'despesa')
+          .eq('status', 'pendente')
           .order('data_vencimento', { ascending: true }),
         supabase
           .from('categorias')
@@ -86,80 +87,6 @@ const AccountsPayable: React.FC = () => {
           table: 'transacoes',
           filters: { 
             id_empresa: profile.id_empresa,
-            tipo: 'despesa'
-          }
-        }
-      });
-
-      setTransactions(transactionsRes.data || []);
-      setCategories(categoriesRes.data || []);
-      setPessoas(pessoasRes.data || []);
-    } catch (error) {
-      console.error('❌ AccountsPayable: Error loading data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(value);
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR');
-  };
-
-  const getCategoryName = (id: string | null) => {
-    if (!id) return '-';
-    const category = categories.find(c => c.id === id);
-    return category?.nome || '-';
-  };
-
-  const getPessoaName = (id: string | null) => {
-    if (!id) return '-';
-    const pessoa = pessoas.find(p => p.id === id);
-    return pessoa?.nome_razao_social || '-';
-  };
-
-  const getStatusColor = (status: string) => {
-    const colors = {
-      pendente: 'bg-yellow-100 text-yellow-700',
-      pago: 'bg-green-100 text-green-700',
-      concluida: 'bg-green-100 text-green-700',
-      vencido: 'bg-red-100 text-red-700',
-      cancelado: 'bg-gray-100 text-gray-700'
-    };
-    return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-700';
-  };
-
-  const getStatusLabel = (status: string) => {
-    const labels = {
-      pendente: 'Pendente',
-      pago: 'Pago',
-      concluida: 'Concluída',
-      vencido: 'Vencido',
-      cancelado: 'Cancelado'
-    };
-    return labels[status as keyof typeof labels] || status;
-  };
-
-  const isOverdue = (transaction: Transaction) => {
-    const today = new Date().toISOString().split('T')[0];
-    const dueDate = transaction.data_vencimento || transaction.data_transacao;
-    return dueDate < today && transaction.status === 'pendente';
-  };
-
-  const getDaysOverdue = (transaction: Transaction) => {
-    const today = new Date();
-    const dueDate = new Date(transaction.data_vencimento || transaction.data_transacao);
-    const diffTime = today.getTime() - dueDate.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-  };
-
   const filteredTransactions = transactions.filter(transaction => {
     const matchesSearch = transaction.descricao.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          getCategoryName(transaction.id_categoria).toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -169,7 +96,6 @@ const AccountsPayable: React.FC = () => {
     
     const matchesCategory = filters.categoria === 'all' || transaction.id_categoria === filters.categoria;
     const matchesPessoa = filters.pessoa === 'all' || transaction.id_pessoa === filters.pessoa;
-    const matchesStatus = filters.status === 'all' || transaction.status === filters.status;
     
     let matchesPeriod = true;
     if (filters.periodo === 'vencidas') {
@@ -185,22 +111,7 @@ const AccountsPayable: React.FC = () => {
       matchesPeriod = diffDays >= 0 && diffDays <= 7;
     }
 
-    return matchesSearch && matchesCategory && matchesPessoa && matchesStatus && matchesPeriod;
-  });
-
-  console.log('🔍 AccountsPayable: Filtering results:', {
-    totalTransactions: transactions.length,
-    filteredTransactions: filteredTransactions.length,
-    filters,
-    searchTerm,
-    sampleTransactions: transactions.slice(0, 2).map(t => ({
-      id: t.id_sequencial,
-      descricao: t.descricao,
-      status: t.status,
-      valor: t.valor,
-      data_vencimento: t.data_vencimento,
-      id_empresa: t.id_empresa
-    }))
+    return matchesSearch && matchesCategory && matchesPessoa && matchesPeriod;
   });
 
   const totals = filteredTransactions.reduce((acc, transaction) => {
@@ -237,35 +148,6 @@ const AccountsPayable: React.FC = () => {
       </div>
 
       {/* Debug Info - Sempre visível para diagnóstico */}
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-        <h4 className="font-semibold text-yellow-900 mb-2">🔍 Debug Info - Contas a Pagar</h4>
-        <div className="text-sm text-yellow-800 space-y-1">
-          <p>• Total de despesas carregadas: {transactions.length}</p>
-          <p>• Despesas após filtros: {filteredTransactions.length}</p>
-          <p>• Empresa ID: {profile?.id_empresa}</p>
-          <p>• Usuário ID: {profile?.id}</p>
-          <p>• Categorias de despesa: {categories.length}</p>
-          <p>• Fornecedores/Pessoas: {pessoas.length}</p>
-          <p>• Filtros ativos: {JSON.stringify(filters)}</p>
-          <p>• Termo de busca: "{searchTerm}"</p>
-          <details className="mt-2">
-            <summary className="cursor-pointer font-medium">Ver primeiras 3 despesas do banco</summary>
-            <pre className="mt-2 text-xs bg-yellow-100 p-2 rounded overflow-auto max-h-40">
-              {JSON.stringify(transactions.slice(0, 3).map(t => ({
-                id: t.id_sequencial,
-                descricao: t.descricao,
-                status: t.status,
-                valor: t.valor,
-                data_transacao: t.data_transacao,
-                data_vencimento: t.data_vencimento,
-                id_empresa: t.id_empresa,
-                tipo: t.tipo
-              })), null, 2)}
-            </pre>
-          </details>
-        </div>
-      </div>
-
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -339,12 +221,8 @@ const AccountsPayable: React.FC = () => {
             onChange={(e) => setFilters({ ...filters, status: e.target.value })}
             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            <option value="all">Todos os status</option>
             <option value="pendente">Pendente</option>
-            <option value="pago">Pago</option>
-            <option value="concluida">Concluída</option>
             <option value="vencido">Vencido</option>
-            <option value="cancelado">Cancelado</option>
           </select>
 
           <select
@@ -390,7 +268,7 @@ const AccountsPayable: React.FC = () => {
                 categoria: 'all',
                 pessoa: 'all',
                 periodo: 'all',
-                status: 'all'
+                status: 'pendente'
               });
               setSearchTerm('');
               console.log('🔄 AccountsPayable: Filters cleared, reloading data...');
@@ -414,7 +292,6 @@ const AccountsPayable: React.FC = () => {
                 <th className="text-left p-4 font-medium text-gray-600">Fornecedor</th>
                 <th className="text-left p-4 font-medium text-gray-600">Categoria</th>
                 <th className="text-left p-4 font-medium text-gray-600">Vencimento</th>
-                <th className="text-center p-4 font-medium text-gray-600">Status</th>
                 <th className="text-right p-4 font-medium text-gray-600">Valor</th>
                 <th className="text-center p-4 font-medium text-gray-600">Ações</th>
               </tr>
@@ -422,14 +299,14 @@ const AccountsPayable: React.FC = () => {
             <tbody>
               {filteredTransactions.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="text-center py-12 text-gray-500">
+                  <td colSpan={7} className="text-center py-12 text-gray-500">
                     <CreditCard className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                     <p className="text-lg font-medium">
-                      {transactions.length === 0 ? 'Nenhuma despesa encontrada' : 'Nenhuma despesa corresponde aos filtros'}
+                      {transactions.length === 0 ? 'Nenhuma conta a pagar vencida' : 'Nenhuma conta vencida corresponde aos filtros'}
                     </p>
                     <p className="text-sm">
                       {transactions.length === 0 
-                        ? 'Vá para "Transações" para criar uma nova despesa' 
+                        ? 'Parabéns! Você não tem contas vencidas' 
                         : 'Tente ajustar os filtros ou limpar a busca'
                       }
                     </p>
@@ -440,7 +317,7 @@ const AccountsPayable: React.FC = () => {
                             categoria: 'all',
                             pessoa: 'all',
                             periodo: 'all',
-                            status: 'all'
+                            status: 'pendente'
                           });
                           setSearchTerm('');
                           console.log('🔄 AccountsPayable: Clearing filters from empty state...');
@@ -496,11 +373,6 @@ const AccountsPayable: React.FC = () => {
                         )}
                       </div>
                     </td>
-                    <td className="p-4 text-center">
-                      <span className={`px-2 py-1 rounded-full text-sm font-medium ${getStatusColor(transaction.status)}`}>
-                        {getStatusLabel(transaction.status)}
-                      </span>
-                    </td>
                     <td className="p-4 text-right font-semibold text-red-600">
                       {formatCurrency(transaction.valor)}
                     </td>
@@ -551,7 +423,7 @@ const AccountsPayable: React.FC = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-600">Status</label>
                   <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(viewingTransaction.status)}`}>
-                    {getStatusLabel(viewingTransaction.status)}
+                    Pendente
                   </span>
                 </div>
                 <div>
