@@ -46,7 +46,7 @@ const TransactionsManager: React.FC = () => {
   const loadData = async () => {
     try {
       if (!profile?.id || !profile?.id_empresa) {
-        console.log('❌ No profile or company ID found');
+        console.log('❌ No profile or company ID found', { profile });
         setTransactions([]);
         setCategories([]);
         setPessoas([]);
@@ -54,7 +54,10 @@ const TransactionsManager: React.FC = () => {
         return;
       }
 
-      console.log('🔍 Loading transactions data for company:', profile.id_empresa);
+      console.log('🔍 Loading transactions data for company:', profile.id_empresa, {
+        userId: profile.id,
+        userRole: profile.papel
+      });
 
       const [transactionsRes, categoriesRes, pessoasRes] = await Promise.all([
         supabase
@@ -77,7 +80,11 @@ const TransactionsManager: React.FC = () => {
       ]);
 
       if (transactionsRes.error) {
-        console.error('❌ Error loading transactions:', transactionsRes.error);
+        console.error('❌ Error loading transactions:', transactionsRes.error, {
+          code: transactionsRes.error.code,
+          message: transactionsRes.error.message,
+          details: transactionsRes.error.details
+        });
         throw transactionsRes.error;
       }
       if (categoriesRes.error) {
@@ -89,17 +96,27 @@ const TransactionsManager: React.FC = () => {
         throw pessoasRes.error;
       }
 
-      console.log('✅ Data loaded successfully:', {
+      console.log('✅ Raw data from Supabase:', {
         transactions: transactionsRes.data?.length || 0,
         categories: categoriesRes.data?.length || 0,
-        pessoas: pessoasRes.data?.length || 0
+        pessoas: pessoasRes.data?.length || 0,
+        transactionsData: transactionsRes.data,
+        query: {
+          table: 'transacoes',
+          filters: { id_empresa: profile.id_empresa },
+          orderBy: 'data_transacao desc'
+        }
       });
 
       setTransactions(transactionsRes.data || []);
       setCategories(categoriesRes.data || []);
       setPessoas(pessoasRes.data || []);
     } catch (error) {
-      console.error('❌ Error loading data:', error);
+      console.error('❌ Error loading data:', error, {
+        profileData: profile,
+        errorType: typeof error,
+        errorMessage: error instanceof Error ? error.message : 'Unknown error'
+      });
     } finally {
       setLoading(false);
     }
@@ -298,7 +315,7 @@ const TransactionsManager: React.FC = () => {
       </div>
 
       {/* Debug Info */}
-      {process.env.NODE_ENV === 'development' && (
+      {true && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <h4 className="font-semibold text-yellow-900 mb-2">🔍 Debug Info</h4>
           <div className="text-sm text-yellow-800 space-y-1">
@@ -308,6 +325,14 @@ const TransactionsManager: React.FC = () => {
             <p>• Usuário ID: {profile?.id}</p>
             <p>• Categorias carregadas: {categories.length}</p>
             <p>• Pessoas carregadas: {pessoas.length}</p>
+            <p>• Filtros ativos: {JSON.stringify(filters)}</p>
+            <p>• Termo de busca: "{searchTerm}"</p>
+            <details className="mt-2">
+              <summary className="cursor-pointer font-medium">Ver dados brutos das transações</summary>
+              <pre className="mt-2 text-xs bg-yellow-100 p-2 rounded overflow-auto max-h-40">
+                {JSON.stringify(transactions.slice(0, 3), null, 2)}
+              </pre>
+            </details>
           </div>
         </div>
       )}
@@ -432,6 +457,8 @@ const TransactionsManager: React.FC = () => {
                 periodo: 'all'
               });
               setSearchTerm('');
+              console.log('🔄 Filters cleared, reloading data...');
+              loadData();
             }}
             className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
           >
@@ -481,6 +508,7 @@ const TransactionsManager: React.FC = () => {
                             periodo: 'all'
                           });
                           setSearchTerm('');
+                          console.log('🔄 Clearing filters from empty state...');
                         }}
                         className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                       >
