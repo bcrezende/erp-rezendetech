@@ -36,6 +36,10 @@ const AccountsPayable: React.FC = () => {
     status: 'pendente',
     origem: 'manual',
     observacoes: '',
+    e_recorrente: false,
+    tipo_recorrencia: '',
+    numero_parcelas: 1,
+    data_inicio_recorrencia: new Date().toISOString().split('T')[0],
   });
 
   useEffect(() => {
@@ -111,6 +115,10 @@ const AccountsPayable: React.FC = () => {
             status: filters.status
           }
         }
+        e_recorrente: transaction.e_recorrente || false,
+        tipo_recorrencia: transaction.tipo_recorrencia || '',
+        numero_parcelas: transaction.numero_parcelas || 1,
+        data_inicio_recorrencia: transaction.data_inicio_recorrencia || transaction.data_transacao,
       });
 
       setTransactions(transactionsRes.data || []);
@@ -151,21 +159,37 @@ const AccountsPayable: React.FC = () => {
         valor: Number(formData.valor),
         id_categoria: formData.id_categoria || null,
         id_pessoa: formData.id_pessoa || null,
+        valor_parcela: formData.e_recorrente && formData.tipo_recorrencia === 'parcelada' 
+          ? Number(formData.valor) / Number(formData.numero_parcelas) 
+          : null,
       };
 
-      const { error } = await supabase
-        .from('transacoes')
-        .update(transactionData)
-        .eq('id', editingTransaction!.id);
+      let error;
+      
+      if (editingTransaction) {
+        // Atualizar transação existente
+        const { error: updateError } = await supabase
+          .from('transacoes')
+          .update(transactionData)
+          .eq('id', editingTransaction.id);
+        error = updateError;
+      } else {
+        // Criar nova transação
+        const { error: insertError } = await supabase
+          .from('transacoes')
+          .insert(transactionData);
+        error = insertError;
+      }
 
       if (error) throw error;
-      alert('Transação atualizada com sucesso!');
+      
+      alert(editingTransaction ? 'Transação atualizada com sucesso!' : 'Nova conta a pagar criada com sucesso!');
 
       await loadData();
       resetForm();
     } catch (error) {
       console.error('Error saving transaction:', error);
-      alert('Erro ao salvar transação. Tente novamente.');
+      alert(`Erro ao ${editingTransaction ? 'atualizar' : 'criar'} transação. Tente novamente.`);
     }
   };
 
@@ -181,6 +205,10 @@ const AccountsPayable: React.FC = () => {
       status: 'pendente',
       origem: 'manual',
       observacoes: '',
+      e_recorrente: false,
+      tipo_recorrencia: '',
+      numero_parcelas: 1,
+      data_inicio_recorrencia: new Date().toISOString().split('T')[0],
     });
     setEditingTransaction(null);
     setShowForm(false);
@@ -775,6 +803,100 @@ const AccountsPayable: React.FC = () => {
                     ))}
                   </select>
                 </div>
+
+                <div className="md:col-span-2">
+                  <div className="flex items-center space-x-2 mb-4">
+                    <input
+                      type="checkbox"
+                      id="e_recorrente"
+                      checked={formData.e_recorrente || false}
+                      onChange={(e) => setFormData({ 
+                        ...formData, 
+                        e_recorrente: e.target.checked,
+                        tipo_recorrencia: e.target.checked ? 'parcelada' : '',
+                        numero_parcelas: e.target.checked ? 2 : 1
+                      })}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <label htmlFor="e_recorrente" className="text-sm font-medium text-gray-700">
+                      Despesa Recorrente
+                    </label>
+                  </div>
+                </div>
+
+                {formData.e_recorrente && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Tipo de Recorrência *
+                      </label>
+                      <select
+                        required={formData.e_recorrente}
+                        value={formData.tipo_recorrencia || ''}
+                        onChange={(e) => setFormData({ ...formData, tipo_recorrencia: e.target.value })}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      >
+                        <option value="">Selecione o tipo</option>
+                        <option value="parcelada">Parcelada</option>
+                        <option value="assinatura">Assinatura (Mensal)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        {formData.tipo_recorrencia === 'assinatura' ? 'Meses de Duração' : 'Número de Parcelas'} *
+                      </label>
+                      <input
+                        type="number"
+                        min="2"
+                        max="60"
+                        required={formData.e_recorrente}
+                        value={formData.numero_parcelas || ''}
+                        onChange={(e) => setFormData({ ...formData, numero_parcelas: Number(e.target.value) })}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Data de Início da Recorrência *
+                      </label>
+                      <input
+                        type="date"
+                        required={formData.e_recorrente}
+                        value={formData.data_inicio_recorrencia || ''}
+                        onChange={(e) => setFormData({ ...formData, data_inicio_recorrencia: e.target.value })}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
+
+                    {formData.tipo_recorrencia === 'parcelada' && formData.numero_parcelas && (
+                      <div className="md:col-span-2">
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                          <h4 className="text-sm font-medium text-blue-800 mb-2">Resumo do Parcelamento</h4>
+                          <div className="text-sm text-blue-700">
+                            <p>Valor total: <strong>{formatCurrency(Number(formData.valor) || 0)}</strong></p>
+                            <p>Número de parcelas: <strong>{formData.numero_parcelas}</strong></p>
+                            <p>Valor por parcela: <strong>{formatCurrency((Number(formData.valor) || 0) / Number(formData.numero_parcelas))}</strong></p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {formData.tipo_recorrencia === 'assinatura' && (
+                      <div className="md:col-span-2">
+                        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                          <h4 className="text-sm font-medium text-green-800 mb-2">Resumo da Assinatura</h4>
+                          <div className="text-sm text-green-700">
+                            <p>Valor mensal: <strong>{formatCurrency(Number(formData.valor) || 0)}</strong></p>
+                            <p>Duração: <strong>{formData.numero_parcelas} meses</strong></p>
+                            <p>Total: <strong>{formatCurrency((Number(formData.valor) || 0) * Number(formData.numero_parcelas))}</strong></p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
 
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
