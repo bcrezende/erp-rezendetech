@@ -14,8 +14,6 @@ import Sidebar from './components/Layout/Sidebar';
 import DREPanel from './components/Dashboard/DREPanel';
 import CashFlowPanel from './components/Dashboard/CashFlowPanel';
 import EstimatePanel from './components/Dashboard/EstimatePanel';
-import CashPositionCard from './components/Dashboard/CashPositionCard';
-import MetricCard from './components/Dashboard/MetricCard';
 import UserSettings from './components/Settings/UserSettings';
 import RemindersManager from './components/Reminders/RemindersManager';
 import CompanyRegistrationForm from './components/Company/CompanyRegistrationForm';
@@ -39,80 +37,9 @@ const AppContent: React.FC = () => {
     startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
     endDate: new Date().toISOString().split('T')[0]
   });
-  const [dashboardData, setDashboardData] = useState({
-    totalReceitas: 0,
-    saldoLiquido: 0,
-    loading: true
-  });
 
   const handleSignOut = async () => {
     await signOut();
-  };
-
-  // Carregar dados do dashboard
-  React.useEffect(() => {
-    if (profile?.id_empresa) {
-      loadDashboardData();
-    }
-  }, [profile, dateFilter]);
-
-  const loadDashboardData = async () => {
-    try {
-      if (!profile?.id || !profile?.id_empresa) {
-        setDashboardData(prev => ({ ...prev, loading: false }));
-        return;
-      }
-
-      setDashboardData(prev => ({ ...prev, loading: true }));
-
-      // Carregar apenas transações pagas/recebidas dentro do período filtrado
-      const { data: transacoes, error: transacoesError } = await supabase
-        .from('transacoes')
-        .select('*')
-        .eq('id_empresa', profile.id_empresa)
-        .in('status', ['concluida', 'pago', 'recebido', 'concluída'])
-        .gte('data_transacao', dateFilter.startDate)
-        .lte('data_transacao', dateFilter.endDate);
-
-      if (transacoesError) throw transacoesError;
-
-      console.log('📊 Dashboard: Transações carregadas para cálculo:', {
-        total: transacoes?.length || 0,
-        periodo: `${dateFilter.startDate} até ${dateFilter.endDate}`,
-        statusFiltrados: ['concluida', 'pago', 'recebido', 'concluída'],
-        transacoesPorStatus: transacoes?.reduce((acc, t) => {
-          acc[t.status] = (acc[t.status] || 0) + 1;
-          return acc;
-        }, {} as Record<string, number>),
-        valorPorTipo: {
-          receitas: transacoes?.filter(t => t.tipo === 'receita').reduce((sum, t) => sum + t.valor, 0) || 0,
-          despesas: transacoes?.filter(t => t.tipo === 'despesa').reduce((sum, t) => sum + t.valor, 0) || 0
-        }
-      });
-
-      // Calcular métricas
-      const receitas = transacoes?.filter(t => t.tipo === 'receita').reduce((sum, t) => sum + t.valor, 0) || 0;
-      const despesas = transacoes?.filter(t => t.tipo === 'despesa').reduce((sum, t) => sum + t.valor, 0) || 0;
-      const saldo = receitas - despesas;
-
-      console.log('📊 Dashboard metrics calculated:', {
-        receitas,
-        despesas,
-        saldo,
-        periodo: `${dateFilter.startDate} até ${dateFilter.endDate}`,
-        transacoesFiltradas: transacoes?.length || 0,
-        totalTransacoes: transacoes?.length || 0
-      });
-
-      setDashboardData({
-        totalReceitas: receitas,
-        saldoLiquido: saldo,
-        loading: false
-      });
-    } catch (error) {
-      console.error('Error loading dashboard data:', error);
-      setDashboardData(prev => ({ ...prev, loading: false }));
-    }
   };
 
   // Loading state
@@ -134,15 +61,6 @@ const AppContent: React.FC = () => {
   }
 
   // User authenticated with profile - show main app
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(value);
-  };
-
   const getPageTitle = (page: string) => {
     const titles: Record<string, { title: string; subtitle: string }> = {
       dashboard: { title: 'Dashboard', subtitle: 'Visão geral do seu negócio' },
@@ -159,44 +77,6 @@ const AppContent: React.FC = () => {
     };
     return titles[page] || { title: 'Sistema ERP', subtitle: 'Gestão empresarial completa' };
   };
-
-  const dashboardMetrics = dashboardData.loading ? [
-    {
-      title: 'Receita Total',
-      value: 'Carregando...',
-      change: 'Aguarde',
-      changeType: 'neutral' as const,
-      icon: TrendingUp,
-      color: 'green' as const
-    },
-    {
-      title: 'Saldo Líquido',
-      value: 'Carregando...',
-      change: 'Aguarde',
-      changeType: 'neutral' as const,
-      icon: DollarSign,
-      color: 'blue' as const
-    }
-  ] : [
-    {
-      title: 'Receita Total',
-      value: formatCurrency(dashboardData.totalReceitas),
-      change: dashboardData.totalReceitas > 0 ? 'Receitas registradas' : 'Nenhuma receita registrada',
-      changeType: dashboardData.totalReceitas > 0 ? 'positive' as const : 'neutral' as const,
-      icon: TrendingUp,
-      color: 'green' as const
-    },
-    {
-      title: 'Saldo Líquido',
-      value: formatCurrency(dashboardData.saldoLiquido),
-      change: dashboardData.saldoLiquido > 0 ? 'Saldo positivo' : 
-             dashboardData.saldoLiquido < 0 ? 'Saldo negativo' : 'Aguardando movimentações',
-      changeType: dashboardData.saldoLiquido > 0 ? 'positive' as const : 
-                  dashboardData.saldoLiquido < 0 ? 'negative' as const : 'neutral' as const,
-      icon: DollarSign,
-      color: dashboardData.saldoLiquido >= 0 ? 'blue' as const : 'red' as const
-    }
-  ];
 
   const renderPageContent = () => {
     switch (currentPage) {
@@ -249,24 +129,9 @@ const AppContent: React.FC = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {dashboardMetrics.map((metric, index) => (
-                <MetricCard
-                  key={index}
-                  title={metric.title}
-                  value={metric.value}
-                  change={metric.change}
-                  changeType={metric.changeType}
-                  icon={metric.icon}
-                  color={metric.color}
-                />
-              ))}
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <DREPanel dateFilter={dateFilter} />
-              <CashFlowPanel dateFilter={dateFilter} />
-              <CashPositionCard dateFilter={dateFilter} />
+              <CashFlowPanel />
             </div>
 
             <EstimatePanel dateFilter={dateFilter} />
