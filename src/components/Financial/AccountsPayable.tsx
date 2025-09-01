@@ -654,12 +654,12 @@ const AccountsPayable: React.FC = () => {
       </div>
 
       {/* Edit Form Modal */}
-      {showForm && editingTransaction && (
+      {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <h2 className="text-xl font-semibold text-gray-900">
-                Editar Despesa #{editingTransaction.id_sequencial}
+                {editingTransaction ? `Editar Despesa #${editingTransaction.id_sequencial}` : 'Nova Conta a Pagar'}
               </h2>
             </div>
 
