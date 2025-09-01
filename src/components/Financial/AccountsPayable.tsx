@@ -808,7 +808,6 @@ const AccountsPayable: React.FC = () => {
                         </button>
                       </div>
                     </td>
-                    <th className="text-center p-4 font-medium text-gray-600">Ações</th>
                   </tr>
                 ))
               )}
