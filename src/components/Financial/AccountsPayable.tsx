@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../Auth/AuthProvider';
-import { CreditCard, Search, Calendar, AlertTriangle, DollarSign, User, Tag, Eye, X, Filter, Edit } from 'lucide-react';
+import { CreditCard, Search, Calendar, AlertTriangle, DollarSign, User, Tag, Eye, X, Filter, Edit, Plus } from 'lucide-react';
 import { Database } from '../../types/supabase';
 
 type Transaction = Database['public']['Tables']['transacoes']['Row'];
@@ -340,6 +340,7 @@ const AccountsPayable: React.FC = () => {
           <Plus size={20} />
           <span>Nova Conta a Pagar</span>
         </button>
+      </div>
 
       {/* Debug Info - Sempre visível para diagnóstico */}
       {/* Summary Cards */}
@@ -840,7 +841,7 @@ const AccountsPayable: React.FC = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-600">Status</label>
                   <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(viewingTransaction.status)}`}>
-                    Pendente
+                    {getStatusLabel(viewingTransaction.status)}
                   </span>
                 </div>
                 <div>
