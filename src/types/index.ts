@@ -104,6 +104,7 @@ export interface CashFlowData {
   income: number;
   expenses: number;
   balance: number;
+  dailyTransactions: Transaction[];
 }
 
 export interface EstimateData {
