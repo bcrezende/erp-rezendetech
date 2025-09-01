@@ -16,7 +16,7 @@ const CashFlowPanel: React.FC<CashFlowPanelProps> = ({ dateFilter }) => {
 
   React.useEffect(() => {
     loadTransactions();
-  }, [dateFilter]);
+  }, [profile]);
 
   const loadTransactions = async () => {
     try {
@@ -110,7 +110,7 @@ const CashFlowPanel: React.FC<CashFlowPanelProps> = ({ dateFilter }) => {
           Fluxo de Caixa
         </h3>
         <div className="text-xs sm:text-sm text-gray-500 text-right">
-          Todas as Movimentações
+          {new Date(dateFilter.startDate).toLocaleDateString('pt-BR')} - {new Date(dateFilter.endDate).toLocaleDateString('pt-BR')}
         </div>
       </div>
 
