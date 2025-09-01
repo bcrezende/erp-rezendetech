@@ -3,14 +3,7 @@ import { useAuth } from '../Auth/AuthProvider';
 import { CashFlowData } from '../../types';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 
-interface CashFlowPanelProps {
-  dateFilter: {
-    startDate: string;
-    endDate: string;
-  };
-}
-
-const CashFlowPanel: React.FC<CashFlowPanelProps> = ({ dateFilter }) => {
+const CashFlowPanel: React.FC = () => {
   const { supabase, profile } = useAuth();
   const [transactions, setTransactions] = React.useState<any[]>([]);
 
@@ -31,15 +24,13 @@ const CashFlowPanel: React.FC<CashFlowPanelProps> = ({ dateFilter }) => {
         .from('transacoes')
         .select('*')
         .eq('id_empresa', profile.id_empresa)
-        .in('status', ['concluida', 'pago', 'recebido', 'concluída'])
-        .gte('data_transacao', dateFilter.startDate)
-        .lte('data_transacao', dateFilter.endDate);
+        .in('status', ['concluida', 'pago', 'recebido', 'concluída']);
 
       if (error) throw error;
       
       console.log('📊 Cash flow transactions loaded:', {
         total: data?.length || 0,
-        periodo: `${dateFilter.startDate} até ${dateFilter.endDate}`,
+        periodo: 'Todas as movimentações',
         transacoes: data
       });
       
@@ -110,7 +101,7 @@ const CashFlowPanel: React.FC<CashFlowPanelProps> = ({ dateFilter }) => {
           Fluxo de Caixa
         </h3>
         <div className="text-xs sm:text-sm text-gray-500 text-right">
-          {new Date(dateFilter.startDate).toLocaleDateString('pt-BR')} - {new Date(dateFilter.endDate).toLocaleDateString('pt-BR')}
+          Todas as Movimentações
         </div>
       </div>
 
