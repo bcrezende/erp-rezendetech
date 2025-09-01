@@ -87,6 +87,71 @@ const AccountsPayable: React.FC = () => {
           table: 'transacoes',
           filters: { 
             id_empresa: profile.id_empresa,
+            tipo: 'despesa',
+            status: 'pendente'
+          }
+        }
+      });
+
+      setTransactions(transactionsRes.data || []);
+      setCategories(categoriesRes.data || []);
+      setPessoas(pessoasRes.data || []);
+    } catch (error) {
+      console.error('❌ AccountsPayable: Error loading data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getCategoryName = (categoryId: string | null) => {
+    if (!categoryId) return 'Sem categoria';
+    const category = categories.find(c => c.id === categoryId);
+    return category?.nome || 'Categoria não encontrada';
+  };
+
+  const getPessoaName = (pessoaId: string | null) => {
+    if (!pessoaId) return 'Sem fornecedor';
+    const pessoa = pessoas.find(p => p.id === pessoaId);
+    return pessoa?.nome_razao_social || 'Fornecedor não encontrado';
+  };
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('pt-BR');
+  };
+
+  const isOverdue = (transaction: Transaction) => {
+    const today = new Date();
+    const dueDate = new Date(transaction.data_vencimento || transaction.data_transacao);
+    return dueDate < today;
+  };
+
+  const getDaysOverdue = (transaction: Transaction) => {
+    const today = new Date();
+    const dueDate = new Date(transaction.data_vencimento || transaction.data_transacao);
+    const diffTime = today.getTime() - dueDate.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pendente':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'pago':
+        return 'bg-green-100 text-green-800';
+      case 'vencido':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   const filteredTransactions = transactions.filter(transaction => {
     const matchesSearch = transaction.descricao.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          getCategoryName(transaction.id_categoria).toLowerCase().includes(searchTerm.toLowerCase()) ||
