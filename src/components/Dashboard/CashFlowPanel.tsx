@@ -28,11 +28,7 @@ const CashFlowPanel: React.FC = () => {
 
       if (error) throw error;
       
-      console.log('📊 Cash flow transactions loaded:', {
-        total: data?.length || 0,
-        periodo: 'Todas as movimentações',
-        transacoes: data
-      });
+      console.log('📊 Cash flow transactions loaded:', data?.length || 0, 'transactions');
       
       setTransactions(data || []);
     } catch (error) {
