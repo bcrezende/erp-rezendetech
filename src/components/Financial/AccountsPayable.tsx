@@ -328,6 +328,26 @@ const AccountsPayable: React.FC = () => {
     setShowForm(false);
   };
 
+  const handleDelete = async (id: string) => {
+    if (!confirm('Tem certeza que deseja excluir esta conta a pagar? Esta ação não pode ser desfeita.')) return;
+
+    try {
+      // Soft delete - marcar como inativo
+      const { error } = await supabase
+        .from('transacoes')
+        .update({ ativo: false })
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      await loadAccountsPayable();
+      alert('Conta a pagar excluída com sucesso!');
+    } catch (error) {
+      console.error('Error deleting account payable:', error);
+      alert('Erro ao excluir conta a pagar. Tente novamente.');
+    }
+  };
+
   const getCategoryName = (categoryId: string | null) => {
     if (!categoryId) return 'Sem categoria';
     const category = categories.find(c => c.id === categoryId);
@@ -788,6 +808,7 @@ const AccountsPayable: React.FC = () => {
                         </button>
                       </div>
                     </td>
+                    <th className="text-center p-4 font-medium text-gray-600">Ações</th>
                   </tr>
                 ))
               )}
