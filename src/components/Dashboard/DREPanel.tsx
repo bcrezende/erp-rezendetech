@@ -65,7 +65,7 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
           .from('transacoes')
           .select('*')
           .eq('id_empresa', profile.id_empresa)
-          .in('status', ['concluida', 'pago', 'recebido'])
+          .in('status', ['concluida', 'pago', 'recebido', 'concluída'])
           .gte('data_transacao', dateFilter.startDate)
           .lte('data_transacao', dateFilter.endDate),
         supabase
