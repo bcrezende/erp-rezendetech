@@ -28,6 +28,7 @@ const AccountsPayable: React.FC = () => {
   const [formData, setFormData] = useState<Partial<any>>({
     valor: 0,
     tipo: 'despesa',
+    tipo_despesa: 'normal', // normal ou recorrente
     descricao: '',
     data_transacao: new Date().toISOString().split('T')[0],
     data_vencimento: new Date().toISOString().split('T')[0],
@@ -36,7 +37,6 @@ const AccountsPayable: React.FC = () => {
     status: 'pendente',
     origem: 'manual',
     observacoes: '',
-    e_recorrente: false,
     tipo_recorrencia: '',
     numero_parcelas: 1,
     data_inicio_recorrencia: new Date().toISOString().split('T')[0],
@@ -151,11 +151,12 @@ const AccountsPayable: React.FC = () => {
     try {
       const transactionData = {
         ...formData,
+        e_recorrente: formData.tipo_despesa === 'recorrente',
         id_empresa: profile.id_empresa,
         valor: Number(formData.valor),
         id_categoria: formData.id_categoria || null,
         id_pessoa: formData.id_pessoa || null,
-        valor_parcela: formData.e_recorrente && formData.tipo_recorrencia === 'parcelada' 
+        valor_parcela: formData.tipo_despesa === 'recorrente' && formData.tipo_recorrencia === 'parcelada' 
           ? Number(formData.valor) / Number(formData.numero_parcelas) 
           : null,
       };
@@ -193,6 +194,7 @@ const AccountsPayable: React.FC = () => {
     setFormData({
       valor: 0,
       tipo: 'despesa',
+      tipo_despesa: 'normal',
       descricao: '',
       data_transacao: new Date().toISOString().split('T')[0],
       data_vencimento: new Date().toISOString().split('T')[0],
@@ -201,7 +203,6 @@ const AccountsPayable: React.FC = () => {
       status: 'pendente',
       origem: 'manual',
       observacoes: '',
-      e_recorrente: false,
       tipo_recorrencia: '',
       numero_parcelas: 1,
       data_inicio_recorrencia: new Date().toISOString().split('T')[0],
@@ -347,6 +348,7 @@ const AccountsPayable: React.FC = () => {
             setFormData({
               valor: 0,
               tipo: 'despesa',
+              tipo_despesa: 'normal',
               descricao: '',
               data_transacao: new Date().toISOString().split('T')[0],
               data_vencimento: new Date().toISOString().split('T')[0],
@@ -688,6 +690,52 @@ const AccountsPayable: React.FC = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              {/* Seleção do Tipo de Despesa */}
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Tipo de Despesa</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <label className="flex items-center space-x-3 p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-white transition-colors">
+                    <input
+                      type="radio"
+                      name="tipo_despesa"
+                      value="normal"
+                      checked={formData.tipo_despesa === 'normal'}
+                      onChange={(e) => setFormData({ 
+                        ...formData, 
+                        tipo_despesa: e.target.value,
+                        tipo_recorrencia: '',
+                        numero_parcelas: 1
+                      })}
+                      className="text-blue-600 focus:ring-blue-500"
+                    />
+                    <div>
+                      <span className="font-medium text-gray-900">💰 Despesa Normal</span>
+                      <p className="text-sm text-gray-600">Despesa única, sem repetição</p>
+                    </div>
+                  </label>
+                  
+                  <label className="flex items-center space-x-3 p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-white transition-colors">
+                    <input
+                      type="radio"
+                      name="tipo_despesa"
+                      value="recorrente"
+                      checked={formData.tipo_despesa === 'recorrente'}
+                      onChange={(e) => setFormData({ 
+                        ...formData, 
+                        tipo_despesa: e.target.value,
+                        tipo_recorrencia: 'parcelada',
+                        numero_parcelas: 2
+                      })}
+                      className="text-purple-600 focus:ring-purple-500"
+                    />
+                    <div>
+                      <span className="font-medium text-gray-900">🔄 Despesa Recorrente</span>
+                      <p className="text-sm text-gray-600">Parcelada ou assinatura mensal</p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -800,34 +848,23 @@ const AccountsPayable: React.FC = () => {
                   </select>
                 </div>
 
-                <div className="md:col-span-2">
-                  <div className="flex items-center space-x-2 mb-4">
-                    <input
-                      type="checkbox"
-                      id="e_recorrente"
-                      checked={formData.e_recorrente || false}
-                      onChange={(e) => setFormData({ 
-                        ...formData, 
-                        e_recorrente: e.target.checked,
-                        tipo_recorrencia: e.target.checked ? 'parcelada' : '',
-                        numero_parcelas: e.target.checked ? 2 : 1
-                      })}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    <label htmlFor="e_recorrente" className="text-sm font-medium text-gray-700">
-                      Despesa Recorrente
-                    </label>
-                  </div>
-                </div>
-
-                {formData.e_recorrente && (
+                {formData.tipo_despesa === 'recorrente' && (
                   <>
+                    <div className="md:col-span-2">
+                      <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                        <h4 className="font-semibold text-purple-900 mb-2">⚙️ Configuração de Recorrência</h4>
+                        <p className="text-sm text-purple-800">
+                          Configure como esta despesa se repetirá ao longo do tempo
+                        </p>
+                      </div>
+                    </div>
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Tipo de Recorrência *
                       </label>
                       <select
-                        required={formData.e_recorrente}
+                        required={formData.tipo_despesa === 'recorrente'}
                         value={formData.tipo_recorrencia || ''}
                         onChange={(e) => setFormData({ ...formData, tipo_recorrencia: e.target.value })}
                         className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -846,7 +883,7 @@ const AccountsPayable: React.FC = () => {
                         type="number"
                         min="2"
                         max="60"
-                        required={formData.e_recorrente}
+                        required={formData.tipo_despesa === 'recorrente'}
                         value={formData.numero_parcelas || ''}
                         onChange={(e) => setFormData({ ...formData, numero_parcelas: Number(e.target.value) })}
                         className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -859,7 +896,7 @@ const AccountsPayable: React.FC = () => {
                       </label>
                       <input
                         type="date"
-                        required={formData.e_recorrente}
+                        required={formData.tipo_despesa === 'recorrente'}
                         value={formData.data_inicio_recorrencia || ''}
                         onChange={(e) => setFormData({ ...formData, data_inicio_recorrencia: e.target.value })}
                         className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
