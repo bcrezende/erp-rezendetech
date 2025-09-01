@@ -150,15 +150,25 @@ const AccountsPayable: React.FC = () => {
 
     try {
       const transactionData = {
-        ...formData,
-        e_recorrente: formData.tipo_despesa === 'recorrente',
-        id_empresa: profile.id_empresa,
         valor: Number(formData.valor),
+        tipo: formData.tipo,
+        descricao: formData.descricao,
+        data_transacao: formData.data_transacao,
+        data_vencimento: formData.data_vencimento,
         id_categoria: formData.id_categoria || null,
         id_pessoa: formData.id_pessoa || null,
+        status: formData.status,
+        origem: formData.origem,
+        observacoes: formData.observacoes,
+        e_recorrente: formData.tipo_despesa === 'recorrente',
+        tipo_recorrencia: formData.tipo_despesa === 'recorrente' ? formData.tipo_recorrencia : null,
+        numero_parcelas: formData.tipo_despesa === 'recorrente' ? formData.numero_parcelas : null,
+        data_inicio_recorrencia: formData.tipo_despesa === 'recorrente' ? formData.data_inicio_recorrencia : null,
         valor_parcela: formData.tipo_despesa === 'recorrente' && formData.tipo_recorrencia === 'parcelada' 
           ? Number(formData.valor) / Number(formData.numero_parcelas) 
           : null,
+        ativa_recorrencia: formData.tipo_despesa === 'recorrente',
+        id_empresa: profile.id_empresa,
       };
 
       let error;
