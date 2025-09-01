@@ -50,8 +50,11 @@ const EstimatePanel: React.FC<EstimatePanelProps> = ({ dateFilter }) => {
   };
 
   const estimateData = useMemo((): EstimateData => {
-    const startDate = new Date(dateFilter.startDate);
-    const endDate = new Date(dateFilter.endDate);
+    // Parse dates correctly to avoid timezone issues
+    const [startYear, startMonth, startDay] = dateFilter.startDate.split('-').map(Number);
+    const [endYear, endMonth, endDay] = dateFilter.endDate.split('-').map(Number);
+    const startDate = new Date(startYear, startMonth - 1, startDay);
+    const endDate = new Date(endYear, endMonth - 1, endDay);
     const today = new Date();
     
     // Total de dias no período
@@ -141,7 +144,7 @@ const EstimatePanel: React.FC<EstimatePanelProps> = ({ dateFilter }) => {
         <div className="flex items-center text-xs sm:text-sm text-gray-500">
           <Calendar size={16} className="mr-1" />
           <span className="hidden sm:inline">
-            {new Date(dateFilter.startDate).toLocaleDateString('pt-BR')} - {new Date(dateFilter.endDate).toLocaleDateString('pt-BR')}
+            {formatDate(dateFilter.startDate)} - {formatDate(dateFilter.endDate)}
           </span>
           <span className="sm:hidden">
             Período

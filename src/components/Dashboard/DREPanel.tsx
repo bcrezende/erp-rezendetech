@@ -122,6 +122,11 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
     return pessoa?.nome_razao_social || null;
   };
 
+  const formatDateFromString = (dateString: string) => {
+    const [year, month, day] = dateString.split('-');
+    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    return date.toLocaleDateString('pt-BR');
+  };
   const dreData = useMemo((): DREData => {
     // As transações e vendas já vêm filtradas pela data do useEffect
     const filteredTransactions = transactions;
@@ -254,7 +259,7 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
     const resultadoNegocio = margemContribuicao - custoFixo;
 
     return {
-      period: `${new Date(dateFilter.startDate).toLocaleDateString('pt-BR')} - ${new Date(dateFilter.endDate).toLocaleDateString('pt-BR')}`,
+      period: `${formatDateFromString(dateFilter.startDate)} - ${formatDateFromString(dateFilter.endDate)}`,
       receitaBruta,
       despesaOperacional,
       margemContribuicao,
