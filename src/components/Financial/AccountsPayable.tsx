@@ -817,20 +817,6 @@ const AccountsPayable: React.FC = () => {
                   <select
                     value={formData.id_categoria || ''}
                     onChange={(e) => setFormData({ ...formData, id_categoria: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  >
-                    <option value="">Selecione uma categoria</option>
-                    {categories.map(category => (
-                      <option key={category.id} value={category.id}>
-                        {category.nome}
-                        {category.classificacao_dre && 
-                          ` (${category.classificacao_dre.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())})`
-                        }
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Observações
