@@ -310,11 +310,36 @@ const AccountsPayable: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center space-x-3">
-        <CreditCard className="h-8 w-8 text-red-600" />
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Contas a Pagar</h1>
-          <p className="text-gray-600">Gerencie suas despesas e pagamentos</p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <CreditCard className="h-8 w-8 text-red-600" />
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Contas a Pagar</h1>
+            <p className="text-gray-600">Gerencie suas despesas e pagamentos</p>
+          </div>
+        </div>
+        <button
+          onClick={() => {
+            setFormData({
+              valor: 0,
+              tipo: 'despesa',
+              descricao: '',
+              data_transacao: new Date().toISOString().split('T')[0],
+              data_vencimento: new Date().toISOString().split('T')[0],
+              id_categoria: '',
+              id_pessoa: '',
+              status: 'pendente',
+              origem: 'manual',
+              observacoes: '',
+            });
+            setEditingTransaction(null);
+            setShowForm(true);
+          }}
+          className="flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+        >
+          <Plus size={20} />
+          <span>Nova Conta a Pagar</span>
+        </button>
         </div>
       </div>
 
@@ -778,7 +803,7 @@ const AccountsPayable: React.FC = () => {
                   type="submit"
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
-                  Atualizar Despesa
+                  {editingTransaction ? 'Atualizar' : 'Criar'} Despesa
                 </button>
               </div>
             </form>
