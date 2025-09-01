@@ -56,6 +56,12 @@ const AccountsPayable: React.FC = () => {
     data_inicio_recorrencia: null,
     valor_parcela: null,
     ativa_recorrencia: true,
+    data_inicio_recorrencia: null,
+    valor_parcela: null,
+    ativa_recorrencia: true,
+    data_inicio_recorrencia: null,
+    valor_parcela: null,
+    ativa_recorrencia: true,
   });
 
   useEffect(() => {
@@ -118,16 +124,17 @@ const AccountsPayable: React.FC = () => {
     if (!profile?.id_empresa) return;
 
     try {
-      const transactionData = {
-        ...formData,
-        id_empresa: profile.id_empresa,
-        valor: Number(formData.valor),
-        tipo: 'despesa' as const,
-        id_categoria: formData.id_categoria || null,
-        id_pessoa: formData.id_pessoa || null,
-      };
-
       if (editingTransaction) {
+        // Para edição, apenas atualizar a transação existente (sem criar novas parcelas)
+        const transactionData = {
+          ...formData,
+          id_empresa: profile.id_empresa,
+          valor: formData.e_recorrente ? Number(formData.valor_parcela) : Number(formData.valor),
+          tipo: 'despesa' as const,
+          id_categoria: formData.id_categoria || null,
+          id_pessoa: formData.id_pessoa || null,
+        };
+
         const { error } = await supabase
           .from('transacoes')
           .update(transactionData)
@@ -136,12 +143,32 @@ const AccountsPayable: React.FC = () => {
         if (error) throw error;
         alert('Conta a pagar atualizada com sucesso!');
       } else {
-        const { error } = await supabase
-          .from('transacoes')
-          .insert(transactionData);
+        // Para criação nova
+        if (formData.e_recorrente && formData.tipo_recorrencia === 'parcelada' && formData.numero_parcelas && formData.numero_parcelas > 1) {
+          // Criar despesa parcelada - múltiplas transações
+          await createParceladaTransactions();
+        } else {
+          // Criar despesa única ou assinatura (apenas primeira parcela)
+          const transactionData = {
+            ...formData,
+            id_empresa: profile.id_empresa,
+            valor: formData.e_recorrente ? Number(formData.valor_parcela) : Number(formData.valor),
+            tipo: 'despesa' as const,
+            id_categoria: formData.id_categoria || null,
+            id_pessoa: formData.id_pessoa || null,
+            parcela_atual: formData.e_recorrente ? 1 : null,
+            descricao: formData.e_recorrente && formData.tipo_recorrencia === 'assinatura' 
+              ? `${formData.descricao} (Assinatura)`
+              : formData.descricao
+          };
 
-        if (error) throw error;
-        alert('Conta a pagar criada com sucesso!');
+          const { error } = await supabase
+            .from('transacoes')
+            .insert(transactionData);
+
+          if (error) throw error;
+          alert(formData.e_recorrente ? 'Assinatura criada com sucesso!' : 'Conta a pagar criada com sucesso!');
+        }
       }
 
       await loadData();
@@ -149,6 +176,86 @@ const AccountsPayable: React.FC = () => {
     } catch (error) {
       console.error('Error saving transaction:', error);
       alert('Erro ao salvar conta a pagar. Tente novamente.');
+    }
+  };
+
+  const createParceladaTransactions = async () => {
+    if (!profile?.id_empresa || !formData.numero_parcelas || !formData.data_inicio_recorrencia) return;
+
+    try {
+      // 1. Criar a transação pai (primeira parcela)
+      const transacaoPaiData = {
+        ...formData,
+        id_empresa: profile.id_empresa,
+        valor: Number(formData.valor_parcela),
+        tipo: 'despesa' as const,
+        id_categoria: formData.id_categoria || null,
+        id_pessoa: formData.id_pessoa || null,
+        data_transacao: formData.data_inicio_recorrencia,
+        data_vencimento: formData.data_inicio_recorrencia,
+        parcela_atual: 1,
+        id_transacao_pai: null,
+        descricao: `${formData.descricao} (Parcela 1/${formData.numero_parcelas})`
+      };
+
+      const { data: transacaoPai, error: paiError } = await supabase
+        .from('transacoes')
+        .insert(transacaoPaiData)
+        .select()
+        .single();
+
+      if (paiError) throw paiError;
+
+      console.log('✅ Transação pai criada:', transacaoPai.id);
+
+      // 2. Criar as parcelas futuras (2ª até a última)
+      const parcelasFuturas = [];
+      
+      for (let i = 2; i <= formData.numero_parcelas; i++) {
+        const dataVencimento = new Date(formData.data_inicio_recorrencia);
+        dataVencimento.setMonth(dataVencimento.getMonth() + (i - 1));
+        
+        const parcelaData = {
+          id_empresa: profile.id_empresa,
+          valor: Number(formData.valor_parcela),
+          tipo: 'despesa' as const,
+          descricao: `${formData.descricao} (Parcela ${i}/${formData.numero_parcelas})`,
+          data_transacao: dataVencimento.toISOString().split('T')[0],
+          data_vencimento: dataVencimento.toISOString().split('T')[0],
+          id_categoria: formData.id_categoria || null,
+          id_pessoa: formData.id_pessoa || null,
+          status: 'pendente',
+          origem: 'manual',
+          observacoes: formData.observacoes,
+          e_recorrente: true,
+          tipo_recorrencia: 'parcelada',
+          numero_parcelas: formData.numero_parcelas,
+          parcela_atual: i,
+          data_inicio_recorrencia: formData.data_inicio_recorrencia,
+          valor_parcela: Number(formData.valor_parcela),
+          id_transacao_pai: transacaoPai.id,
+          ativa_recorrencia: true
+        };
+        
+        parcelasFuturas.push(parcelaData);
+      }
+
+      // Inserir todas as parcelas futuras em lote
+      if (parcelasFuturas.length > 0) {
+        const { error: parcelasError } = await supabase
+          .from('transacoes')
+          .insert(parcelasFuturas);
+
+        if (parcelasError) throw parcelasError;
+
+        console.log('✅ Parcelas futuras criadas:', parcelasFuturas.length);
+      }
+
+      alert(`Despesa parcelada criada com sucesso! ${formData.numero_parcelas} parcelas de ${formatCurrency(Number(formData.valor_parcela))} foram geradas.`);
+
+    } catch (error) {
+      console.error('Error creating parcelada transactions:', error);
+      throw error;
     }
   };
 
@@ -750,6 +857,150 @@ const AccountsPayable: React.FC = () => {
                           e_recorrente: e.target.checked,
                           tipo_recorrencia: e.target.checked ? 'parcelada' : null,
                           numero_parcelas: e.target.checked ? 2 : null,
+                          valor_parcela: e.target.checked && formData.valor ? Number(formData.valor) / 2 : null,
+                          data_inicio_recorrencia: e.target.checked ? formData.data_transacao : null
+                        })}
+                        className="rounded border-gray-300 text-red-600 focus:ring-red-500"
+                      />
+                      <label htmlFor="e_recorrente" className="text-sm font-medium text-gray-700">
+                        Despesa Recorrente
+                      </label>
+                    </div>
+
+                    {formData.e_recorrente && (
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Tipo de Recorrência *
+                            </label>
+                            <select
+                              required={formData.e_recorrente}
+                              value={formData.tipo_recorrencia || ''}
+                              onChange={(e) => setFormData({ ...formData, tipo_recorrencia: e.target.value })}
+                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                            >
+                              <option value="">Selecione o tipo</option>
+                              <option value="parcelada">Parcelada (número fixo de parcelas)</option>
+                              <option value="assinatura">Assinatura (recorrência contínua)</option>
+                            </select>
+                          </div>
+
+                          {formData.tipo_recorrencia === 'parcelada' && (
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Número de Parcelas *
+                              </label>
+                              <input
+                                type="number"
+                                min="2"
+                                max="60"
+                                required={formData.tipo_recorrencia === 'parcelada'}
+                                value={formData.numero_parcelas || ''}
+                                onChange={(e) => {
+                                  const parcelas = Number(e.target.value);
+                                  setFormData({ 
+                                    ...formData, 
+                                    numero_parcelas: parcelas,
+                                    valor_parcela: parcelas > 0 && formData.valor ? Number(formData.valor) / parcelas : null
+                                  });
+                                }}
+                                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                                placeholder="Ex: 12"
+                              />
+                            </div>
+                          )}
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Data de Início da Recorrência *
+                            </label>
+                            <input
+                              type="date"
+                              required={formData.e_recorrente}
+                              value={formData.data_inicio_recorrencia || ''}
+                              onChange={(e) => setFormData({ ...formData, data_inicio_recorrencia: e.target.value })}
+                              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Valor por Parcela
+                            </label>
+                            <input
+                              type="text"
+                              value={formData.valor_parcela ? formatCurrency(formData.valor_parcela) : ''}
+                              className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-50 text-gray-600"
+                              disabled
+                              placeholder="Calculado automaticamente"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">
+                              {formData.tipo_recorrencia === 'parcelada' && formData.numero_parcelas 
+                                ? `${formatCurrency(Number(formData.valor))} ÷ ${formData.numero_parcelas} parcelas`
+                                : 'Valor igual ao total para assinaturas'
+                              }
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Simulação do Parcelamento */}
+                        {formData.tipo_recorrencia === 'parcelada' && formData.numero_parcelas && formData.valor_parcela && formData.data_inicio_recorrencia && (
+                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <h4 className="font-semibold text-blue-900 mb-3">📋 Simulação do Parcelamento</h4>
+                            <div className="space-y-2 max-h-40 overflow-y-auto">
+                              {Array.from({ length: formData.numero_parcelas }, (_, index) => {
+                                const parcelaNum = index + 1;
+                                const dataVencimento = new Date(formData.data_inicio_recorrencia!);
+                                dataVencimento.setMonth(dataVencimento.getMonth() + index);
+                                
+                                return (
+                                  <div key={index} className="flex items-center justify-between text-sm">
+                                    <span className="text-blue-800">
+                                      Parcela {parcelaNum}/{formData.numero_parcelas} - {dataVencimento.toLocaleDateString('pt-BR')}
+                                    </span>
+                                    <span className="font-semibold text-blue-900">
+                                      {formatCurrency(formData.valor_parcela)}
+                                    </span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                            <div className="mt-3 pt-3 border-t border-blue-200 flex items-center justify-between">
+                              <span className="font-semibold text-blue-900">Total:</span>
+                              <span className="font-bold text-blue-900">{formatCurrency(Number(formData.valor))}</span>
+                            </div>
+                          </div>
+                        )}
+
+                        {formData.tipo_recorrencia === 'assinatura' && (
+                          <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                            <h4 className="font-semibold text-purple-900 mb-2">🔄 Assinatura Mensal</h4>
+                            <div className="text-sm text-purple-800 space-y-1">
+                              <p>• Valor mensal: {formatCurrency(Number(formData.valor))}</p>
+                              <p>• Início: {formData.data_inicio_recorrencia ? new Date(formData.data_inicio_recorrencia).toLocaleDateString('pt-BR') : '-'}</p>
+                              <p>• Próximas cobranças serão criadas automaticamente</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Seção de Recorrência */}
+                <div className="md:col-span-2">
+                  <div className="border border-gray-200 rounded-lg p-4">
+                    <div className="flex items-center space-x-2 mb-4">
+                      <input
+                        type="checkbox"
+                        id="e_recorrente"
+                        checked={formData.e_recorrente || false}
+                        onChange={(e) => setFormData({ 
+                          ...formData, 
+                          e_recorrente: e.target.checked,
+                          tipo_recorrencia: e.target.checked ? 'parcelada' : null,
+                          numero_parcelas: e.target.checked ? 2 : null,
                           valor_parcela: e.target.checked ? Number(formData.valor) : null,
                           data_inicio_recorrencia: e.target.checked ? formData.data_transacao : null
                         })}
@@ -948,6 +1199,9 @@ const AccountsPayable: React.FC = () => {
           </div>
         </div>
       )}
+    data_inicio_recorrencia: transaction.data_inicio_recorrencia,
+    valor_parcela: transaction.valor_parcela,
+    ativa_recorrencia: transaction.ativa_recorrencia,
     </div>
   );
 };
