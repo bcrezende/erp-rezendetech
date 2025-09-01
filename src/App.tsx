@@ -33,10 +33,19 @@ const AppContent: React.FC = () => {
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const { user, profile, loading, signOut, supabase } = useAuth();
-  const [dateFilter, setDateFilter] = useState({
-    startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-    endDate: new Date().toISOString().split('T')[0]
-  });
+
+  // Calculate initial date filter for the entire current month
+  const getInitialMonthDateRange = () => {
+    const today = new Date();
+    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0); // Day 0 of next month is last day of current month
+
+    return {
+      startDate: firstDayOfMonth.toISOString().split('T')[0],
+      endDate: lastDayOfMonth.toISOString().split('T')[0]
+    };
+  };
+  const [dateFilter, setDateFilter] = useState(getInitialMonthDateRange());
 
   const handleSignOut = async () => {
     await signOut();
@@ -113,13 +122,7 @@ const AppContent: React.FC = () => {
                     />
                   </div>
                   <button
-                    onClick={() => {
-                      const today = new Date();
-                      const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-                      setDateFilter({
-                        startDate: firstDay.toISOString().split('T')[0],
-                        endDate: today.toISOString().split('T')[0]
-                      });
+                    onClick={() => { setDateFilter(getInitialMonthDateRange());
                     }}
                     className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm w-full sm:w-auto whitespace-nowrap"
                   >
@@ -132,6 +135,9 @@ const AppContent: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <DREPanel dateFilter={dateFilter} />
               <CashFlowPanel />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <PendingAccountsPanel dateFilter={dateFilter} />
             </div>
 
             <EstimatePanel dateFilter={dateFilter} />
