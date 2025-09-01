@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../Auth/AuthProvider';
-import { CreditCard, Search, Calendar, AlertTriangle, DollarSign, User, Tag, Eye, X, Filter } from 'lucide-react';
+import { CreditCard, Search, Calendar, AlertTriangle, DollarSign, User, Tag, Eye, X, Filter, Edit } from 'lucide-react';
 import { Database } from '../../types/supabase';
 
 type Transaction = Database['public']['Tables']['transacoes']['Row'];
@@ -15,6 +15,8 @@ const AccountsPayable: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [viewingTransaction, setViewingTransaction] = useState<Transaction | null>(null);
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const [showForm, setShowForm] = useState(false);
   const [filters, setFilters] = useState({
     categoria: 'all',
     pessoa: 'all',
@@ -23,12 +25,24 @@ const AccountsPayable: React.FC = () => {
     dataInicio: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
     dataFim: new Date().toISOString().split('T')[0]
   });
+  const [formData, setFormData] = useState<Partial<any>>({
+    valor: 0,
+    tipo: 'despesa',
+    descricao: '',
+    data_transacao: new Date().toISOString().split('T')[0],
+    data_vencimento: new Date().toISOString().split('T')[0],
+    id_categoria: '',
+    id_pessoa: '',
+    status: 'pendente',
+    origem: 'manual',
+    observacoes: '',
+  });
 
   useEffect(() => {
     if (profile?.id_empresa) {
       loadData();
     }
-  }, [profile]);
+  }, [profile, filters.dataInicio, filters.dataFim, filters.status]);
 
   const loadData = async () => {
     try {
@@ -49,8 +63,8 @@ const AccountsPayable: React.FC = () => {
           .select('*')
           .eq('id_empresa', profile.id_empresa)
           .eq('tipo', 'despesa')
-          .gte('data_vencimento', filters.dataInicio)
-          .lte('data_vencimento', filters.dataFim)
+          .gte('data_transacao', filters.dataInicio)
+          .lte('data_transacao', filters.dataFim)
           .order('data_vencimento', { ascending: true }),
         supabase
           .from('categorias')
@@ -85,13 +99,16 @@ const AccountsPayable: React.FC = () => {
         allTransactions: transactionsRes.data?.length || 0,
         categories: categoriesRes.data?.length || 0,
         pessoas: pessoasRes.data?.length || 0,
-        transactionsData: transactionsRes.data,
+        filtros: filters,
+        transactionsData: transactionsRes.data?.slice(0, 3),
         query: {
           table: 'transacoes',
           filters: { 
             id_empresa: profile.id_empresa,
             tipo: 'despesa',
-            status: 'pendente'
+            data_inicio: filters.dataInicio,
+            data_fim: filters.dataFim,
+            status: filters.status
           }
         }
       });
@@ -104,6 +121,69 @@ const AccountsPayable: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEdit = (transaction: Transaction) => {
+    setEditingTransaction(transaction);
+    setFormData({
+      valor: transaction.valor,
+      tipo: transaction.tipo,
+      descricao: transaction.descricao,
+      data_transacao: transaction.data_transacao,
+      data_vencimento: transaction.data_vencimento || transaction.data_transacao,
+      id_categoria: transaction.id_categoria || '',
+      id_pessoa: transaction.id_pessoa || '',
+      status: transaction.status,
+      origem: transaction.origem,
+      observacoes: transaction.observacoes,
+    });
+    setShowForm(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!profile?.id_empresa) return;
+
+    try {
+      const transactionData = {
+        ...formData,
+        id_empresa: profile.id_empresa,
+        valor: Number(formData.valor),
+        id_categoria: formData.id_categoria || null,
+        id_pessoa: formData.id_pessoa || null,
+      };
+
+      const { error } = await supabase
+        .from('transacoes')
+        .update(transactionData)
+        .eq('id', editingTransaction!.id);
+
+      if (error) throw error;
+      alert('Transação atualizada com sucesso!');
+
+      await loadData();
+      resetForm();
+    } catch (error) {
+      console.error('Error saving transaction:', error);
+      alert('Erro ao salvar transação. Tente novamente.');
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      valor: 0,
+      tipo: 'despesa',
+      descricao: '',
+      data_transacao: new Date().toISOString().split('T')[0],
+      data_vencimento: new Date().toISOString().split('T')[0],
+      id_categoria: '',
+      id_pessoa: '',
+      status: 'pendente',
+      origem: 'manual',
+      observacoes: '',
+    });
+    setEditingTransaction(null);
+    setShowForm(false);
   };
 
   const getCategoryName = (categoryId: string | null) => {
@@ -155,6 +235,23 @@ const AccountsPayable: React.FC = () => {
     }
   };
 
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'pendente':
+        return 'Pendente';
+      case 'pago':
+        return 'Pago';
+      case 'concluida':
+        return 'Concluída';
+      case 'vencido':
+        return 'Vencido';
+      case 'cancelado':
+        return 'Cancelado';
+      default:
+        return status;
+    }
+  };
+
   const filteredTransactions = transactions.filter(transaction => {
     const matchesSearch = transaction.descricao.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          getCategoryName(transaction.id_categoria).toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -166,7 +263,10 @@ const AccountsPayable: React.FC = () => {
     const matchesPessoa = filters.pessoa === 'all' || transaction.id_pessoa === filters.pessoa;
     
     // Filtro de status
-    const matchesStatus = filters.status === 'all' || transaction.status === filters.status;
+    let matchesStatus = true;
+    if (filters.status !== 'all') {
+      matchesStatus = transaction.status === filters.status;
+    }
     
     let matchesPeriod = true;
     if (filters.periodo === 'vencidas') {
@@ -300,12 +400,12 @@ const AccountsPayable: React.FC = () => {
             onChange={(e) => setFilters({ ...filters, status: e.target.value })}
             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            <option value="all">Todos os status</option>
             <option value="pendente">Pendente</option>
             <option value="pago">Pago</option>
             <option value="concluida">Concluída</option>
             <option value="vencido">Vencido</option>
             <option value="cancelado">Cancelado</option>
+            <option value="all">Todos os status</option>
           </select>
 
           <select
@@ -388,13 +488,12 @@ const AccountsPayable: React.FC = () => {
                 categoria: 'all',
                 pessoa: 'all',
                 periodo: 'all',
-                status: 'all',
+                status: 'pendente',
                 dataInicio: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
                 dataFim: new Date().toISOString().split('T')[0]
               });
               setSearchTerm('');
-              console.log('🔄 AccountsPayable: Filters cleared, reloading data...');
-              loadData();
+              console.log('🔄 AccountsPayable: Filters cleared');
             }}
             className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
           >
@@ -414,6 +513,7 @@ const AccountsPayable: React.FC = () => {
                 <th className="text-left p-4 font-medium text-gray-600">Fornecedor</th>
                 <th className="text-left p-4 font-medium text-gray-600">Categoria</th>
                 <th className="text-left p-4 font-medium text-gray-600">Vencimento</th>
+                <th className="text-center p-4 font-medium text-gray-600">Status</th>
                 <th className="text-right p-4 font-medium text-gray-600">Valor</th>
                 <th className="text-center p-4 font-medium text-gray-600">Ações</th>
               </tr>
@@ -421,14 +521,14 @@ const AccountsPayable: React.FC = () => {
             <tbody>
               {filteredTransactions.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-12 text-gray-500">
+                  <td colSpan={8} className="text-center py-12 text-gray-500">
                     <CreditCard className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                     <p className="text-lg font-medium">
-                      {transactions.length === 0 ? 'Nenhuma conta a pagar vencida' : 'Nenhuma conta vencida corresponde aos filtros'}
+                      {transactions.length === 0 ? 'Nenhuma despesa encontrada' : 'Nenhuma despesa corresponde aos filtros'}
                     </p>
                     <p className="text-sm">
                       {transactions.length === 0 
-                        ? 'Parabéns! Você não tem contas vencidas' 
+                        ? 'Nenhuma despesa encontrada no período selecionado' 
                         : 'Tente ajustar os filtros ou limpar a busca'
                       }
                     </p>
@@ -439,7 +539,7 @@ const AccountsPayable: React.FC = () => {
                             categoria: 'all',
                             pessoa: 'all',
                             periodo: 'all',
-                            status: 'all',
+                            status: 'pendente',
                             dataInicio: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
                             dataFim: new Date().toISOString().split('T')[0]
                           });
@@ -497,16 +597,29 @@ const AccountsPayable: React.FC = () => {
                         )}
                       </div>
                     </td>
+                    <td className="p-4 text-center">
+                      <span className={`px-2 py-1 rounded-full text-sm font-medium ${getStatusColor(transaction.status)}`}>
+                        {getStatusLabel(transaction.status)}
+                      </span>
+                    </td>
                     <td className="p-4 text-right font-semibold text-red-600">
                       {formatCurrency(transaction.valor)}
                     </td>
                     <td className="p-4 text-center">
-                      <button
-                        onClick={() => setViewingTransaction(transaction)}
-                        className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                      >
-                        <Eye size={16} />
-                      </button>
+                      <div className="flex items-center justify-center space-x-2">
+                        <button
+                          onClick={() => setViewingTransaction(transaction)}
+                          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        >
+                          <Eye size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleEdit(transaction)}
+                          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        >
+                          <Edit size={16} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -515,6 +628,163 @@ const AccountsPayable: React.FC = () => {
           </table>
         </div>
       </div>
+
+      {/* Edit Form Modal */}
+      {showForm && editingTransaction && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">
+                Editar Despesa #{editingTransaction.id_sequencial}
+              </h2>
+            </div>
+
+            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Valor *
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    required
+                    value={formData.valor || ''}
+                    onChange={(e) => setFormData({ ...formData, valor: Number(e.target.value) })}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Status *
+                  </label>
+                  <select
+                    required
+                    value={formData.status || ''}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="pendente">Pendente</option>
+                    <option value="pago">Pago</option>
+                    <option value="concluida">Concluída</option>
+                    <option value="vencido">Vencido</option>
+                    <option value="cancelado">Cancelado</option>
+                  </select>
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Descrição *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.descricao || ''}
+                    onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Descrição da despesa"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Data da Transação *
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    value={formData.data_transacao || ''}
+                    onChange={(e) => setFormData({ ...formData, data_transacao: e.target.value })}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Data de Vencimento
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.data_vencimento || ''}
+                    onChange={(e) => setFormData({ ...formData, data_vencimento: e.target.value })}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Fornecedor
+                  </label>
+                  <select
+                    value={formData.id_pessoa || ''}
+                    onChange={(e) => setFormData({ ...formData, id_pessoa: e.target.value })}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Selecione um fornecedor</option>
+                    {pessoas.map(pessoa => (
+                      <option key={pessoa.id} value={pessoa.id}>
+                        {pessoa.nome_razao_social}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Categoria
+                  </label>
+                  <select
+                    value={formData.id_categoria || ''}
+                    onChange={(e) => setFormData({ ...formData, id_categoria: e.target.value })}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Selecione uma categoria</option>
+                    {categories.map(category => (
+                      <option key={category.id} value={category.id}>
+                        {category.nome}
+                        {category.classificacao_dre && 
+                          ` (${category.classificacao_dre.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())})`
+                        }
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Observações
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={formData.observacoes || ''}
+                    onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Observações adicionais sobre a despesa..."
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Atualizar Despesa
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* View Transaction Modal */}
       {viewingTransaction && (
