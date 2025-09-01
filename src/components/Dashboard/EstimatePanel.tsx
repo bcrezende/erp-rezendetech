@@ -57,12 +57,15 @@ const EstimatePanel: React.FC<EstimatePanelProps> = ({ dateFilter }) => {
     const endDate = new Date(endYear, endMonth - 1, endDay);
     const today = new Date();
     
+    // Normalize today and startDate to midnight for accurate day difference calculation
+    const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const startDateMidnight = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+    
     // Total de dias no período
     const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-    
     // Dias decorridos no período (até hoje ou até o fim do período, o que for menor)
     const daysElapsed = Math.min(
-      Math.ceil((Math.min(today.getTime(), endDate.getTime()) - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1,
+      Math.floor((Math.min(todayMidnight.getTime(), endDate.getTime()) - startDateMidnight.getTime()) / (1000 * 60 * 60 * 24)) + 1,
       totalDays
     );
     
