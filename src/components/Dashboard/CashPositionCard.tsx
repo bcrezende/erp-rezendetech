@@ -39,7 +39,7 @@ const CashPositionCard: React.FC<CashPositionCardProps> = ({ dateFilter }) => {
           .from('transacoes')
           .select('*')
           .eq('id_empresa', profile.id_empresa)
-          .in('status', ['concluida', 'pago', 'recebido'])
+          .in('status', ['concluida', 'pago', 'recebido', 'concluída'])
           .gte('data_transacao', dateFilter.startDate)
           .lte('data_transacao', dateFilter.endDate),
         supabase
@@ -67,13 +67,13 @@ const CashPositionCard: React.FC<CashPositionCardProps> = ({ dateFilter }) => {
   const cashPosition = useMemo(() => {
     // RECEITAS PAGAS/RECEBIDAS
     const receitasPagas = transactions
-      .filter(t => t.tipo === 'receita' && ['concluida', 'pago', 'recebido'].includes(t.status))
+      .filter(t => t.tipo === 'receita' && ['concluida', 'pago', 'recebido', 'concluída'].includes(t.status))
       .reduce((sum, t) => sum + t.valor, 0);
 
     // DESPESAS PAGAS (TODAS AS DESPESAS PAGAS)
     const despesasPagas = transactions
       .filter(t => {
-        return t.tipo === 'despesa' && ['concluida', 'pago'].includes(t.status);
+        return t.tipo === 'despesa' && ['concluida', 'pago', 'concluída'].includes(t.status);
       })
       .reduce((sum, t) => sum + t.valor, 0);
 
@@ -89,14 +89,14 @@ const CashPositionCard: React.FC<CashPositionCardProps> = ({ dateFilter }) => {
 
   const receitasDetalhe = useMemo(() => {
     return transactions
-      .filter(t => t.tipo === 'receita' && ['concluida', 'pago', 'recebido'].includes(t.status))
+      .filter(t => t.tipo === 'receita' && ['concluida', 'pago', 'recebido', 'concluída'].includes(t.status))
       .sort((a, b) => new Date(b.data_transacao).getTime() - new Date(a.data_transacao).getTime());
   }, [transactions]);
 
   const despesasDetalhe = useMemo(() => {
     return transactions
       .filter(t => {
-        return t.tipo === 'despesa' && ['concluida', 'pago'].includes(t.status);
+        return t.tipo === 'despesa' && ['concluida', 'pago', 'concluída'].includes(t.status);
       })
       .sort((a, b) => new Date(b.data_transacao).getTime() - new Date(a.data_transacao).getTime());
   }, [transactions, categories]);
