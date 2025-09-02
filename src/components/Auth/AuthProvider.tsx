@@ -29,17 +29,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const initializeAuth = async () => {
       try {
-        console.log('🔄 Initializing auth...');
-        
         // Get current session
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.error('❌ Error getting session:', error);
-          
           // If refresh token is invalid, clear it by signing out
           if (error.message && error.message.includes('Invalid Refresh Token')) {
-            console.log('🔄 Clearing invalid refresh token...');
             await supabase.auth.signOut();
           }
           
@@ -52,7 +47,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           return;
         }
 
-        console.log('📋 Current session:', session?.user?.email || 'No session');
 
         if (session?.user && mounted) {
           setUser(session.user);
@@ -67,7 +61,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           setInitialized(true);
         }
       } catch (error) {
-        console.error('❌ Error initializing auth:', error);
         if (mounted) {
           setUser(null);
           setProfile(null);
@@ -83,8 +76,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (!mounted || !initialized) return;
-        
-        console.log('🔄 Auth event:', event, session?.user?.email || 'No user');
         
         setUser(session?.user ?? null);
         
@@ -112,8 +103,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
 
     try {
-      console.log('🔍 Fetching profile for user:', userId);
-      
       const { data, error } = await supabase
         .from('perfis')
         .select(`
@@ -133,29 +122,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         .maybeSingle();
 
       if (error) {
-        console.error('❌ Error fetching profile:', error);
         setProfile(null);
       } else {
-        console.log('✅ Profile data received:', data);
-        console.log('✅ Profile loaded:', data?.nome_completo || 'No profile');
         setProfile(data);
       }
     } catch (error) {
-      console.error('❌ Error in fetchProfile:', error);
       setProfile(null);
     } finally {
-      console.log('🏁 Setting loading to false');
       setLoading(false);
     }
   };
 
   const signIn = async (email: string, password: string) => {
-    console.log('🔐 AuthProvider.signIn chamado com:', email);
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-    console.log('📊 Resposta do Supabase auth:', { data: data?.user?.email, error });
     return { data, error };
   };
 

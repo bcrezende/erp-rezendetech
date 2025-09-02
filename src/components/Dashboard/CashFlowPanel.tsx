@@ -27,7 +27,6 @@ const CashFlowPanel: React.FC = () => {
         return;
       }
 
-      console.log('🔍 Loading cash flow transactions');
 
       const [transactionsRes, categoriesRes] = await Promise.all([ // Fetch categories as well
         supabase
@@ -45,8 +44,6 @@ const CashFlowPanel: React.FC = () => {
 
       if (transactionsRes.error) throw transactionsRes.error;
       if (categoriesRes.error) throw categoriesRes.error; // Handle category error
-      
-      console.log('📊 Cash flow transactions loaded:', transactionsRes.data?.length || 0, 'transactions');
       
       setTransactions(transactionsRes.data || []);
       setCategories(categoriesRes.data || []); // Set categories

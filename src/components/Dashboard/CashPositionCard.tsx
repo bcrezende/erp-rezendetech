@@ -34,7 +34,6 @@ const CashPositionCard: React.FC<CashPositionCardProps> = ({ dateFilter }) => {
         return;
       }
 
-      console.log('🔍 Loading cash position data for period:', dateFilter);
 
       const [transactionsRes, categoriesRes] = await Promise.all([
         supabase
@@ -54,11 +53,6 @@ const CashPositionCard: React.FC<CashPositionCardProps> = ({ dateFilter }) => {
       if (transactionsRes.error) throw transactionsRes.error;
       if (categoriesRes.error) throw categoriesRes.error;
 
-      console.log('📊 Cash position data loaded:', {
-        transacoes: transactionsRes.data?.length || 0,
-        periodo: `${dateFilter.startDate} até ${dateFilter.endDate}`,
-        dados: transactionsRes.data
-      });
       setTransactions(transactionsRes.data || []);
       setCategories(categoriesRes.data || []);
     } catch (error) {

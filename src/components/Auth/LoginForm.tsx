@@ -22,14 +22,11 @@ const LoginForm: React.FC<LoginFormProps> = () => {
     setLoading(true);
     setError('');
 
-    console.log('🔄 Tentando fazer login com:', email);
 
     try {
       const { error } = await signIn(email, password);
-      console.log('📋 Resultado do login:', { error });
       
       if (error) {
-        console.error('❌ Erro no login:', error);
         if (error.message.includes('Invalid login credentials') || 
             error.message.includes('invalid_credentials')) {
           setError('Email ou senha incorretos. Verifique suas credenciais.');
@@ -39,12 +36,10 @@ const LoginForm: React.FC<LoginFormProps> = () => {
           setError('Erro ao fazer login: ' + error.message);
         }
       } else {
-        console.log('✅ Login realizado com sucesso');
         // Força o recarregamento da página para garantir que o AuthProvider detecte o usuário
         window.location.reload();
       }
     } catch (err) {
-      console.error('❌ Erro inesperado no login:', err);
       setError('Erro inesperado. Tente novamente.');
     } finally {
       setLoading(false);

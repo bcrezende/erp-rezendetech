@@ -25,7 +25,6 @@ const EstimatePanel: React.FC<EstimatePanelProps> = ({ dateFilter }) => {
         return;
       }
 
-      console.log('🔍 Loading estimate transactions for period:', dateFilter);
 
       const { data, error } = await supabase
         .from('transacoes')
@@ -36,12 +35,6 @@ const EstimatePanel: React.FC<EstimatePanelProps> = ({ dateFilter }) => {
         .lte('data_transacao', dateFilter.endDate);
 
       if (error) throw error;
-      
-      console.log('📊 Estimate transactions loaded:', {
-        total: data?.length || 0,
-        periodo: `${dateFilter.startDate} até ${dateFilter.endDate}`,
-        transacoes: data
-      });
       
       setTransactions(data || []);
     } catch (error) {
