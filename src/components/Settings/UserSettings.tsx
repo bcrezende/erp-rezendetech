@@ -154,6 +154,12 @@ const UserSettings: React.FC = () => {
                   <p className="text-gray-900 font-mono text-xs">{profile.empresas.assinatura_id}</p>
                 </div>
               )}
+              {profile.assinatura_id && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-600">ID da Assinatura do Usuário</label>
+                  <p className="text-gray-900 font-mono text-xs">{profile.assinatura_id}</p>
+                </div>
+              )}
             </div>
             <div className="mt-3 text-xs text-gray-500">
               💡 Para editar informações da empresa, acesse: Configurações → Empresa
@@ -365,6 +371,12 @@ const UserSettings: React.FC = () => {
             <label className="block text-xs font-medium text-gray-600">ID do Usuário</label>
             <p className="text-gray-900 font-mono text-xs">{user?.id}</p>
           </div>
+          {profile?.assinatura_id && (
+            <div>
+              <label className="block text-xs font-medium text-gray-600">ID da Assinatura</label>
+              <p className="text-gray-900 font-mono text-xs">{profile.assinatura_id}</p>
+            </div>
+          )}
           <div>
             <label className="block text-xs font-medium text-gray-600">Papel na Empresa</label>
             <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
@@ -415,6 +427,9 @@ const UserSettings: React.FC = () => {
               <p>• Apenas você e administradores da sua empresa podem ver suas informações</p>
               <p>• Para alterar sua senha, use a opção "Esqueci minha senha" na tela de login</p>
               <p>• Para configurações da empresa, acesse o menu "Configurações → Empresa"</p>
+              {profile?.assinatura_id && (
+                <p>• Seu ID de assinatura é usado para validação de webhooks e integrações</p>
+              )}
             </div>
           </div>
         </div>
