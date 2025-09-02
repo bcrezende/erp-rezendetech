@@ -102,40 +102,43 @@ const AppContent: React.FC = () => {
     switch (currentPage) {
       case 'dashboard':
         return (
-          <div className="space-y-6">
+          <div className="space-y-8">
             {/* Filtro Global de Data */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="card-modern rounded-2xl shadow-xl border border-white/20 p-6 hover-lift animate-slide-in-up">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-purple-600/5 rounded-2xl" />
               <div className="flex items-center justify-between">
                 <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-3">
-                  <Calendar className="h-6 w-6 text-blue-600" />
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900">Filtro de Período</h3>
-                    <p className="text-sm text-gray-600">Selecione o período para análise</p>
+                  <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg">
+                    <Calendar className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="relative z-10">
+                    <h3 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">Filtro de Período</h3>
+                    <p className="text-sm text-gray-600 font-medium">Selecione o período para análise</p>
                   </div>
                 </div>
                 <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
                   <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
-                    <label className="text-sm font-medium text-gray-700">De:</label>
+                    <label className="text-sm font-semibold text-gray-700">De:</label>
                     <input
                       type="date"
                       value={dateFilter.startDate}
                       onChange={(e) => setDateFilter({ ...dateFilter, startDate: e.target.value })}
-                      className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-auto"
+                      className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-auto bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-200"
                     />
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
-                    <label className="text-sm font-medium text-gray-700">Até:</label>
+                    <label className="text-sm font-semibold text-gray-700">Até:</label>
                     <input
                       type="date"
                       value={dateFilter.endDate}
                       onChange={(e) => setDateFilter({ ...dateFilter, endDate: e.target.value })}
-                      className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-auto"
+                      className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-auto bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-200"
                     />
                   </div>
                   <button
                     onClick={() => { setDateFilter(getInitialMonthDateRange());
                     }}
-                    className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm w-full sm:w-auto whitespace-nowrap"
+                    className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 text-sm w-full sm:w-auto whitespace-nowrap shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold"
                   >
                     Mês Atual
                   </button>
@@ -143,13 +146,22 @@ const AppContent: React.FC = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <DREPanel dateFilter={dateFilter} />
-              <CashFlowPanel />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="animate-slide-in-left stagger-1">
+                <DREPanel dateFilter={dateFilter} />
+              </div>
+              <div className="animate-slide-in-left stagger-2">
+                <CashFlowPanel />
+              </div>
             </div>
-            <PendingAccountsPanel dateFilter={dateFilter} />
+            
+            <div className="animate-slide-in-up stagger-3">
+              <PendingAccountsPanel dateFilter={dateFilter} />
+            </div>
 
-            <EstimatePanel dateFilter={dateFilter} />
+            <div className="animate-slide-in-up stagger-4">
+              <EstimatePanel dateFilter={dateFilter} />
+            </div>
           </div>
         );
       
@@ -208,7 +220,7 @@ const AppContent: React.FC = () => {
   const { title, subtitle } = getPageTitle(currentPage);
 
   return (
-    <div className={`flex h-screen bg-gray-50 ${isMobileSidebarOpen ? 'overflow-hidden' : ''}`}>
+    <div className={`flex h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 ${isMobileSidebarOpen ? 'overflow-hidden' : ''}`}>
       <Sidebar 
         currentPage={currentPage} 
         onNavigate={setCurrentPage} 
@@ -218,33 +230,36 @@ const AppContent: React.FC = () => {
       />
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="bg-white shadow-sm border-b border-gray-200 px-4 sm:px-6 py-4">
+        <div className="bg-white/80 backdrop-blur-md shadow-lg border-b border-white/20 px-4 sm:px-6 py-4 relative">
+          {/* Header gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-purple-600/5" />
+          
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMobileSidebarOpen(true)}
-                className="p-2 rounded-lg hover:bg-gray-100 transition-colors md:hidden"
+                className="p-2 rounded-xl hover:bg-white/60 transition-all duration-200 md:hidden backdrop-blur-sm"
               >
                 <Menu size={20} className="text-gray-600" />
               </button>
               
-              <div>
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">{title}</h2>
+              <div className="relative z-10">
+                <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">{title}</h2>
                 {subtitle && (
-                  <p className="text-xs sm:text-sm text-gray-600 mt-1">{subtitle}</p>
+                  <p className="text-xs sm:text-sm text-gray-600 mt-1 font-medium">{subtitle}</p>
                 )}
               </div>
             </div>
 
-            <div className="flex items-center space-x-2 sm:space-x-4">
-              <div className="text-right hidden sm:block">
+            <div className="flex items-center space-x-2 sm:space-x-4 relative z-10">
+              <div className="text-right hidden sm:block bg-white/60 backdrop-blur-sm rounded-xl px-3 py-2">
                 <p className="text-sm font-medium text-gray-900">{profile?.nome_completo}</p>
                 <p className="text-xs text-gray-500">{profile?.empresas?.nome}</p>
               </div>
               
               {/* Mobile User Avatar */}
-              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center sm:hidden">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center sm:hidden shadow-lg">
                 <span className="text-white text-xs font-medium">
                   {profile?.nome_completo?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'U'}
                 </span>
@@ -252,7 +267,7 @@ const AppContent: React.FC = () => {
               
               <button
                 onClick={handleSignOut}
-                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 text-gray-600 hover:text-red-600 hover:bg-white/60 rounded-xl transition-all duration-200 backdrop-blur-sm"
               >
                 <LogOut size={18} className="sm:w-5 sm:h-5" />
               </button>
@@ -260,7 +275,7 @@ const AppContent: React.FC = () => {
           </div>
         </div>
         
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 animate-fade-in">
           {renderPageContent()}
         </main>
       </div>
