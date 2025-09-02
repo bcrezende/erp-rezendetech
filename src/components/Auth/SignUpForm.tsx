@@ -125,6 +125,13 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onBackToLogin }) => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
+            <div className="mb-6">
+              <img 
+                src="/10f97f14-9488-4367-a784-0868f7340b82 copy.png" 
+                alt="RezendeTech Logo" 
+                className="mx-auto h-16 w-auto mb-4"
+              />
+            </div>
             <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-green-600">
               <CheckCircle className="h-6 w-6 text-white" />
             </div>
@@ -133,7 +140,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onBackToLogin }) => {
             </h2>
             <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
               <p className="text-sm text-green-700 mb-2">
-                Sua conta e empresa foram criadas com sucesso!
+                Sua conta e empresa foram criadas com sucesso no RezendeTech ERP!
               </p>
               <div className="text-sm text-green-600 space-y-1">
                 <p><strong>Email:</strong> {formData.email}</p>
@@ -149,7 +156,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onBackToLogin }) => {
             </div>
             <button
               onClick={onBackToLogin}
-              className="mt-6 w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="mt-6 w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 shadow-lg"
             >
               Ir para Login
             </button>
@@ -163,15 +170,20 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onBackToLogin }) => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-blue-600">
-            <UserPlus className="h-6 w-6 text-white" />
+          <div className="text-center mb-8">
+            <img 
+              src="/10f97f14-9488-4367-a784-0868f7340b82 copy.png" 
+              alt="RezendeTech Logo" 
+              className="mx-auto h-20 w-auto mb-6"
+            />
+            <div className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold mb-2">Bem-vindo ao ERP</h1>
+              <h2 className="text-2xl font-semibold">RezendeTech</h2>
+            </div>
+            <p className="mt-3 text-gray-600 text-sm">
+              Crie sua conta e comece a usar nosso sistema
+            </p>
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Criar Nova Conta
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Sistema ERP Integrado
-          </p>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -440,12 +452,18 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onBackToLogin }) => {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg"
             >
               {loading ? (
-                <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
+                <div className="flex items-center space-x-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                  <span>Criando conta...</span>
+                </div>
               ) : (
-                'Criar Conta'
+                <div className="flex items-center space-x-2">
+                  <UserPlus size={18} />
+                  <span>Criar Conta</span>
+                </div>
               )}
             </button>
 
@@ -457,6 +475,16 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onBackToLogin }) => {
               <ArrowLeft className="h-4 w-4 mr-2" />
               Voltar para Login
             </button>
+          </div>
+
+          {/* Footer */}
+          <div className="text-center pt-6 border-t border-gray-200">
+            <p className="text-xs text-gray-500">
+              © 2025 RezendeTech. Todos os direitos reservados.
+            </p>
+            <p className="text-xs text-gray-400 mt-1">
+              Sistema ERP com IA integrada para gestão empresarial
+            </p>
           </div>
         </form>
       </div>

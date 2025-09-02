@@ -128,12 +128,19 @@ const ResetPasswordForm: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
+            <div className="mb-6">
+              <img 
+                src="/10f97f14-9488-4367-a784-0868f7340b82 copy.png" 
+                alt="RezendeTech Logo" 
+                className="mx-auto h-16 w-auto mb-4"
+              />
+            </div>
             <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
               Validando Link de Redefinição
             </h2>
             <p className="text-gray-600">
-              Aguarde enquanto validamos seu link de redefinição de senha...
+              RezendeTech ERP - Aguarde enquanto validamos seu link de redefinição de senha...
             </p>
           </div>
         </div>
@@ -147,6 +154,13 @@ const ResetPasswordForm: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
+            <div className="mb-6">
+              <img 
+                src="/10f97f14-9488-4367-a784-0868f7340b82 copy.png" 
+                alt="RezendeTech Logo" 
+                className="mx-auto h-16 w-auto mb-4"
+              />
+            </div>
             <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-green-600">
               <CheckCircle className="h-6 w-6 text-white" />
             </div>
@@ -155,7 +169,7 @@ const ResetPasswordForm: React.FC = () => {
             </h2>
             <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
               <p className="text-sm text-green-700 mb-2">
-                Sua senha foi alterada com sucesso!
+                Sua senha do RezendeTech ERP foi alterada com sucesso!
               </p>
               <p className="text-xs text-green-600">
                 Você será redirecionado para a tela de login em alguns segundos...
@@ -179,6 +193,13 @@ const ResetPasswordForm: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
+            <div className="mb-6">
+              <img 
+                src="/10f97f14-9488-4367-a784-0868f7340b82 copy.png" 
+                alt="RezendeTech Logo" 
+                className="mx-auto h-16 w-auto mb-4"
+              />
+            </div>
             <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-red-600">
               <AlertCircle className="h-6 w-6 text-white" />
             </div>
@@ -190,7 +211,7 @@ const ResetPasswordForm: React.FC = () => {
                 {error || 'O link de redefinição de senha é inválido ou já expirou.'}
               </p>
               <p className="text-xs text-red-600">
-                Solicite um novo link de redefinição na tela de login.
+                Solicite um novo link de redefinição na tela de login do RezendeTech ERP.
               </p>
             </div>
             <button
@@ -211,14 +232,21 @@ const ResetPasswordForm: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-blue-600">
-            <Key className="h-6 w-6 text-white" />
+          <div className="text-center mb-8">
+            <img 
+              src="/10f97f14-9488-4367-a784-0868f7340b82 copy.png" 
+              alt="RezendeTech Logo" 
+              className="mx-auto h-16 w-auto mb-4"
+            />
+            <div className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-2xl font-bold">RezendeTech ERP</h1>
+            </div>
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Redefinir Senha
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Digite sua nova senha
+            Digite sua nova senha para acessar o sistema
           </p>
         </div>
 
@@ -278,12 +306,18 @@ const ResetPasswordForm: React.FC = () => {
             <button
               type="submit"
               disabled={loading || !password || !confirmPassword}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg"
             >
               {loading ? (
-                <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
+                <div className="flex items-center space-x-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                  <span>Redefinindo...</span>
+                </div>
               ) : (
-                'Redefinir Senha'
+                <div className="flex items-center space-x-2">
+                  <Key size={18} />
+                  <span>Redefinir Senha</span>
+                </div>
               )}
             </button>
 
@@ -312,6 +346,13 @@ const ResetPasswordForm: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Footer */}
+        <div className="text-center pt-4">
+          <p className="text-xs text-gray-500">
+            © 2025 RezendeTech. Sistema ERP com IA integrada.
+          </p>
         </div>
       </div>
     </div>

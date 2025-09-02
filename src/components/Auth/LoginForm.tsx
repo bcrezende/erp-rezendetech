@@ -96,14 +96,18 @@ const LoginForm: React.FC<LoginFormProps> = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div>
-            <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-blue-600">
-              <Mail className="h-6 w-6 text-white" />
+            <div className="text-center mb-6">
+              <img 
+                src="/10f97f14-9488-4367-a784-0868f7340b82 copy.png" 
+                alt="RezendeTech Logo" 
+                className="mx-auto h-16 w-auto mb-4"
+              />
             </div>
             <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
               Redefinir Senha
             </h2>
             <p className="mt-2 text-center text-sm text-gray-600">
-              Digite seu email para receber as instruções
+              RezendeTech ERP - Digite seu email para receber as instruções
             </p>
           </div>
 
@@ -195,15 +199,20 @@ const LoginForm: React.FC<LoginFormProps> = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-blue-600">
-            <LogIn className="h-6 w-6 text-white" />
+          <div className="text-center mb-8">
+            <img 
+              src="/10f97f14-9488-4367-a784-0868f7340b82 copy.png" 
+              alt="RezendeTech Logo" 
+              className="mx-auto h-20 w-auto mb-6"
+            />
+            <div className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold mb-2">Bem-vindo ao ERP</h1>
+              <h2 className="text-2xl font-semibold">RezendeTech</h2>
+            </div>
+            <p className="mt-3 text-gray-600 text-sm">
+              Sistema de Gestão Empresarial Completo
+            </p>
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Acesse sua conta
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Sistema ERP Integrado
-          </p>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -264,9 +273,19 @@ const LoginForm: React.FC<LoginFormProps> = () => {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg"
             >
-              {loading ? 'Entrando...' : 'Entrar'}
+              {loading ? (
+                <div className="flex items-center space-x-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                  <span>Entrando...</span>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <LogIn size={18} />
+                  <span>Acessar Sistema</span>
+                </div>
+              )}
             </button>
           </div>
 
@@ -285,10 +304,20 @@ const LoginForm: React.FC<LoginFormProps> = () => {
               href="https://sandbox.asaas.com/c/52etrpbztyd8msz9"
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-full text-white bg-green-600 hover:bg-green-700 text-sm font-medium py-3 px-4 border border-transparent rounded-lg transition-colors text-center"
+              className="block w-full text-white bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-sm font-medium py-3 px-4 border border-transparent rounded-lg transition-all duration-200 text-center shadow-lg"
             >
-              Adquira Já - Criar Conta
+              🚀 Adquira Já - Criar Conta Premium
             </a>
+          </div>
+
+          {/* Footer */}
+          <div className="text-center pt-6 border-t border-gray-200">
+            <p className="text-xs text-gray-500">
+              © 2025 RezendeTech. Todos os direitos reservados.
+            </p>
+            <p className="text-xs text-gray-400 mt-1">
+              Sistema ERP com IA integrada para gestão empresarial
+            </p>
           </div>
         </form>
       </div>
