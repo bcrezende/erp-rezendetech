@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './components/Auth/AuthProvider';
 import { AppProvider } from './contexts/AppContext';
 import LoginForm from './components/Auth/LoginForm';
+import ResetPasswordForm from './components/Auth/ResetPasswordForm';
 import PeopleManager from './components/People/PeopleManager';
 import ProductsManager from './components/Products/ProductsManager';
 import TransactionsManager from './components/Transactions/TransactionsManager';
@@ -35,6 +36,9 @@ const AppContent: React.FC = () => {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const { user, profile, loading, signOut, supabase } = useAuth();
 
+  // Check if current URL is reset-password
+  const isResetPasswordPage = window.location.pathname === '/reset-password';
+
   // Calculate initial date filter for the entire current month
   const getInitialMonthDateRange = () => {
     const today = new Date();
@@ -51,6 +55,11 @@ const AppContent: React.FC = () => {
   const handleSignOut = async () => {
     await signOut();
   };
+
+  // If on reset password page, show reset form regardless of auth state
+  if (isResetPasswordPage) {
+    return <ResetPasswordForm />;
+  }
 
   // Loading state
   if (loading) {
