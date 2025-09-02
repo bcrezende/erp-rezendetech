@@ -202,8 +202,6 @@ const CashFlowPanel: React.FC = () => {
       </div>
 
       {/* Detalhamento por Data */}
-      <div className="space-y-3 max-h-60 sm:max-h-80 overflow-y-auto relative z-10 custom-scrollbar">
-      {/* Detalhamento por Data */}
       <div className="space-y-3 max-h-96 sm:max-h-[500px] overflow-y-auto relative z-10 custom-scrollbar">
         <div className="grid grid-cols-4 gap-2 sm:gap-4 text-sm sm:text-base font-black text-gray-800 pb-4 border-b-2 border-white/40 bg-gradient-to-r from-white/70 to-slate-50/70 rounded-xl p-4 sticky top-0 backdrop-blur-lg shadow-lg">
           <span>Data</span>
