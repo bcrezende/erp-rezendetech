@@ -84,6 +84,14 @@ const AccountsPayable: React.FC = () => {
           .eq('ativo', true)
           .order('nome'),
         supabase
+          .from('pessoas')
+          .select('*')
+          .eq('id_empresa', profile.id_empresa)
+          .in('tipo_cadastro', ['fornecedor', 'colaborador', 'outro'])
+          .eq('ativo', true)
+          .order('nome_razao_social')
+      ]);
+
       setTransactions(transactionsRes.data || []);
       setCategories(categoriesRes.data || []);
       setPessoas(pessoasRes.data || []);
