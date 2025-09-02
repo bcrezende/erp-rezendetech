@@ -180,6 +180,12 @@ const EstimatePanel: React.FC<EstimatePanelProps> = ({ dateFilter }) => {
         <div className="w-full bg-gradient-to-r from-gray-200 to-gray-300 rounded-full h-3 sm:h-4 shadow-inner relative overflow-hidden">
           <div 
             className="bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 h-3 sm:h-4 rounded-full transition-all duration-1000 ease-out shadow-lg relative overflow-hidden"
+            style={{ width: `${progressPercentage}%` }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent animate-shimmer" />
+          </div>
+        </div>
+      </div>
 
       <div className="relative z-10 overflow-hidden">
         <table className="w-full">
