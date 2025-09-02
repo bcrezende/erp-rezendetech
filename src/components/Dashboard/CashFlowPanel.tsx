@@ -203,6 +203,8 @@ const CashFlowPanel: React.FC = () => {
 
       {/* Detalhamento por Data */}
       <div className="space-y-3 max-h-60 sm:max-h-80 overflow-y-auto relative z-10 custom-scrollbar">
+      {/* Detalhamento por Data */}
+      <div className="space-y-3 max-h-96 sm:max-h-[500px] overflow-y-auto relative z-10 custom-scrollbar">
         <div className="grid grid-cols-4 gap-2 sm:gap-4 text-sm sm:text-base font-black text-gray-800 pb-4 border-b-2 border-white/40 bg-gradient-to-r from-white/70 to-slate-50/70 rounded-xl p-4 sticky top-0 backdrop-blur-lg shadow-lg">
           <span>Data</span>
           <span className="text-right">Entradas</span>
@@ -215,11 +217,11 @@ const CashFlowPanel: React.FC = () => {
             Nenhuma movimentação encontrada
           </div>
         ) : (
-          cashFlowData.slice(-30).map((day) => (
+          cashFlowData.slice(-7).map((day) => (
             <React.Fragment key={day.date}>
               <button
                 onClick={() => toggleExpanded(day.date)}
-                className="w-full grid grid-cols-4 gap-2 sm:gap-4 py-3 sm:py-4 px-3 sm:px-4 rounded-xl hover:bg-gradient-to-r hover:from-white/60 hover:to-slate-50/60 text-sm sm:text-base text-left transition-smooth hover:shadow-xl backdrop-blur-sm group interactive-card"
+                className="w-full grid grid-cols-4 gap-2 sm:gap-4 py-3 sm:py-4 px-3 sm:px-4 rounded-xl hover:bg-gradient-to-r hover:from-white/60 hover:to-slate-50/60 text-sm sm:text-base text-left transition-smooth hover:shadow-xl backdrop-blur-sm group interactive-card relative z-20"
               >
                 <span className="font-black text-gray-900 flex items-center space-x-2">
                   <div className={`p-2 rounded-xl transition-all duration-300 shadow-md ${
@@ -243,11 +245,11 @@ const CashFlowPanel: React.FC = () => {
               </button>
 
               {expandedDate === day.date && (
-                <div className="ml-6 sm:ml-8 border-l-4 border-gradient-to-b from-blue-400 to-purple-600 pl-4 sm:pl-6 py-2 space-y-2 animate-slide-in-left bg-gradient-to-r from-blue-50/60 to-transparent rounded-r-xl">
+                <div className="ml-6 sm:ml-8 border-l-4 border-blue-400 pl-4 sm:pl-6 py-4 space-y-3 animate-slide-in-left bg-gradient-to-r from-blue-50/80 to-purple-50/40 rounded-r-xl shadow-inner relative z-10 backdrop-blur-sm">
                   {day.dailyTransactions
                     .sort((a, b) => new Date(a.criado_em).getTime() - new Date(b.criado_em).getTime()) // Sort by creation time
                     .map((transaction) => (
-                      <div key={transaction.id} className="flex justify-between items-center text-sm sm:text-base text-gray-800 glass p-4 rounded-xl shadow-lg hover:shadow-xl transition-smooth border border-white/40 hover-lift">
+                      <div key={transaction.id} className="flex justify-between items-center text-sm sm:text-base text-gray-800 bg-white/70 p-4 rounded-xl shadow-lg hover:shadow-xl transition-smooth border border-white/60 hover:bg-white/90 backdrop-blur-sm relative z-30">
                         <span className="flex-1 truncate">
                           {transaction.descricao} ({getCategoryName(transaction.id_categoria)})
                         </span>
