@@ -204,87 +204,124 @@ const CashFlowPanel: React.FC = () => {
       </div>
 
       {/* Detalhamento por Data */}
-      <div className={`overflow-y-auto relative z-10 custom-scrollbar mobile-scroll ${
+      <div className={`relative z-10 ${
         isMobile ? 'max-h-[500px]' : 'max-h-[700px]'
-      }`}>
-        {/* Header da Tabela */}
-        <div className="sticky top-0 z-30 bg-gradient-to-r from-white/90 to-slate-50/90 backdrop-blur-lg shadow-lg rounded-xl mb-2">
-          <div className="grid grid-cols-4 gap-4 p-4 text-sm font-black text-gray-800 border-b-2 border-white/40">
-            <div className="text-left">Data</div>
-            <div className="text-right">Entradas</div>
-            <div className="text-right">Saídas</div>
-            <div className="text-right">Saldo</div>
-          </div>
-        </div>
-
-        {/* Linhas da Tabela */}
-        <div className="space-y-2">
-        {cashFlowData.length === 0 ? (
-          <div className={`text-center text-gray-600 font-semibold animate-fade-in p-8 ${
-            isMobile ? 'py-8 text-sm' : 'py-12 text-base'
-          }`}>
-            Nenhuma movimentação encontrada
-          </div>
-        ) : (
-          cashFlowData.slice(isMobile ? -7 : -14).map((day) => (
-            <React.Fragment key={day.date}>
-              <button
-                onClick={() => toggleExpanded(day.date)}
-                className="w-full grid grid-cols-4 gap-4 py-3 px-4 rounded-xl hover:bg-gradient-to-r hover:from-white/60 hover:to-slate-50/60 text-sm text-left transition-smooth hover:shadow-xl backdrop-blur-sm group interactive-card relative z-20 touch-target no-select"
-              >
-                <div className="font-black text-gray-900 flex items-center space-x-2 min-w-0">
-                  <div className={`p-1.5 rounded-lg transition-all duration-300 shadow-md ${
-                    expandedDate === day.date ? 'bg-gradient-to-br from-blue-500 to-purple-600 text-white' : 'bg-white/80 text-gray-600 group-hover:bg-gradient-to-br group-hover:from-blue-500 group-hover:to-purple-600 group-hover:text-white'
+      } overflow-hidden`}>
+        {/* Tabela Real com Alinhamento Perfeito */}
+        <div className="overflow-y-auto custom-scrollbar mobile-scroll max-h-full">
+          <table className="w-full">
+            {/* Header da Tabela */}
+            <thead className="sticky top-0 z-30 bg-gradient-to-r from-white/95 to-slate-50/95 backdrop-blur-lg shadow-lg">
+              <tr>
+                <th className="text-left p-4 font-black text-gray-800 text-sm lg:text-base border-b-2 border-white/40">
+                  Data
+                </th>
+                <th className="text-right p-4 font-black text-gray-800 text-sm lg:text-base border-b-2 border-white/40">
+                  Entradas
+                </th>
+                <th className="text-right p-4 font-black text-gray-800 text-sm lg:text-base border-b-2 border-white/40">
+                  Saídas
+                </th>
+                <th className="text-right p-4 font-black text-gray-800 text-sm lg:text-base border-b-2 border-white/40">
+                  Saldo
+                </th>
+              </tr>
+            </thead>
+            
+            {/* Body da Tabela */}
+            <tbody>
+              {cashFlowData.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className={`text-center text-gray-600 font-semibold animate-fade-in ${
+                    isMobile ? 'py-8 text-sm' : 'py-12 text-base'
                   }`}>
-                    {expandedDate === day.date ? <Minus size={12} /> : <Plus size={12} />}
-                  </div>
-                  <span className="text-sm font-black truncate">{formatDate(day.date)}</span>
-                </div>
-                <div className={`text-right font-black tracking-tight ${
-                  day.income > 0 ? 'text-green-600' : 'text-gray-400'
-                }`}>
-                  {day.income > 0 ? formatCurrency(day.income) : '-'}
-                </div>
-                <div className={`text-right font-black tracking-tight ${
-                  day.expenses > 0 ? 'text-red-600' : 'text-gray-400'
-                }`}>
-                  {day.expenses > 0 ? formatCurrency(day.expenses) : '-'}
-                </div>
-                <div className={`text-right font-black tracking-tight ${
-                  day.balance >= 0 ? 'text-blue-600' : 'text-orange-600'
-                } drop-shadow-lg`}>
-                  {formatCurrency(day.balance)}
-                </div>
-              </button>
+                    Nenhuma movimentação encontrada
+                  </td>
+                </tr>
+              ) : (
+                cashFlowData.slice(isMobile ? -7 : -14).map((day) => (
+                  <React.Fragment key={day.date}>
+                    <tr>
+                      <td colSpan={4} className="p-0">
+                        <button
+                          onClick={() => toggleExpanded(day.date)}
+                          className="w-full hover:bg-gradient-to-r hover:from-white/60 hover:to-slate-50/60 transition-smooth hover:shadow-xl backdrop-blur-sm group interactive-card relative z-20 touch-target no-select"
+                        >
+                          <table className="w-full">
+                            <tbody>
+                              <tr>
+                                <td className="text-left p-4 w-1/4">
+                                  <div className="font-black text-gray-900 flex items-center space-x-2">
+                                    <div className={`p-1.5 rounded-lg transition-all duration-300 shadow-md ${
+                                      expandedDate === day.date ? 'bg-gradient-to-br from-blue-500 to-purple-600 text-white' : 'bg-white/80 text-gray-600 group-hover:bg-gradient-to-br group-hover:from-blue-500 group-hover:to-purple-600 group-hover:text-white'
+                                    }`}>
+                                      {expandedDate === day.date ? <Minus size={12} /> : <Plus size={12} />}
+                                    </div>
+                                    <span className="text-sm font-black">{formatDate(day.date)}</span>
+                                  </div>
+                                </td>
+                                <td className="text-right p-4 w-1/4">
+                                  <span className={`font-black tracking-tight text-sm lg:text-base ${
+                                    day.income > 0 ? 'text-green-600' : 'text-gray-400'
+                                  }`}>
+                                    {day.income > 0 ? formatCurrency(day.income) : '-'}
+                                  </span>
+                                </td>
+                                <td className="text-right p-4 w-1/4">
+                                  <span className={`font-black tracking-tight text-sm lg:text-base ${
+                                    day.expenses > 0 ? 'text-red-600' : 'text-gray-400'
+                                  }`}>
+                                    {day.expenses > 0 ? formatCurrency(day.expenses) : '-'}
+                                  </span>
+                                </td>
+                                <td className="text-right p-4 w-1/4">
+                                  <span className={`font-black tracking-tight text-sm lg:text-base ${
+                                    day.balance >= 0 ? 'text-blue-600' : 'text-orange-600'
+                                  } drop-shadow-lg`}>
+                                    {formatCurrency(day.balance)}
+                                  </span>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </button>
+                      </td>
+                    </tr>
 
-              {expandedDate === day.date && (
-                <div className={`border-l-4 border-blue-400 space-y-2 animate-slide-in-left bg-gradient-to-r from-blue-50/90 to-purple-50/60 rounded-r-xl shadow-inner backdrop-blur-sm overflow-y-auto mobile-scroll ${
-                  isMobile ? 'ml-4 pl-4 py-3 max-h-48' : 'ml-8 pl-6 py-4 max-h-60'
-                } relative z-10`}>
-                  {day.dailyTransactions
-                    .sort((a, b) => new Date(a.criado_em).getTime() - new Date(b.criado_em).getTime()) // Sort by creation time
-                    .map((transaction) => (
-                      <div key={transaction.id} className={`flex justify-between items-center text-gray-800 bg-white/90 rounded-lg shadow-md hover:shadow-lg transition-smooth border border-white/60 hover:bg-white/95 backdrop-blur-sm touch-target ${
-                        isMobile ? 'text-xs p-3' : 'text-base p-4'
-                      } relative z-30`}>
-                        <span className="flex-1 truncate mr-2">
-                          <span className="font-semibold">{transaction.descricao}</span>
-                          <span className="text-gray-600 text-xs block">
-                            {getCategoryName(transaction.id_categoria)}
-                          </span>
-                        </span>
-                        <span className={`font-bold flex-shrink-0 drop-shadow-lg ${
-                          transaction.tipo === 'receita' ? 'text-green-600' : 'text-red-600'
-                        } text-sm`}>
-                          {`${transaction.tipo === 'despesa' ? '-' : ''}${formatCurrency(transaction.valor)}`}
-                        </span>
-                      </div>
-                    ))}
-                </div>
+                    {expandedDate === day.date && (
+                      <tr>
+                        <td colSpan={4} className="p-0">
+                          <div className={`border-l-4 border-blue-400 space-y-2 animate-slide-in-left bg-gradient-to-r from-blue-50/90 to-purple-50/60 shadow-inner backdrop-blur-sm overflow-y-auto mobile-scroll ${
+                            isMobile ? 'ml-4 pl-4 py-3 max-h-48' : 'ml-8 pl-6 py-4 max-h-60'
+                          } relative z-10`}>
+                            {day.dailyTransactions
+                              .sort((a, b) => new Date(a.criado_em).getTime() - new Date(b.criado_em).getTime())
+                              .map((transaction) => (
+                                <div key={transaction.id} className={`flex justify-between items-center text-gray-800 bg-white/90 rounded-lg shadow-md hover:shadow-lg transition-smooth border border-white/60 hover:bg-white/95 backdrop-blur-sm touch-target ${
+                                  isMobile ? 'text-xs p-3' : 'text-base p-4'
+                                } relative z-30`}>
+                                  <span className="flex-1 truncate mr-2">
+                                    <span className="font-semibold">{transaction.descricao}</span>
+                                    <span className="text-gray-600 text-xs block">
+                                      {getCategoryName(transaction.id_categoria)}
+                                    </span>
+                                  </span>
+                                  <span className={`font-bold flex-shrink-0 drop-shadow-lg ${
+                                    transaction.tipo === 'receita' ? 'text-green-600' : 'text-red-600'
+                                  } text-sm`}>
+                                    {`${transaction.tipo === 'despesa' ? '-' : ''}${formatCurrency(transaction.valor)}`}
+                                  </span>
+                                </div>
+                              ))}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                ))
               )}
-            </React.Fragment>
-          ))
-        )}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
