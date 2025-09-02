@@ -17,7 +17,7 @@ import EstimatePanel from './components/Dashboard/EstimatePanel';
 import UserSettings from './components/Settings/UserSettings';
 import RemindersManager from './components/Reminders/RemindersManager';
 import PendingAccountsPanel from './components/Dashboard/PendingAccountsPanel';
-import CompanyRegistrationForm from './components/Company/CompanyRegistrationForm';
+import CompanySettings from './components/Settings/CompanySettings';
 import { 
   DollarSign, 
   TrendingUp, 
@@ -83,7 +83,8 @@ const AppContent: React.FC = () => {
       reminders: { title: 'Lembretes', subtitle: 'Gerencie seus lembretes e notificações' },
       reports: { title: 'Relatórios', subtitle: 'Análises e indicadores' },
       'whatsapp-agent': { title: 'Agente WhatsApp', subtitle: 'Integração com inteligência artificial' },
-      settings: { title: 'Configurações', subtitle: 'Configurações da conta e empresa' }
+      settings: { title: 'Configurações do Usuário', subtitle: 'Configurações da sua conta' },
+      'company-settings': { title: 'Configurações da Empresa', subtitle: 'Dados e informações da empresa' }
     };
     return titles[page] || { title: 'Sistema ERP', subtitle: 'Gestão empresarial completa' };
   };
@@ -172,6 +173,9 @@ const AppContent: React.FC = () => {
       
       case 'settings':
         return <UserSettings />;
+      
+      case 'company-settings':
+        return <CompanySettings />;
       
       default:
         return (

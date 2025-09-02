@@ -18,7 +18,9 @@ import {
   AlertTriangle,
   Tag,
   Bot,
-  Bell
+  Bell,
+  User,
+  Building
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -62,7 +64,15 @@ const menuItems: MenuItem[] = [
   { id: 'purchases', label: 'Compras', icon: TruckIcon },
   { id: 'reminders', label: 'Lembretes', icon: Bell },
   { id: 'reports', label: 'Relatórios', icon: BarChart3 },
-  { id: 'settings', label: 'Configurações', icon: Settings }
+  {
+    id: 'configuracoes',
+    label: 'Configurações',
+    icon: Settings,
+    children: [
+      { id: 'settings', label: 'Usuário', icon: User },
+      { id: 'company-settings', label: 'Empresa', icon: Building },
+    ]
+  }
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mobileOpen, onClose }) => {
