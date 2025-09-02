@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useAuth } from '../Auth/AuthProvider';
+import { useDeviceDetection } from '../../hooks/useDeviceDetection';
 import { Wallet, TrendingUp, TrendingDown, Eye, X } from 'lucide-react';
 import { Database } from '../../types/supabase';
 
@@ -15,6 +16,7 @@ interface CashPositionCardProps {
 
 const CashPositionCard: React.FC<CashPositionCardProps> = ({ dateFilter }) => {
   const { supabase, profile } = useAuth();
+  const { isMobile, isTablet } = useDeviceDetection();
   const [transactions, setTransactions] = React.useState<Transaction[]>([]);
   const [categories, setCategories] = React.useState<Category[]>([]);
   const [showReceitasDetail, setShowReceitasDetail] = React.useState(false);
@@ -115,9 +117,13 @@ const CashPositionCard: React.FC<CashPositionCardProps> = ({ dateFilter }) => {
   };
 
   return (
-    <div className="card-premium rounded-3xl shadow-2xl border border-white/30 p-6 sm:p-8 hover-lift relative overflow-hidden animate-slide-in-up">
+    <div className={`card-premium shadow-2xl border border-white/30 hover-lift relative overflow-hidden animate-slide-in-up ${
+      isMobile ? 'rounded-2xl p-4' : 'rounded-3xl p-8'
+    }`}>
       {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-cyan-50/60 via-blue-50/40 to-indigo-50/60 rounded-3xl" />
+      <div className={`absolute inset-0 bg-gradient-to-br from-cyan-50/60 via-blue-50/40 to-indigo-50/60 ${
+        isMobile ? 'rounded-2xl' : 'rounded-3xl'
+      }`} />
       
       {/* Floating elements */}
       <div className="absolute top-4 left-4 w-24 h-24 bg-gradient-to-br from-cyan-400/10 to-blue-400/10 rounded-full blur-xl animate-float" />
@@ -125,24 +131,36 @@ const CashPositionCard: React.FC<CashPositionCardProps> = ({ dateFilter }) => {
       
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3 relative z-10">
-          <div className={`p-3 rounded-full ${
+          <div className={`rounded-full ${
             cashPosition.caixaAtual >= 0 ? 'bg-blue-50' : 'bg-orange-50'
-          } shadow-xl hover-glow animate-scale-in`}>
-            <Wallet className={`h-6 w-6 ${
+          } shadow-xl hover-glow animate-scale-in ${
+            isMobile ? 'p-2' : 'p-3'
+          }`}>
+            <Wallet className={`${
               cashPosition.caixaAtual >= 0 ? 'text-blue-600' : 'text-orange-600'
-            } drop-shadow-lg`} />
+            } drop-shadow-lg ${isMobile ? 'h-5 w-5' : 'h-6 w-6'}`} />
           </div>
           <div>
-            <h3 className="text-lg sm:text-xl font-black bg-gradient-to-r from-gray-900 via-cyan-900 to-blue-900 bg-clip-text text-transparent tracking-tight">Caixa Atual</h3>
-            <p className="text-sm text-gray-700 font-bold tracking-wide">Receitas pagas - Despesas pagas</p>
+            <h3 className={`font-black bg-gradient-to-r from-gray-900 via-cyan-900 to-blue-900 bg-clip-text text-transparent tracking-tight ${
+              isMobile ? 'text-base' : 'text-xl'
+            }`}>
+              Caixa Atual
+            </h3>
+            <p className={`text-gray-700 font-bold tracking-wide ${
+              isMobile ? 'text-xs' : 'text-sm'
+            }`}>
+              {isMobile ? 'Receitas - Despesas' : 'Receitas pagas - Despesas pagas'}
+            </p>
           </div>
         </div>
       </div>
 
       {/* Modal de Detalhes das Receitas */}
       {showReceitasDetail && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[80vh] overflow-hidden">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+          <div className={`bg-white shadow-xl w-full overflow-hidden ${
+            isMobile ? 'rounded-lg max-h-[90vh] max-w-full mx-2' : 'rounded-xl max-w-4xl max-h-[80vh]'
+          }`}>
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
@@ -220,8 +238,10 @@ const CashPositionCard: React.FC<CashPositionCardProps> = ({ dateFilter }) => {
 
       {/* Modal de Detalhes das Despesas */}
       {showDespesasDetail && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[80vh] overflow-hidden">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+          <div className={`bg-white shadow-xl w-full overflow-hidden ${
+            isMobile ? 'rounded-lg max-h-[90vh] max-w-full mx-2' : 'rounded-xl max-w-4xl max-h-[80vh]'
+          }`}>
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <div>
@@ -315,30 +335,30 @@ const CashPositionCard: React.FC<CashPositionCardProps> = ({ dateFilter }) => {
       )}
       <div className="space-y-4">
         {/* Caixa Atual - Destaque */}
-        <div className={`p-6 sm:p-8 rounded-2xl border-3 shadow-2xl hover:shadow-3xl transition-all duration-500 hover-lift relative overflow-hidden animate-scale-in ${
+        <div className={`border-3 shadow-2xl hover:shadow-3xl transition-all duration-500 hover-lift relative overflow-hidden animate-scale-in ${
           cashPosition.caixaAtual >= 0 
             ? 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-300' 
             : 'bg-gradient-to-br from-orange-50 to-yellow-50 border-orange-300'
-        }`}>
+        } ${isMobile ? 'p-4 rounded-xl' : 'p-8 rounded-2xl'}`}>
           <div className={`absolute inset-0 ${
             cashPosition.caixaAtual >= 0 
               ? 'bg-gradient-to-r from-blue-600/5 to-indigo-600/5' 
               : 'bg-gradient-to-r from-orange-600/5 to-yellow-600/5'
           }`} />
           <div className="text-center">
-            <p className={`text-base sm:text-lg font-black tracking-wider uppercase ${
+            <p className={`font-black tracking-wider uppercase ${
               cashPosition.caixaAtual >= 0 ? 'text-blue-800' : 'text-orange-800'
-            }`}>
+            } ${isMobile ? 'text-sm' : 'text-lg'}`}>
               Saldo em Caixa
             </p>
-            <p className={`text-4xl sm:text-6xl font-black tracking-tight drop-shadow-xl ${
+            <p className={`font-black tracking-tight drop-shadow-xl ${
               cashPosition.caixaAtual >= 0 ? 'text-blue-900' : 'text-orange-900'
-            }`}>
+            } ${isMobile ? 'text-3xl' : 'text-6xl'}`}>
               {formatCurrency(cashPosition.caixaAtual)}
             </p>
-            <p className={`text-sm mt-3 font-bold tracking-wide ${
+            <p className={`font-bold tracking-wide ${
               cashPosition.caixaAtual >= 0 ? 'text-blue-700' : 'text-orange-700'
-            }`}>
+            } ${isMobile ? 'text-xs mt-2' : 'text-sm mt-3'}`}>
               {cashPosition.caixaAtual >= 0 ? 'Posição positiva' : 'Posição negativa'}
             </p>
           </div>
@@ -348,50 +368,74 @@ const CashPositionCard: React.FC<CashPositionCardProps> = ({ dateFilter }) => {
         <div className="grid grid-cols-2 gap-6 relative z-10">
           <button
             onClick={() => setShowReceitasDetail(true)}
-            className="bg-gradient-to-br from-green-50 to-emerald-50 p-5 sm:p-6 rounded-2xl border-2 border-green-300 hover:bg-gradient-to-br hover:from-green-100 hover:to-emerald-100 transition-all duration-500 text-left group shadow-xl hover:shadow-2xl hover-lift interactive-card animate-slide-in-from-left"
+            className={`bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-300 hover:bg-gradient-to-br hover:from-green-100 hover:to-emerald-100 transition-all duration-500 text-left group shadow-xl hover:shadow-2xl hover-lift interactive-card animate-slide-in-from-left ${
+              isMobile ? 'p-4 rounded-xl' : 'p-6 rounded-2xl'
+            }`}
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-base font-black text-green-800 tracking-wider uppercase">Receitas Pagas</p>
-                <p className="text-2xl sm:text-3xl font-black text-green-900 tracking-tight drop-shadow-lg">
+                <p className={`font-black text-green-800 tracking-wider uppercase ${
+                  isMobile ? 'text-xs' : 'text-base'
+                }`}>
+                  Receitas Pagas
+                </p>
+                <p className={`font-black text-green-900 tracking-tight drop-shadow-lg ${
+                  isMobile ? 'text-lg' : 'text-3xl'
+                }`}>
                   {formatCurrency(cashPosition.receitasPagas)}
                 </p>
-                <p className="text-sm text-green-700 mt-2 font-bold">
-                  {receitasDetalhe.length} transação(ões) • Clique para detalhes
+                <p className={`text-green-700 font-bold ${
+                  isMobile ? 'text-xs mt-1' : 'text-sm mt-2'
+                }`}>
+                  {receitasDetalhe.length} transação(ões) {!isMobile && '• Clique para detalhes'}
                 </p>
               </div>
               <div className="flex items-center space-x-1">
-                <TrendingUp className="text-green-600 drop-shadow-lg" size={24} />
-                <Eye className="text-green-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={18} />
+                <TrendingUp className="text-green-600 drop-shadow-lg" size={isMobile ? 20 : 24} />
+                {!isMobile && <Eye className="text-green-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={18} />}
               </div>
             </div>
           </button>
 
           <button
             onClick={() => setShowDespesasDetail(true)}
-            className="bg-gradient-to-br from-red-50 to-pink-50 p-5 sm:p-6 rounded-2xl border-2 border-red-300 hover:bg-gradient-to-br hover:from-red-100 hover:to-pink-100 transition-all duration-500 text-left group shadow-xl hover:shadow-2xl hover-lift interactive-card animate-slide-in-from-right"
+            className={`bg-gradient-to-br from-red-50 to-pink-50 border-2 border-red-300 hover:bg-gradient-to-br hover:from-red-100 hover:to-pink-100 transition-all duration-500 text-left group shadow-xl hover:shadow-2xl hover-lift interactive-card animate-slide-in-from-right ${
+              isMobile ? 'p-4 rounded-xl' : 'p-6 rounded-2xl'
+            }`}
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-base font-black text-red-800 tracking-wider uppercase">Custos Pagos</p>
-                <p className="text-2xl sm:text-3xl font-black text-red-900 tracking-tight drop-shadow-lg">
+                <p className={`font-black text-red-800 tracking-wider uppercase ${
+                  isMobile ? 'text-xs' : 'text-base'
+                }`}>
+                  Custos Pagos
+                </p>
+                <p className={`font-black text-red-900 tracking-tight drop-shadow-lg ${
+                  isMobile ? 'text-lg' : 'text-3xl'
+                }`}>
                   {formatCurrency(cashPosition.despesasPagas)}
                 </p>
-                <p className="text-sm text-red-700 mt-2 font-bold">
-                  {despesasDetalhe.length} transação(ões) • Clique para detalhes
+                <p className={`text-red-700 font-bold ${
+                  isMobile ? 'text-xs mt-1' : 'text-sm mt-2'
+                }`}>
+                  {despesasDetalhe.length} transação(ões) {!isMobile && '• Clique para detalhes'}
                 </p>
               </div>
               <div className="flex items-center space-x-1">
-                <TrendingDown className="text-red-600 drop-shadow-lg" size={24} />
-                <Eye className="text-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={18} />
+                <TrendingDown className="text-red-600 drop-shadow-lg" size={isMobile ? 20 : 24} />
+                {!isMobile && <Eye className="text-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={18} />}
               </div>
             </div>
           </button>
         </div>
 
         {/* Fórmula */}
-        <div className="glass p-4 sm:p-5 rounded-2xl shadow-lg border border-white/30 relative z-10 animate-slide-in-up">
-          <p className="text-sm text-gray-700 text-center font-bold tracking-wide">
+        <div className={`glass shadow-lg border border-white/30 relative z-10 animate-slide-in-up ${
+          isMobile ? 'p-3 rounded-xl' : 'p-5 rounded-2xl'
+        }`}>
+          <p className={`text-gray-700 text-center font-bold tracking-wide ${
+            isMobile ? 'text-xs' : 'text-sm'
+          }`}>
             <strong>Fórmula:</strong> Receitas (pagas/recebidas) - Despesas (pagas) = Caixa Atual
           </p>
         </div>

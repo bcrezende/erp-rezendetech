@@ -224,6 +224,52 @@
   }
 }
 
+/* Device-specific styles */
+.device-mobile {
+  --spacing-unit: 0.75rem;
+  --text-scale: 0.9;
+}
+
+.device-tablet {
+  --spacing-unit: 1rem;
+  --text-scale: 1;
+}
+
+.device-desktop {
+  --spacing-unit: 1.5rem;
+  --text-scale: 1.1;
+}
+
+.device-pwa {
+  --pwa-padding: env(safe-area-inset-top, 0px);
+}
+
+.device-touch .hover-lift:hover {
+  transform: translateY(-2px) scale(1.01);
+}
+
+.device-mobile .hover-lift:hover {
+  transform: translateY(-1px) scale(1.005);
+}
+
+/* PWA specific optimizations */
+.device-pwa {
+  padding-top: var(--pwa-padding);
+}
+
+.device-pwa .glass-strong {
+  backdrop-filter: blur(15px);
+}
+
+/* Mobile landscape optimizations */
+.device-mobile.device-landscape {
+  --mobile-landscape-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+}
+
+.device-mobile.device-landscape .sidebar {
+  height: var(--mobile-landscape-height);
+}
+
 /* Touch-friendly interactions */
 .touch-target {
   min-height: 48px;
@@ -237,6 +283,16 @@
 .mobile-scroll {
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
+  overscroll-behavior: contain;
+}
+
+/* Mobile-specific scroll improvements */
+.device-mobile .mobile-scroll {
+  scroll-snap-type: y proximity;
+}
+
+.device-mobile .mobile-scroll > * {
+  scroll-snap-align: start;
 }
 
 /* Mobile-optimized cards */
@@ -255,10 +311,60 @@
   }
 }
 
+/* Device-specific card optimizations */
+.device-mobile .card-premium {
+  padding: 1rem;
+  border-radius: 1rem;
+  margin-bottom: 1rem;
+}
+
+.device-tablet .card-premium {
+  padding: 1.5rem;
+  border-radius: 1.5rem;
+}
+
+.device-desktop .card-premium {
+  padding: 2rem;
+  border-radius: 2rem;
+}
+
 /* Prevent text selection on interactive elements */
 .no-select {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+/* Mobile performance optimizations */
+.device-mobile * {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.device-mobile .animate-float {
+  animation-duration: 8s;
+  animation-timing-function: ease-in-out;
+}
+
+.device-mobile .bg-orb {
+  opacity: 0.1;
+  filter: blur(20px);
+}
+
+/* Touch feedback */
+.device-touch .touch-target:active {
+  transform: scale(0.98);
+  transition: transform 0.1s ease-out;
+}
+
+/* PWA status bar adjustments */
+@media (display-mode: standalone) {
+  .device-pwa {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .device-pwa .glass-strong {
+    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.85);
+  }
 }

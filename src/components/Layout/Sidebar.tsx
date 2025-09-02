@@ -29,6 +29,13 @@ interface SidebarProps {
   profile?: any;
   mobileOpen: boolean;
   onClose: () => void;
+  deviceInfo?: {
+    isMobile: boolean;
+    isTablet: boolean;
+    isDesktop: boolean;
+    isPWA: boolean;
+    hasTouch: boolean;
+  };
 }
 
 interface MenuItem {
@@ -75,9 +82,11 @@ const menuItems: MenuItem[] = [
   }
 ];
 
-const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mobileOpen, onClose }) => {
+const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mobileOpen, onClose, deviceInfo }) => {
   const [isDesktopCollapsed, setIsDesktopCollapsed] = useState(false);
   const [expandedItems, setExpandedItems] = useState<string[]>(['cadastros', 'financeiro']);
+  
+  const { isMobile, isTablet, isDesktop, isPWA, hasTouch } = deviceInfo || {};
 
   const toggleExpanded = (itemId: string) => {
     setExpandedItems(prev => 
@@ -90,7 +99,9 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mob
   const handleNavigate = (page: string) => {
     onNavigate(page);
     // Close mobile sidebar after navigation
-    onClose();
+    if (isMobile) {
+      onClose();
+    }
   };
 
   const renderMenuItem = (item: MenuItem, level = 0) => {
@@ -148,57 +159,81 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mob
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 left-0 z-50 w-72 sm:w-80 glass-strong shadow-2xl transform transition-all duration-500 ease-in-out safe-top safe-bottom
-        md:relative md:translate-x-0 md:z-auto md:shadow-xl
+        ${isMobile ? 'fixed inset-y-0 left-0 z-50 w-80' : 'relative z-auto'} 
+        glass-strong shadow-2xl transform transition-all duration-500 ease-in-out safe-top safe-bottom
         ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}
-        ${isDesktopCollapsed ? 'md:w-20' : 'md:w-72'}
+        ${!isMobile && isDesktopCollapsed ? 'w-20' : !isMobile ? 'w-72' : ''}
         h-full flex flex-col border-r border-white/30 backdrop-blur-xl
       `}>
         {/* Header */}
-        <div className="p-3 sm:p-6 border-b border-white/30 bg-gradient-to-r from-white/20 to-transparent">
+        <div className={`border-b border-white/30 bg-gradient-to-r from-white/20 to-transparent ${
+          isMobile ? 'p-4' : 'p-6'
+        }`}>
           <div className="flex items-center justify-between">
-            {(!isDesktopCollapsed || mobileOpen) && (
+            {(!isDesktopCollapsed || isMobile) && (
               <div className="animate-slide-in-from-left">
-                <h1 className="text-base sm:text-xl font-black bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 bg-clip-text text-transparent tracking-tight">Sistema ERP</h1>
-                <p className="text-xs sm:text-sm text-gray-600 font-bold tracking-wide">Gestão Empresarial</p>
+                <h1 className={`font-black bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 bg-clip-text text-transparent tracking-tight ${
+                  isMobile ? 'text-lg' : 'text-xl'
+                }`}>
+                  {isPWA ? 'ERP Mobile' : 'Sistema ERP'}
+                </h1>
+                <p className={`text-gray-600 font-bold tracking-wide ${
+                  isMobile ? 'text-xs' : 'text-sm'
+                }`}>
+                  {isPWA ? 'App Instalado' : 'Gestão Empresarial'}
+                </p>
               </div>
             )}
             
             {/* Mobile Close Button */}
-            <button
-              onClick={onClose}
-              className="p-3 rounded-xl hover:bg-white/60 transition-smooth md:hidden hover-glow touch-target"
-            >
-              <X size={20} />
-            </button>
+            {isMobile && (
+              <button
+                onClick={onClose}
+                className="p-3 rounded-xl hover:bg-white/60 transition-smooth hover-glow touch-target"
+              >
+                <X size={20} />
+              </button>
+            )}
             
             {/* Desktop Collapse Button */}
-            <button
-              onClick={() => setIsDesktopCollapsed(!isDesktopCollapsed)}
-              className="p-3 rounded-xl hover:bg-white/60 transition-smooth hidden md:block hover-glow touch-target"
-            >
-              {isDesktopCollapsed ? <Menu size={20} /> : <X size={20} />}
-            </button>
+            {!isMobile && (
+              <button
+                onClick={() => setIsDesktopCollapsed(!isDesktopCollapsed)}
+                className="p-3 rounded-xl hover:bg-white/60 transition-smooth hover-glow touch-target"
+              >
+                {isDesktopCollapsed ? <Menu size={20} /> : <X size={20} />}
+              </button>
+            )}
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-2 sm:p-4 space-y-2 sm:space-y-3 overflow-y-auto custom-scrollbar mobile-scroll">
+        <nav className={`flex-1 space-y-3 overflow-y-auto custom-scrollbar mobile-scroll ${
+          isMobile ? 'p-3' : 'p-4'
+        }`}>
           {menuItems.map(item => renderMenuItem(item))}
         </nav>
 
         {/* User Info */}
-        <div className="p-3 sm:p-6 border-t border-white/30 bg-gradient-to-r from-white/20 to-transparent">
-          <div className={`flex items-center ${isDesktopCollapsed && !mobileOpen ? 'justify-center' : 'space-x-3'}`}>
+        <div className={`border-t border-white/30 bg-gradient-to-r from-white/20 to-transparent ${
+          isMobile ? 'p-4' : 'p-6'
+        }`}>
+          <div className={`flex items-center ${isDesktopCollapsed && !isMobile ? 'justify-center' : 'space-x-3'}`}>
             <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-xl hover-glow animate-scale-in touch-target">
               <span className="text-white text-sm font-bold">
                 {profile?.nome_completo?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'U'}
               </span>
             </div>
-            {(!isDesktopCollapsed || mobileOpen) && (
+            {(!isDesktopCollapsed || isMobile) && (
               <div className="min-w-0 flex-1 animate-slide-in-from-left">
-                <p className="text-xs sm:text-sm font-bold text-gray-900 truncate tracking-wide">{profile?.nome_completo || 'Usuário'}</p>
-                <p className="text-xs text-gray-600 capitalize truncate font-semibold">{profile?.papel || 'Usuário'}</p>
+                <p className={`font-bold text-gray-900 truncate tracking-wide ${
+                  isMobile ? 'text-xs' : 'text-sm'
+                }`}>
+                  {profile?.nome_completo || 'Usuário'}
+                </p>
+                <p className="text-xs text-gray-600 capitalize truncate font-semibold">
+                  {profile?.papel || 'Usuário'} {isPWA && '• PWA'}
+                </p>
               </div>
             )}
           </div>

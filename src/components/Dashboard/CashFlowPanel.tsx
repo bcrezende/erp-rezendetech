@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useAuth } from '../Auth/AuthProvider';
+import { useDeviceDetection } from '../../hooks/useDeviceDetection';
 import { CashFlowData } from '../../types'; // Ensure CashFlowData type is updated
 import { TrendingUp, TrendingDown, Plus, Minus, DollarSign } from 'lucide-react';
 import { Database } from '../../types/supabase'; // Import Database type for Transaction and Category
@@ -9,6 +10,7 @@ type Category = Database['public']['Tables']['categorias']['Row'];
 
 const CashFlowPanel: React.FC = () => {
   const { supabase, profile } = useAuth();
+  const { isMobile, isTablet } = useDeviceDetection();
   const [transactions, setTransactions] = React.useState<Transaction[]>([]);
   const [categories, setCategories] = React.useState<Category[]>([]); // State for categories
   const [expandedDate, setExpandedDate] = React.useState<string | null>(null); // State for expanded date
@@ -202,7 +204,9 @@ const CashFlowPanel: React.FC = () => {
       </div>
 
       {/* Detalhamento por Data */}
-      <div className="space-y-2 sm:space-y-3 max-h-[400px] sm:max-h-[600px] overflow-y-auto relative z-10 custom-scrollbar mobile-scroll">
+      <div className={`space-y-3 overflow-y-auto relative z-10 custom-scrollbar mobile-scroll ${
+        isMobile ? 'max-h-[500px]' : 'max-h-[700px]'
+      }`}>
         <div className="grid grid-cols-4 gap-1 sm:gap-4 text-xs sm:text-base font-black text-gray-800 pb-3 sm:pb-4 border-b-2 border-white/40 bg-gradient-to-r from-white/70 to-slate-50/70 rounded-xl p-3 sm:p-4 sticky top-0 backdrop-blur-lg shadow-lg z-30">
           <span className="truncate">Data</span>
           <span className="text-right truncate">Entradas</span>
@@ -211,11 +215,13 @@ const CashFlowPanel: React.FC = () => {
         </div>
 
         {cashFlowData.length === 0 ? (
-          <div className="text-center py-6 sm:py-12 text-gray-600 text-sm sm:text-base font-semibold animate-fade-in">
+          <div className={`text-center text-gray-600 font-semibold animate-fade-in ${
+            isMobile ? 'py-8 text-sm' : 'py-12 text-base'
+          }`}>
             Nenhuma movimentação encontrada
           </div>
         ) : (
-          cashFlowData.slice(-14).map((day) => (
+          cashFlowData.slice(isMobile ? -7 : -14).map((day) => (
             <React.Fragment key={day.date}>
               <button
                 onClick={() => toggleExpanded(day.date)}
@@ -254,27 +260,29 @@ const CashFlowPanel: React.FC = () => {
               </button>
 
               {expandedDate === day.date && (
-                <div className="ml-3 sm:ml-8 border-l-4 border-blue-400 pl-3 sm:pl-6 py-3 sm:py-4 space-y-2 sm:space-y-3 animate-slide-in-left bg-gradient-to-r from-blue-50/90 to-purple-50/60 rounded-r-xl shadow-inner relative z-10 backdrop-blur-sm max-h-60 overflow-y-auto mobile-scroll">
+                <div className={`border-l-4 border-blue-400 space-y-3 animate-slide-in-left bg-gradient-to-r from-blue-50/90 to-purple-50/60 rounded-r-xl shadow-inner backdrop-blur-sm overflow-y-auto mobile-scroll ${
+                  isMobile ? 'ml-4 pl-4 py-3 max-h-48' : 'ml-8 pl-6 py-4 max-h-60'
+                } relative z-10`}>
                   {day.dailyTransactions
                     .sort((a, b) => new Date(a.criado_em).getTime() - new Date(b.criado_em).getTime()) // Sort by creation time
                     .map((transaction) => (
-                      <div key={transaction.id} className="flex justify-between items-center text-xs sm:text-base text-gray-800 bg-white/80 p-3 sm:p-4 rounded-xl shadow-lg hover:shadow-xl transition-smooth border border-white/60 hover:bg-white/90 backdrop-blur-sm relative z-30 touch-target">
+                      <div key={transaction.id} className={`flex justify-between items-center text-gray-800 bg-white/90 rounded-xl shadow-lg hover:shadow-xl transition-smooth border border-white/60 hover:bg-white/95 backdrop-blur-sm touch-target ${
+                        isMobile ? 'text-xs p-3' : 'text-base p-4'
+                      } relative z-30`}>
                         <span className="flex-1 truncate mr-2">
                           <span className="font-semibold">{transaction.descricao}</span>
-                          <span className="text-gray-600 text-xs block sm:inline sm:ml-1">
-                            <span className="hidden sm:inline">({getCategoryName(transaction.id_categoria)})</span>
-                            <span className="sm:hidden">{getCategoryName(transaction.id_categoria)}</span>
+                          <span className={`text-gray-600 ${isMobile ? 'text-xs block' : 'text-xs inline ml-1'}`}>
+                            {isMobile ? getCategoryName(transaction.id_categoria) : `(${getCategoryName(transaction.id_categoria)})`}
                           </span>
                         </span>
-                        <span className={`font-black flex-shrink-0 ${
+                        <span className={`font-black flex-shrink-0 drop-shadow-lg ${
                           transaction.tipo === 'receita' ? 'text-green-600' : 'text-red-600'
-                        } drop-shadow-lg text-xs sm:text-base`}>
-                          <span className="hidden sm:inline">
-                            {transaction.tipo === 'despesa' ? '-' : ''}{formatCurrency(transaction.valor)}
-                          </span>
-                          <span className="sm:hidden">
-                            {transaction.tipo === 'despesa' ? '-' : ''}R$ {(transaction.valor / 1000).toFixed(1)}k
-                          </span>
+                        } ${isMobile ? 'text-xs' : 'text-base'}`}>
+                          {isMobile ? (
+                            `${transaction.tipo === 'despesa' ? '-' : ''}R$ ${(transaction.valor / 1000).toFixed(1)}k`
+                          ) : (
+                            `${transaction.tipo === 'despesa' ? '-' : ''}${formatCurrency(transaction.valor)}`
+                          )}
                         </span>
                       </div>
                     ))}
