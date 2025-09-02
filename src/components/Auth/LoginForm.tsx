@@ -293,7 +293,7 @@ const LoginForm: React.FC<LoginFormProps> = () => {
             <button
               type="button"
               onClick={() => setShowForgotPassword(true)}
-             className="text-sm text-white font-medium bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 px-4 py-2 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
+             className="w-full text-sm text-white font-medium bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 py-3 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
             >
               Esqueceu sua senha?
             </button>
