@@ -104,41 +104,41 @@ const AppContent: React.FC = () => {
         return (
           <div className="space-y-8">
             {/* Filtro Global de Data */}
-            <div className="card-modern rounded-2xl shadow-xl border border-white/20 p-6 hover-lift animate-slide-in-up">
+            <div className="card-modern rounded-2xl shadow-xl border border-white/20 p-4 sm:p-6 hover-lift animate-slide-in-up">
               <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-purple-600/5 rounded-2xl" />
               <div className="flex items-center justify-between">
-                <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-3">
+                <div className="flex flex-col lg:flex-row lg:items-center space-y-3 lg:space-y-0 lg:space-x-3 w-full lg:w-auto">
                   <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg">
                     <Calendar className="h-6 w-6 text-white" />
                   </div>
                   <div className="relative z-10">
-                    <h3 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">Filtro de Período</h3>
-                    <p className="text-sm text-gray-600 font-medium">Selecione o período para análise</p>
+                    <h3 className="text-base sm:text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">Filtro de Período</h3>
+                    <p className="text-xs sm:text-sm text-gray-600 font-medium">Selecione o período para análise</p>
                   </div>
                 </div>
-                <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
+                <div className="flex flex-col lg:flex-row lg:items-center space-y-3 lg:space-y-0 lg:space-x-4 w-full lg:w-auto mt-4 lg:mt-0">
                   <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
-                    <label className="text-sm font-semibold text-gray-700">De:</label>
+                    <label className="text-xs sm:text-sm font-semibold text-gray-700 whitespace-nowrap">De:</label>
                     <input
                       type="date"
                       value={dateFilter.startDate}
                       onChange={(e) => setDateFilter({ ...dateFilter, startDate: e.target.value })}
-                      className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-auto bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-200"
+                      className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-auto bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-200 touch-target"
                     />
                   </div>
                   <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
-                    <label className="text-sm font-semibold text-gray-700">Até:</label>
+                    <label className="text-xs sm:text-sm font-semibold text-gray-700 whitespace-nowrap">Até:</label>
                     <input
                       type="date"
                       value={dateFilter.endDate}
                       onChange={(e) => setDateFilter({ ...dateFilter, endDate: e.target.value })}
-                      className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-auto bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-200"
+                      className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-auto bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-200 touch-target"
                     />
                   </div>
                   <button
                     onClick={() => { setDateFilter(getInitialMonthDateRange());
                     }}
-                    className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 text-sm w-full sm:w-auto whitespace-nowrap shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold"
+                    className="px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 text-sm w-full sm:w-auto whitespace-nowrap shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold touch-target"
                   >
                     Mês Atual
                   </button>
@@ -146,7 +146,7 @@ const AppContent: React.FC = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
               <div className="animate-slide-in-left stagger-1">
                 <DREPanel dateFilter={dateFilter} />
               </div>
@@ -220,7 +220,7 @@ const AppContent: React.FC = () => {
   const { title, subtitle } = getPageTitle(currentPage);
 
   return (
-    <div className={`flex h-screen bg-gradient-dashboard animate-gradient-shift ${isMobileSidebarOpen ? 'overflow-hidden' : ''}`}>
+    <div className={`flex h-screen bg-gradient-dashboard animate-gradient-shift safe-top safe-bottom ${isMobileSidebarOpen ? 'overflow-hidden' : ''}`}>
       <Sidebar 
         currentPage={currentPage} 
         onNavigate={setCurrentPage} 
@@ -230,7 +230,7 @@ const AppContent: React.FC = () => {
       />
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="glass-strong shadow-2xl border-b border-white/30 px-4 sm:px-6 py-6 relative overflow-hidden">
+        <div className="glass-strong shadow-2xl border-b border-white/30 px-3 sm:px-6 py-4 sm:py-6 relative overflow-hidden">
           {/* Header gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 animate-gradient-shift" />
           
@@ -246,17 +246,17 @@ const AppContent: React.FC = () => {
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMobileSidebarOpen(true)}
-                className="p-3 rounded-xl hover:bg-white/60 transition-smooth md:hidden backdrop-blur-sm hover-glow"
+                className="p-3 rounded-xl hover:bg-white/60 transition-smooth md:hidden backdrop-blur-sm hover-glow touch-target"
               >
                 <Menu size={20} className="text-gray-600" />
               </button>
               
               <div className="relative z-10">
-                <h2 className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 bg-clip-text text-transparent tracking-tight animate-slide-in-from-left">
+                <h2 className="text-lg sm:text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 bg-clip-text text-transparent tracking-tight animate-slide-in-from-left">
                   {title}
                 </h2>
                 {subtitle && (
-                  <p className="text-xs sm:text-sm text-gray-700 mt-2 font-semibold tracking-wide animate-slide-in-from-left stagger-1">
+                  <p className="text-xs sm:text-sm text-gray-700 mt-1 sm:mt-2 font-semibold tracking-wide animate-slide-in-from-left stagger-1">
                     {subtitle}
                   </p>
                 )}
@@ -264,13 +264,13 @@ const AppContent: React.FC = () => {
             </div>
 
             <div className="flex items-center space-x-2 sm:space-x-4 relative z-10">
-              <div className="text-right hidden sm:block glass rounded-xl px-4 py-3 hover-lift animate-slide-in-from-right">
+              <div className="text-right hidden lg:block glass rounded-xl px-4 py-3 hover-lift animate-slide-in-from-right">
                 <p className="text-sm font-bold text-gray-900 tracking-wide">{profile?.nome_completo}</p>
                 <p className="text-xs text-gray-600 font-medium mt-1">{profile?.empresas?.nome}</p>
               </div>
               
               {/* Mobile User Avatar */}
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 rounded-full flex items-center justify-center sm:hidden shadow-xl hover-glow animate-scale-in">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 rounded-full flex items-center justify-center lg:hidden shadow-xl hover-glow animate-scale-in touch-target">
                 <span className="text-white text-sm font-bold">
                   {profile?.nome_completo?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'U'}
                 </span>
@@ -278,7 +278,7 @@ const AppContent: React.FC = () => {
               
               <button
                 onClick={handleSignOut}
-                className="p-3 text-gray-600 hover:text-red-600 hover:bg-white/60 rounded-xl transition-smooth backdrop-blur-sm hover-glow animate-slide-in-from-right stagger-1"
+                className="p-3 text-gray-600 hover:text-red-600 hover:bg-white/60 rounded-xl transition-smooth backdrop-blur-sm hover-glow animate-slide-in-from-right stagger-1 touch-target"
               >
                 <LogOut size={18} className="sm:w-5 sm:h-5" />
               </button>
@@ -286,7 +286,7 @@ const AppContent: React.FC = () => {
           </div>
         </div>
         
-        <main className="flex-1 overflow-y-auto p-4 sm:p-8 animate-fade-in custom-scrollbar">
+        <main className="flex-1 overflow-y-auto p-3 sm:p-8 animate-fade-in custom-scrollbar mobile-scroll">
           {renderPageContent()}
         </main>
       </div>

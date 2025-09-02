@@ -122,139 +122,159 @@ const CashFlowPanel: React.FC = () => {
   }, [cashFlowData]);
 
   return (
-    <div className="card-premium rounded-3xl shadow-2xl border border-white/30 p-6 sm:p-8 hover-lift relative overflow-hidden animate-slide-in-from-right">
+    <div className="card-premium rounded-2xl sm:rounded-3xl shadow-2xl border border-white/30 p-4 sm:p-8 hover-lift relative overflow-hidden animate-slide-in-from-right">
       {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-green-50/60 via-blue-50/40 to-teal-50/60 rounded-3xl" />
+      <div className="absolute inset-0 bg-gradient-to-br from-green-50/60 via-blue-50/40 to-teal-50/60 rounded-2xl sm:rounded-3xl" />
       
       {/* Floating elements */}
       <div className="absolute top-6 left-6 w-20 h-20 bg-gradient-to-br from-green-400/10 to-blue-400/10 rounded-full blur-xl animate-float" />
       <div className="absolute bottom-6 right-6 w-16 h-16 bg-gradient-to-br from-blue-400/10 to-teal-400/10 rounded-full blur-lg animate-float" style={{ animationDelay: '2s' }} />
       
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-3 relative z-10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
+        <div className="flex items-center space-x-2 sm:space-x-3 relative z-10 min-w-0">
           <div className="p-3 bg-gradient-to-br from-green-500 via-blue-600 to-teal-600 rounded-2xl shadow-xl hover-glow animate-scale-in">
-            <TrendingUp className="h-7 w-7 text-white drop-shadow-lg" />
+            <TrendingUp className="h-5 w-5 sm:h-7 sm:w-7 text-white drop-shadow-lg" />
           </div>
-          <h3 className="text-lg sm:text-xl font-black bg-gradient-to-r from-gray-900 via-green-900 to-blue-900 bg-clip-text text-transparent tracking-tight">
+          <h3 className="text-sm sm:text-xl font-black bg-gradient-to-r from-gray-900 via-green-900 to-blue-900 bg-clip-text text-transparent tracking-tight truncate">
             Fluxo de Caixa
           </h3>
         </div>
-        <div className="text-xs sm:text-sm text-gray-700 text-right relative z-10 glass rounded-xl px-4 py-2 font-semibold animate-slide-in-from-right">
-          Todas as Movimentações
+        <div className="text-xs sm:text-sm text-gray-700 text-center sm:text-right relative z-10 glass rounded-xl px-3 sm:px-4 py-2 font-semibold animate-slide-in-from-right">
+          <span className="hidden sm:inline">Todas as </span>Movimentações
         </div>
       </div>
 
       {/* Resumo Geral */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8 relative z-10">
-        <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 sm:p-6 rounded-2xl border-2 border-green-300 shadow-xl hover:shadow-2xl transition-all duration-500 hover-lift interactive-card animate-scale-in">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 mb-6 sm:mb-8 relative z-10">
+        <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 sm:p-6 rounded-xl sm:rounded-2xl border-2 border-green-300 shadow-xl hover:shadow-2xl transition-all duration-500 hover-lift interactive-card animate-scale-in touch-target">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm sm:text-base font-black text-green-800 tracking-wider uppercase">Total Entradas</p>
-              <p className="text-2xl sm:text-3xl font-black text-green-900 drop-shadow-lg tracking-tight">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-base font-black text-green-800 tracking-wider uppercase truncate">Total Entradas</p>
+              <p className="text-lg sm:text-3xl font-black text-green-900 drop-shadow-lg tracking-tight break-all">
                 {formatCurrency(totals.income)}
               </p>
             </div>
-            <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl shadow-xl hover-glow">
-              <TrendingUp className="text-white drop-shadow-lg" size={24} />
+            <div className="p-2 sm:p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl sm:rounded-2xl shadow-xl hover-glow flex-shrink-0">
+              <TrendingUp className="text-white drop-shadow-lg" size={20} />
             </div>
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-red-50 to-pink-50 p-4 sm:p-6 rounded-2xl border-2 border-red-300 shadow-xl hover:shadow-2xl transition-all duration-500 hover-lift interactive-card animate-scale-in stagger-1">
+        <div className="bg-gradient-to-br from-red-50 to-pink-50 p-4 sm:p-6 rounded-xl sm:rounded-2xl border-2 border-red-300 shadow-xl hover:shadow-2xl transition-all duration-500 hover-lift interactive-card animate-scale-in stagger-1 touch-target">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm sm:text-base font-black text-red-800 tracking-wider uppercase">Total Saídas</p>
-              <p className="text-2xl sm:text-3xl font-black text-red-900 drop-shadow-lg tracking-tight">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-base font-black text-red-800 tracking-wider uppercase truncate">Total Saídas</p>
+              <p className="text-lg sm:text-3xl font-black text-red-900 drop-shadow-lg tracking-tight break-all">
                 {formatCurrency(totals.expenses)}
               </p>
             </div>
-            <div className="p-3 bg-gradient-to-br from-red-500 to-pink-600 rounded-2xl shadow-xl hover-glow">
-              <TrendingDown className="text-white drop-shadow-lg" size={24} />
+            <div className="p-2 sm:p-3 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl sm:rounded-2xl shadow-xl hover-glow flex-shrink-0">
+              <TrendingDown className="text-white drop-shadow-lg" size={20} />
             </div>
           </div>
         </div>
 
-        <div className={`p-4 sm:p-6 rounded-2xl border-2 shadow-xl hover:shadow-2xl transition-all duration-500 hover-lift interactive-card animate-scale-in stagger-2 ${
+        <div className={`p-4 sm:p-6 rounded-xl sm:rounded-2xl border-2 shadow-xl hover:shadow-2xl transition-all duration-500 hover-lift interactive-card animate-scale-in stagger-2 touch-target ${
           totals.balance >= 0 
             ? 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-300' 
             : 'bg-gradient-to-br from-orange-50 to-yellow-50 border-orange-300'
         }`}>
           <div className="flex items-center justify-between">
-            <div>
+            <div className="min-w-0 flex-1">
               <p className={`text-sm sm:text-base font-black tracking-wider uppercase ${
                 totals.balance >= 0 ? 'text-blue-800' : 'text-orange-800'
-              }`}>
+              } truncate`}>
                 Saldo Líquido
               </p>
-              <p className={`text-2xl sm:text-3xl font-black tracking-tight drop-shadow-lg ${
+              <p className={`text-lg sm:text-3xl font-black tracking-tight drop-shadow-lg ${
                 totals.balance >= 0 ? 'text-blue-900' : 'text-orange-900'
-              }`}>
+              } break-all`}>
                 {formatCurrency(totals.balance)}
               </p>
             </div>
-            <div className={`p-3 rounded-2xl shadow-xl hover-glow ${
+            <div className={`p-2 sm:p-3 rounded-xl sm:rounded-2xl shadow-xl hover-glow flex-shrink-0 ${
               totals.balance >= 0 ? 'bg-gradient-to-br from-blue-500 to-indigo-600' : 'bg-gradient-to-br from-orange-500 to-yellow-600'
             }`}>
-              <DollarSign className="text-white drop-shadow-lg" size={24} />
+              <DollarSign className="text-white drop-shadow-lg" size={20} />
             </div>
           </div>
         </div>
       </div>
 
       {/* Detalhamento por Data */}
-      <div className="space-y-3 max-h-96 sm:max-h-[500px] overflow-y-auto relative z-10 custom-scrollbar">
-        <div className="grid grid-cols-4 gap-2 sm:gap-4 text-sm sm:text-base font-black text-gray-800 pb-4 border-b-2 border-white/40 bg-gradient-to-r from-white/70 to-slate-50/70 rounded-xl p-4 sticky top-0 backdrop-blur-lg shadow-lg">
-          <span>Data</span>
-          <span className="text-right">Entradas</span>
-          <span className="text-right">Saídas</span>
-          <span className="text-right">Saldo</span>
+      <div className="space-y-2 sm:space-y-3 max-h-[400px] sm:max-h-[600px] overflow-y-auto relative z-10 custom-scrollbar mobile-scroll">
+        <div className="grid grid-cols-4 gap-1 sm:gap-4 text-xs sm:text-base font-black text-gray-800 pb-3 sm:pb-4 border-b-2 border-white/40 bg-gradient-to-r from-white/70 to-slate-50/70 rounded-xl p-3 sm:p-4 sticky top-0 backdrop-blur-lg shadow-lg z-30">
+          <span className="truncate">Data</span>
+          <span className="text-right truncate">Entradas</span>
+          <span className="text-right truncate">Saídas</span>
+          <span className="text-right truncate">Saldo</span>
         </div>
 
         {cashFlowData.length === 0 ? (
-          <div className="text-center py-8 sm:py-12 text-gray-600 text-base font-semibold animate-fade-in">
+          <div className="text-center py-6 sm:py-12 text-gray-600 text-sm sm:text-base font-semibold animate-fade-in">
             Nenhuma movimentação encontrada
           </div>
         ) : (
-          cashFlowData.slice(-7).map((day) => (
+          cashFlowData.slice(-14).map((day) => (
             <React.Fragment key={day.date}>
               <button
                 onClick={() => toggleExpanded(day.date)}
-                className="w-full grid grid-cols-4 gap-2 sm:gap-4 py-3 sm:py-4 px-3 sm:px-4 rounded-xl hover:bg-gradient-to-r hover:from-white/60 hover:to-slate-50/60 text-sm sm:text-base text-left transition-smooth hover:shadow-xl backdrop-blur-sm group interactive-card relative z-20"
+                className="w-full grid grid-cols-4 gap-1 sm:gap-4 py-3 sm:py-4 px-2 sm:px-4 rounded-xl hover:bg-gradient-to-r hover:from-white/60 hover:to-slate-50/60 text-xs sm:text-base text-left transition-smooth hover:shadow-xl backdrop-blur-sm group interactive-card relative z-20 touch-target no-select"
               >
-                <span className="font-black text-gray-900 flex items-center space-x-2">
+                <span className="font-black text-gray-900 flex items-center space-x-1 sm:space-x-2 min-w-0">
                   <div className={`p-2 rounded-xl transition-all duration-300 shadow-md ${
                     expandedDate === day.date ? 'bg-gradient-to-br from-blue-500 to-purple-600 text-white' : 'bg-white/80 text-gray-600 group-hover:bg-gradient-to-br group-hover:from-blue-500 group-hover:to-purple-600 group-hover:text-white'
                   }`}>
-                    {expandedDate === day.date ? <Minus size={14} /> : <Plus size={14} />}
+                    {expandedDate === day.date ? <Minus size={12} className="sm:w-[14px] sm:h-[14px]" /> : <Plus size={12} className="sm:w-[14px] sm:h-[14px]" />}
                   </div>
-                  <span>{formatDate(day.date)}</span>
+                  <span className="text-xs sm:text-base truncate">{formatDate(day.date)}</span>
                 </span>
-                <span className="text-right font-black text-green-600 drop-shadow-lg">
-                  {day.income > 0 ? formatCurrency(day.income) : '-'}
+                <span className="text-right font-black text-green-600 drop-shadow-lg text-xs sm:text-base truncate">
+                  {day.income > 0 ? (
+                    <span className="hidden sm:inline">{formatCurrency(day.income)}</span>
+                  ) : (
+                    <span className="hidden sm:inline">-</span>
+                  )}
+                  <span className="sm:hidden">{day.income > 0 ? `R$ ${(day.income / 1000).toFixed(1)}k` : '-'}</span>
                 </span>
-                <span className="text-right font-black text-red-600 drop-shadow-lg">
-                  {day.expenses > 0 ? formatCurrency(day.expenses) : '-'}
+                <span className="text-right font-black text-red-600 drop-shadow-lg text-xs sm:text-base truncate">
+                  {day.expenses > 0 ? (
+                    <span className="hidden sm:inline">{formatCurrency(day.expenses)}</span>
+                  ) : (
+                    <span className="hidden sm:inline">-</span>
+                  )}
+                  <span className="sm:hidden">{day.expenses > 0 ? `R$ ${(day.expenses / 1000).toFixed(1)}k` : '-'}</span>
                 </span>
-                <span className={`text-right font-black ${
+                <span className={`text-right font-black text-xs sm:text-base truncate ${
                   day.balance >= 0 ? 'text-blue-600' : 'text-orange-600'
                 } drop-shadow-lg`}>
-                  {formatCurrency(day.balance)}
+                  <span className="hidden sm:inline">{formatCurrency(day.balance)}</span>
+                  <span className="sm:hidden">R$ {(day.balance / 1000).toFixed(1)}k</span>
                 </span>
               </button>
 
               {expandedDate === day.date && (
-                <div className="ml-6 sm:ml-8 border-l-4 border-blue-400 pl-4 sm:pl-6 py-4 space-y-3 animate-slide-in-left bg-gradient-to-r from-blue-50/80 to-purple-50/40 rounded-r-xl shadow-inner relative z-10 backdrop-blur-sm">
+                <div className="ml-3 sm:ml-8 border-l-4 border-blue-400 pl-3 sm:pl-6 py-3 sm:py-4 space-y-2 sm:space-y-3 animate-slide-in-left bg-gradient-to-r from-blue-50/90 to-purple-50/60 rounded-r-xl shadow-inner relative z-10 backdrop-blur-sm max-h-60 overflow-y-auto mobile-scroll">
                   {day.dailyTransactions
                     .sort((a, b) => new Date(a.criado_em).getTime() - new Date(b.criado_em).getTime()) // Sort by creation time
                     .map((transaction) => (
-                      <div key={transaction.id} className="flex justify-between items-center text-sm sm:text-base text-gray-800 bg-white/70 p-4 rounded-xl shadow-lg hover:shadow-xl transition-smooth border border-white/60 hover:bg-white/90 backdrop-blur-sm relative z-30">
-                        <span className="flex-1 truncate">
-                          {transaction.descricao} ({getCategoryName(transaction.id_categoria)})
+                      <div key={transaction.id} className="flex justify-between items-center text-xs sm:text-base text-gray-800 bg-white/80 p-3 sm:p-4 rounded-xl shadow-lg hover:shadow-xl transition-smooth border border-white/60 hover:bg-white/90 backdrop-blur-sm relative z-30 touch-target">
+                        <span className="flex-1 truncate mr-2">
+                          <span className="font-semibold">{transaction.descricao}</span>
+                          <span className="text-gray-600 text-xs block sm:inline sm:ml-1">
+                            <span className="hidden sm:inline">({getCategoryName(transaction.id_categoria)})</span>
+                            <span className="sm:hidden">{getCategoryName(transaction.id_categoria)}</span>
+                          </span>
                         </span>
-                        <span className={`font-black ${
+                        <span className={`font-black flex-shrink-0 ${
                           transaction.tipo === 'receita' ? 'text-green-600' : 'text-red-600'
-                        } drop-shadow-lg`}>
-                          {transaction.tipo === 'despesa' ? '-' : ''}{formatCurrency(transaction.valor)}
+                        } drop-shadow-lg text-xs sm:text-base`}>
+                          <span className="hidden sm:inline">
+                            {transaction.tipo === 'despesa' ? '-' : ''}{formatCurrency(transaction.valor)}
+                          </span>
+                          <span className="sm:hidden">
+                            {transaction.tipo === 'despesa' ? '-' : ''}R$ {(transaction.valor / 1000).toFixed(1)}k
+                          </span>
                         </span>
                       </div>
                     ))}

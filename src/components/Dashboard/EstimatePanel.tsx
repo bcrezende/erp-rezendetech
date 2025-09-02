@@ -139,25 +139,25 @@ const EstimatePanel: React.FC<EstimatePanelProps> = ({ dateFilter }) => {
   ];
 
   return (
-    <div className="card-premium rounded-3xl shadow-2xl border border-white/30 p-6 sm:p-8 hover-lift relative overflow-hidden animate-slide-in-up">
+    <div className="card-premium rounded-2xl sm:rounded-3xl shadow-2xl border border-white/30 p-4 sm:p-8 hover-lift relative overflow-hidden animate-slide-in-up">
       {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-50/60 via-pink-50/40 to-blue-50/60 rounded-3xl" />
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-50/60 via-pink-50/40 to-blue-50/60 rounded-2xl sm:rounded-3xl" />
       
       {/* Floating elements */}
       <div className="absolute top-4 right-4 w-28 h-28 bg-gradient-to-br from-purple-400/10 to-pink-400/10 rounded-full blur-2xl animate-float" />
       <div className="absolute bottom-4 left-4 w-20 h-20 bg-gradient-to-br from-pink-400/10 to-blue-400/10 rounded-full blur-xl animate-float" style={{ animationDelay: '2s' }} />
       
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-3 relative z-10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
+        <div className="flex items-center space-x-2 sm:space-x-3 relative z-10 min-w-0">
           <div className="p-3 bg-gradient-to-br from-purple-500 via-pink-600 to-blue-600 rounded-2xl shadow-xl hover-glow animate-scale-in">
-            <Calendar className="h-7 w-7 text-white drop-shadow-lg" />
+            <Calendar className="h-5 w-5 sm:h-7 sm:w-7 text-white drop-shadow-lg" />
           </div>
-          <h3 className="text-lg sm:text-xl font-black bg-gradient-to-r from-gray-900 via-purple-900 to-pink-900 bg-clip-text text-transparent tracking-tight">
+          <h3 className="text-sm sm:text-xl font-black bg-gradient-to-r from-gray-900 via-purple-900 to-pink-900 bg-clip-text text-transparent tracking-tight truncate">
           Estimativa de Resultado Mensal
           </h3>
         </div>
-        <div className="text-xs sm:text-sm text-gray-700 text-right relative z-10 glass rounded-xl px-4 py-2 font-semibold animate-slide-in-from-right">
-          <Calendar size={16} className="inline mr-2" />
+        <div className="text-xs sm:text-sm text-gray-700 text-center sm:text-right relative z-10 glass rounded-xl px-3 sm:px-4 py-2 font-semibold animate-slide-in-from-right">
+          <Calendar size={14} className="inline mr-1 sm:mr-2" />
           <span className="hidden sm:inline">
             {formatDate(dateFilter.startDate)} - {formatDate(dateFilter.endDate)}
           </span>
@@ -168,18 +168,18 @@ const EstimatePanel: React.FC<EstimatePanelProps> = ({ dateFilter }) => {
       </div>
 
       {/* Progresso do Mês */}
-      <div className="mb-8 relative z-10">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-sm sm:text-base font-black text-gray-800 tracking-wide">
+      <div className="mb-6 sm:mb-8 relative z-10">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 space-y-1 sm:space-y-0">
+          <span className="text-xs sm:text-base font-black text-gray-800 tracking-wide">
             Progresso do Mês
           </span>
-          <span className="text-sm sm:text-base font-black text-gray-900">
+          <span className="text-xs sm:text-base font-black text-gray-900">
             {estimateData.daysElapsed} de {estimateData.totalDays} dias ({progressPercentage.toFixed(1)}%)
           </span>
         </div>
-        <div className="w-full bg-gradient-to-r from-gray-200 to-gray-300 rounded-full h-4 shadow-inner relative overflow-hidden">
+        <div className="w-full bg-gradient-to-r from-gray-200 to-gray-300 rounded-full h-3 sm:h-4 shadow-inner relative overflow-hidden">
           <div 
-            className="bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 h-4 rounded-full transition-all duration-1000 ease-out shadow-lg relative overflow-hidden"
+            className="bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 h-3 sm:h-4 rounded-full transition-all duration-1000 ease-out shadow-lg relative overflow-hidden"
             style={{ width: `${progressPercentage}%` }}
           >
             <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent animate-shimmer" />
@@ -188,11 +188,11 @@ const EstimatePanel: React.FC<EstimatePanelProps> = ({ dateFilter }) => {
       </div>
 
       {/* Tabela de Estimativas */}
-      <div className="space-y-4 relative z-10">
-        <div className="grid grid-cols-3 gap-2 sm:gap-4 text-sm sm:text-base font-black text-gray-800 pb-4 border-b-2 border-white/40 bg-gradient-to-r from-white/70 to-slate-50/70 rounded-xl p-4 backdrop-blur-lg shadow-lg">
-          <span>Categoria</span>
-          <span className="text-right">Atual</span>
-          <span className="text-right">Estimativa</span>
+      <div className="space-y-3 sm:space-y-4 relative z-10">
+        <div className="grid grid-cols-3 gap-1 sm:gap-4 text-xs sm:text-base font-black text-gray-800 pb-3 sm:pb-4 border-b-2 border-white/40 bg-gradient-to-r from-white/70 to-slate-50/70 rounded-xl p-3 sm:p-4 backdrop-blur-lg shadow-lg">
+          <span className="truncate">Categoria</span>
+          <span className="text-right truncate">Atual</span>
+          <span className="text-right truncate">Estimativa</span>
         </div>
 
         {estimateItems.map((item, index) => {
@@ -213,24 +213,26 @@ const EstimatePanel: React.FC<EstimatePanelProps> = ({ dateFilter }) => {
           return (
             <div 
               key={item.label}
-              className={`grid grid-cols-3 gap-2 sm:gap-4 p-4 sm:p-6 rounded-2xl border-2 shadow-xl hover:shadow-2xl transition-all duration-500 hover-lift interactive-card animate-scale-in ${
+              className={`grid grid-cols-3 gap-1 sm:gap-4 p-3 sm:p-6 rounded-xl sm:rounded-2xl border-2 shadow-xl hover:shadow-2xl transition-all duration-500 hover-lift interactive-card animate-scale-in touch-target ${
                 bgColorClasses[item.color as keyof typeof bgColorClasses]
               }`}
               style={{ animationDelay: `${index * 100}ms` }}
             >
-              <span className="text-base sm:text-lg font-black text-gray-900 tracking-wide">
+              <span className="text-xs sm:text-lg font-black text-gray-900 tracking-wide truncate">
                 {item.label}
               </span>
-              <span className={`text-right text-base sm:text-lg font-black tracking-tight ${
+              <span className={`text-right text-xs sm:text-lg font-black tracking-tight truncate ${
                 colorClasses[item.color as keyof typeof colorClasses]
               }`}>
-                {formatCurrency(item.current)}
+                <span className="hidden sm:inline">{formatCurrency(item.current)}</span>
+                <span className="sm:hidden">R$ {(item.current / 1000).toFixed(1)}k</span>
               </span>
-              <span className={`text-right text-base sm:text-lg font-black tracking-tight ${
+              <span className={`text-right text-xs sm:text-lg font-black tracking-tight truncate ${
                 colorClasses[item.color as keyof typeof colorClasses]
               }`}>
-                {formatCurrency(item.estimated)}
-                <div className="flex items-center justify-end mt-2 hidden sm:flex">
+                <span className="hidden sm:inline">{formatCurrency(item.estimated)}</span>
+                <span className="sm:hidden">R$ {(item.estimated / 1000).toFixed(1)}k</span>
+                <div className="flex items-center justify-end mt-1 sm:mt-2 hidden lg:flex">
                   <TrendingUp size={14} className="mr-1" />
                   <span className="text-xs font-bold">
                     {item.current > 0 ? 
@@ -246,19 +248,19 @@ const EstimatePanel: React.FC<EstimatePanelProps> = ({ dateFilter }) => {
       </div>
 
       {/* Insight */}
-      <div className="mt-6 sm:mt-8 p-4 sm:p-6 glass rounded-2xl shadow-xl border border-white/30 relative z-10 animate-slide-in-up">
-        <h4 className="text-base sm:text-lg font-black text-gray-900 mb-3 tracking-wide">📈 Análise Rápida</h4>
-        <div className="space-y-2 text-sm sm:text-base text-gray-700 font-semibold">
+      <div className="mt-4 sm:mt-8 p-3 sm:p-6 glass rounded-xl sm:rounded-2xl shadow-xl border border-white/30 relative z-10 animate-slide-in-up">
+        <h4 className="text-sm sm:text-lg font-black text-gray-900 mb-2 sm:mb-3 tracking-wide">📈 Análise Rápida</h4>
+        <div className="space-y-1 sm:space-y-2 text-xs sm:text-base text-gray-700 font-semibold">
           <p>
             • Base de cálculo: {estimateData.daysElapsed} dias decorridos de {estimateData.totalDays} dias no período
           </p>
-          <p className="hidden sm:block">
+          <p className="hidden lg:block">
             • Média diária de receita: {formatCurrency(estimateData.daysElapsed > 0 ? estimateData.currentRevenue / estimateData.daysElapsed : 0)}
           </p>
-          <p className="hidden sm:block">
+          <p className="hidden lg:block">
             • Média diária de despesas: {formatCurrency(estimateData.daysElapsed > 0 ? estimateData.currentExpenses / estimateData.daysElapsed : 0)}
           </p>
-          <p className={`font-black text-base ${
+          <p className={`font-black text-xs sm:text-base ${
             estimateData.estimatedProfit >= 0 ? 'text-green-600' : 'text-red-600'
           }`}>
             • Resultado projetado: {estimateData.estimatedProfit >= 0 ? 'Lucro' : 'Prejuízo'} de {formatCurrency(Math.abs(estimateData.estimatedProfit))}

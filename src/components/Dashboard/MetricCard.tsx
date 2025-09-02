@@ -42,7 +42,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
 
   return (
     <div 
-      className={`bg-gradient-to-br ${bgColorClasses[color]} rounded-3xl shadow-2xl border border-white/30 p-6 sm:p-8 hover-lift card-premium animate-scale-in group relative overflow-hidden interactive-card`}
+      className={`bg-gradient-to-br ${bgColorClasses[color]} rounded-2xl sm:rounded-3xl shadow-2xl border border-white/30 p-4 sm:p-8 hover-lift card-premium animate-scale-in group relative overflow-hidden interactive-card touch-target`}
       style={{ animationDelay: `${delay}ms` }}
     >
       {/* Background pattern */}
@@ -58,11 +58,11 @@ const MetricCard: React.FC<MetricCardProps> = ({
       </div>
       
       <div className="flex items-center justify-between">
-        <div className="flex-1 relative z-10">
-          <h3 className="text-sm sm:text-base font-bold text-gray-800 mb-4 tracking-wider uppercase opacity-90">{title}</h3>
-          <p className="text-3xl sm:text-4xl font-black text-gray-900 mb-3 tracking-tight drop-shadow-sm">{value}</p>
+        <div className="flex-1 relative z-10 min-w-0">
+          <h3 className="text-xs sm:text-base font-bold text-gray-800 mb-2 sm:mb-4 tracking-wider uppercase opacity-90 truncate">{title}</h3>
+          <p className="text-xl sm:text-4xl font-black text-gray-900 mb-2 sm:mb-3 tracking-tight drop-shadow-sm break-all">{value}</p>
           {change && (
-            <p className={`text-sm sm:text-base font-bold ${changeColorClasses[changeType]} flex items-center space-x-2`}>
+            <p className={`text-xs sm:text-base font-bold ${changeColorClasses[changeType]} flex items-center space-x-1 sm:space-x-2`}>
               <span className={`w-3 h-3 rounded-full animate-pulse ${
                 changeType === 'positive' ? 'bg-green-500' :
                 changeType === 'negative' ? 'bg-red-500' : 'bg-gray-500'
@@ -73,8 +73,8 @@ const MetricCard: React.FC<MetricCardProps> = ({
             </p>
           )}
         </div>
-        <div className={`p-4 sm:p-5 rounded-2xl bg-gradient-to-br ${colorClasses[color]} shadow-xl relative z-10 group-hover:scale-125 group-hover:rotate-12 transition-all duration-500 animate-glow`}>
-          <Icon size={24} className="sm:w-8 sm:h-8 drop-shadow-lg" />
+        <div className={`p-3 sm:p-5 rounded-xl sm:rounded-2xl bg-gradient-to-br ${colorClasses[color]} shadow-xl relative z-10 group-hover:scale-110 sm:group-hover:scale-125 group-hover:rotate-6 sm:group-hover:rotate-12 transition-all duration-500 animate-glow flex-shrink-0`}>
+          <Icon size={20} className="sm:w-8 sm:h-8 drop-shadow-lg" />
         </div>
       </div>
       
