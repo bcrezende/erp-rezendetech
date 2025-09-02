@@ -138,6 +138,8 @@ const AccountsPayable: React.FC = () => {
             .eq('id', editingTransaction.id);
 
           if (error) throw error;
+          
+          console.log('✅ DEBUG - Transação atual atualizada com sucesso');
           alert('Conta a pagar atualizada com sucesso!');
         }
       } else {
@@ -155,6 +157,20 @@ const AccountsPayable: React.FC = () => {
       }
 
       await loadData();
+      
+      // Debug: Verificar se a data de vencimento foi atualizada após recarregamento
+      if (editingTransaction) {
+        setTimeout(() => {
+          const updatedTransaction = transactions.find(t => t.id === editingTransaction.id);
+          console.log('🔍 DEBUG - Transação após recarregamento:', {
+            transactionId: editingTransaction.id,
+            updatedDueDate: updatedTransaction?.data_vencimento,
+            expectedDueDate: transactionData.data_vencimento,
+            fullTransaction: updatedTransaction
+          });
+        }, 1000);
+      }
+      
       resetForm();
     } catch (error) {
       console.error('Error saving transaction:', error);
