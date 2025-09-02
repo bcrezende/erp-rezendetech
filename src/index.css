@@ -349,6 +349,56 @@
   border-radius: 2rem;
 }
 
+/* Grid alignment improvements */
+.device-desktop .grid {
+  align-items: start;
+}
+
+.device-desktop .grid-cols-4 {
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+}
+
+.device-desktop .grid-cols-3 {
+  grid-template-columns: 2fr 1fr 1fr;
+}
+
+/* Text alignment for better readability */
+.device-desktop .text-right {
+  text-align: right;
+  justify-self: end;
+}
+
+.device-desktop .text-left {
+  text-align: left;
+  justify-self: start;
+}
+
+/* Responsive spacing for different devices */
+.device-mobile .space-y-3 > * + * {
+  margin-top: 0.75rem;
+}
+
+.device-tablet .space-y-3 > * + * {
+  margin-top: 1rem;
+}
+
+.device-desktop .space-y-3 > * + * {
+  margin-top: 1.5rem;
+}
+
+/* Better grid gaps for desktop */
+.device-desktop .gap-2 {
+  gap: 1rem;
+}
+
+.device-desktop .gap-4 {
+  gap: 1.5rem;
+}
+
+.device-desktop .gap-6 {
+  gap: 2rem;
+}
+
 /* Prevent text selection on interactive elements */
 .no-select {
   -webkit-user-select: none;

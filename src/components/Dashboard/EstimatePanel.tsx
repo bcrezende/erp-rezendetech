@@ -139,7 +139,7 @@ const EstimatePanel: React.FC<EstimatePanelProps> = ({ dateFilter }) => {
   ];
 
   return (
-    <div className="card-premium rounded-2xl sm:rounded-3xl shadow-2xl border border-white/30 p-4 sm:p-8 hover-lift relative overflow-hidden animate-slide-in-up">
+    <div className="card-premium rounded-2xl sm:rounded-3xl shadow-2xl border border-white/30 p-4 sm:p-6 lg:p-8 hover-lift relative overflow-hidden animate-slide-in-up">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-50/60 via-pink-50/40 to-blue-50/60 rounded-2xl sm:rounded-3xl" />
       
@@ -149,14 +149,14 @@ const EstimatePanel: React.FC<EstimatePanelProps> = ({ dateFilter }) => {
       
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
         <div className="flex items-center space-x-2 sm:space-x-3 relative z-10 min-w-0">
-          <div className="p-3 bg-gradient-to-br from-purple-500 via-pink-600 to-blue-600 rounded-2xl shadow-xl hover-glow animate-scale-in">
+          <div className="p-2 sm:p-3 bg-gradient-to-br from-purple-500 via-pink-600 to-blue-600 rounded-xl sm:rounded-2xl shadow-xl hover-glow animate-scale-in">
             <Calendar className="h-5 w-5 sm:h-7 sm:w-7 text-white drop-shadow-lg" />
           </div>
-          <h3 className="text-sm sm:text-xl font-black bg-gradient-to-r from-gray-900 via-purple-900 to-pink-900 bg-clip-text text-transparent tracking-tight truncate">
+          <h3 className="text-base sm:text-lg lg:text-xl font-black bg-gradient-to-r from-gray-900 via-purple-900 to-pink-900 bg-clip-text text-transparent tracking-tight truncate">
           Estimativa de Resultado Mensal
           </h3>
         </div>
-        <div className="text-xs sm:text-sm text-gray-700 text-center sm:text-right relative z-10 glass rounded-xl px-3 sm:px-4 py-2 font-semibold animate-slide-in-from-right">
+        <div className="text-xs sm:text-sm text-gray-700 text-center sm:text-right relative z-10 glass rounded-lg sm:rounded-xl px-2 sm:px-3 lg:px-4 py-1 sm:py-2 font-semibold animate-slide-in-from-right">
           <Calendar size={14} className="inline mr-1 sm:mr-2" />
           <span className="hidden sm:inline">
             {formatDate(dateFilter.startDate)} - {formatDate(dateFilter.endDate)}
@@ -189,7 +189,7 @@ const EstimatePanel: React.FC<EstimatePanelProps> = ({ dateFilter }) => {
 
       {/* Tabela de Estimativas */}
       <div className="space-y-3 sm:space-y-4 relative z-10">
-        <div className="grid grid-cols-3 gap-1 sm:gap-4 text-xs sm:text-base font-black text-gray-800 pb-3 sm:pb-4 border-b-2 border-white/40 bg-gradient-to-r from-white/70 to-slate-50/70 rounded-xl p-3 sm:p-4 backdrop-blur-lg shadow-lg">
+        <div className="grid grid-cols-3 gap-2 sm:gap-4 lg:gap-6 text-xs sm:text-sm lg:text-base font-black text-gray-800 pb-3 sm:pb-4 border-b-2 border-white/40 bg-gradient-to-r from-white/70 to-slate-50/70 rounded-xl p-3 sm:p-4 backdrop-blur-lg shadow-lg">
           <span className="truncate">Categoria</span>
           <span className="text-right truncate">Atual</span>
           <span className="text-right truncate">Estimativa</span>
@@ -213,21 +213,21 @@ const EstimatePanel: React.FC<EstimatePanelProps> = ({ dateFilter }) => {
           return (
             <div 
               key={item.label}
-              className={`grid grid-cols-3 gap-1 sm:gap-4 p-3 sm:p-6 rounded-xl sm:rounded-2xl border-2 shadow-xl hover:shadow-2xl transition-all duration-500 hover-lift interactive-card animate-scale-in touch-target ${
+              className={`grid grid-cols-3 gap-2 sm:gap-4 lg:gap-6 p-3 sm:p-4 lg:p-6 rounded-xl sm:rounded-2xl border-2 shadow-xl hover:shadow-2xl transition-all duration-500 hover-lift interactive-card animate-scale-in touch-target ${
                 bgColorClasses[item.color as keyof typeof bgColorClasses]
               }`}
               style={{ animationDelay: `${index * 100}ms` }}
             >
-              <span className="text-xs sm:text-lg font-black text-gray-900 tracking-wide truncate">
+              <span className="text-xs sm:text-sm lg:text-lg font-black text-gray-900 tracking-wide truncate">
                 {item.label}
               </span>
-              <span className={`text-right text-xs sm:text-lg font-black tracking-tight truncate ${
+              <span className={`text-right text-xs sm:text-sm lg:text-lg font-black tracking-tight truncate ${
                 colorClasses[item.color as keyof typeof colorClasses]
               }`}>
                 <span className="hidden sm:inline">{formatCurrency(item.current)}</span>
                 <span className="sm:hidden">R$ {(item.current / 1000).toFixed(1)}k</span>
               </span>
-              <span className={`text-right text-xs sm:text-lg font-black tracking-tight truncate ${
+              <span className={`text-right text-xs sm:text-sm lg:text-lg font-black tracking-tight truncate ${
                 colorClasses[item.color as keyof typeof colorClasses]
               }`}>
                 <span className="hidden sm:inline">{formatCurrency(item.estimated)}</span>
