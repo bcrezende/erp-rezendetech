@@ -117,6 +117,15 @@ const AccountsPayable: React.FC = () => {
     e.preventDefault();
     if (!profile?.id_empresa) return;
 
+    // Preparar dados da transação no início da função
+    const transactionData = {
+      ...formData,
+      id_empresa: profile.id_empresa,
+      valor: Number(formData.valor),
+      id_categoria: formData.id_categoria || null,
+      id_pessoa: formData.id_pessoa || null,
+    };
+
     try {
       if (editingTransaction) {
         console.log('🔍 DEBUG - Editando transação:', {
@@ -310,14 +319,6 @@ const AccountsPayable: React.FC = () => {
 
     try {
       // 1. Criar a transação pai (primeira parcela)
-      const transacaoPaiData = {
-        ...formData,
-        id_empresa: profile.id_empresa,
-        valor: Number(formData.valor_parcela),
-        tipo: 'despesa' as const,
-        id_categoria: formData.id_categoria || null,
-        id_pessoa: formData.id_pessoa || null,
-        data_transacao: formData.data_inicio_recorrencia,
         data_vencimento: formData.data_inicio_recorrencia,
         parcela_atual: 1,
         id_transacao_pai: null,
