@@ -117,11 +117,22 @@ const AccountsPayable: React.FC = () => {
     e.preventDefault();
     if (!profile?.id_empresa) return;
 
+    // Formatação explícita das datas para garantir consistência
+    const formattedDataTransacao = formData.data_transacao ? 
+      new Date(formData.data_transacao + 'T00:00:00').toISOString().split('T')[0] : 
+      new Date().toISOString().split('T')[0];
+    
+    const formattedDataVencimento = formData.data_vencimento ? 
+      new Date(formData.data_vencimento + 'T00:00:00').toISOString().split('T')[0] : 
+      formattedDataTransacao;
+
     // Preparar dados da transação no início da função
     const transactionData = {
       ...formData,
       id_empresa: profile.id_empresa,
       valor: Number(formData.valor),
+      data_transacao: formattedDataTransacao,
+      data_vencimento: formattedDataVencimento,
       id_categoria: formData.id_categoria || null,
       id_pessoa: formData.id_pessoa || null,
     };
@@ -130,7 +141,8 @@ const AccountsPayable: React.FC = () => {
       if (editingTransaction) {
         console.log('🔍 DEBUG - Editando transação:', {
           transactionId: editingTransaction.id,
-          originalDueDate: editingTransaction.data_vencimento,
+      newDueDate: formattedDataVencimento,
+      rawFormDate: formData.data_vencimento,
           newDueDate: formData.data_vencimento,
           formDataComplete: formData
         });
