@@ -210,102 +210,150 @@ const EstimatePanel: React.FC<EstimatePanelProps> = ({ dateFilter }) => {
             orange: 'bg-gradient-to-br from-orange-50 to-yellow-50 border-orange-300'
           };
 
-    <div className="relative z-10 overflow-hidden">
-      <table className="w-full">
-        {/* Header da Tabela */}
-        <thead className="sticky top-0 z-30 bg-gradient-to-r from-white/95 to-slate-50/95 backdrop-blur-lg shadow-lg">
-          <tr>
-            <th className="text-left p-4 font-black text-gray-800 text-sm lg:text-base border-b-2 border-white/40 w-1/3">
-              Categoria
-            </th>
-            <th className="text-right p-4 font-black text-gray-800 text-sm lg:text-base border-b-2 border-white/40 w-1/3">
-              Atual
-            </th>
-            <th className="text-right p-4 font-black text-gray-800 text-sm lg:text-base border-b-2 border-white/40 w-1/3">
-              Estimativa
-            </th>
-          </tr>
-        </thead>
-        
-        {/* Body da Tabela */}
-        <tbody>
-          {estimateItems.length === 0 ? (
+          return (
+            <div 
+              key={item.label}
+              className={`rounded-xl sm:rounded-2xl border-2 shadow-xl hover:shadow-2xl transition-all duration-500 hover-lift interactive-card animate-scale-in touch-target ${
+                bgColorClasses[item.color as keyof typeof bgColorClasses]
+              }`}
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
+              <div className="grid grid-cols-3 gap-2 sm:gap-4 lg:gap-6 p-3 sm:p-4 lg:p-6">
+                <div className="text-left">
+                  <span className="text-xs sm:text-sm lg:text-lg font-black text-gray-900 tracking-wide">
+                    {item.label}
+                  </span>
+                </div>
+                <div className="text-right">
+                  <span className={`text-xs sm:text-sm lg:text-lg font-black tracking-tight ${
+                    colorClasses[item.color as keyof typeof colorClasses]
+                  }`}>
+                    <span className="hidden sm:inline">{formatCurrency(item.current)}</span>
+                    <span className="sm:hidden">R$ {(item.current / 1000).toFixed(1)}k</span>
+                  </span>
+                </div>
+                <div className="text-right">
+                  <div className="flex flex-col items-end">
+                    <span className={`text-xs sm:text-sm lg:text-lg font-black tracking-tight ${
+                      colorClasses[item.color as keyof typeof colorClasses]
+                    }`}>
+                      <span className="hidden sm:inline">{formatCurrency(item.estimated)}</span>
+                      <span className="sm:hidden">R$ {(item.estimated / 1000).toFixed(1)}k</span>
+                    </span>
+                    <div className="flex items-center mt-1 hidden lg:flex">
+                      <TrendingUp size={14} className="mr-1" />
+                      <span className="text-xs font-bold">
+                        {item.current > 0 ? 
+                          `+${((item.estimated - item.current) / item.current * 100).toFixed(1)}%` : 
+                          'N/A'
+                        }
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="relative z-10 overflow-hidden">
+        <table className="w-full">
+          {/* Header da Tabela */}
+          <thead className="sticky top-0 z-30 bg-gradient-to-r from-white/95 to-slate-50/95 backdrop-blur-lg shadow-lg">
             <tr>
-              <td colSpan={3} className="text-center py-8 text-gray-600 font-semibold animate-fade-in">
-                Nenhuma estimativa disponível
-              </td>
+              <th className="text-left p-4 font-black text-gray-800 text-sm lg:text-base border-b-2 border-white/40 w-1/3">
+                Categoria
+              </th>
+              <th className="text-right p-4 font-black text-gray-800 text-sm lg:text-base border-b-2 border-white/40 w-1/3">
+                Atual
+              </th>
+              <th className="text-right p-4 font-black text-gray-800 text-sm lg:text-base border-b-2 border-white/40 w-1/3">
+                Estimativa
+              </th>
             </tr>
-          ) : (
-            estimateItems.map((item, index) => {
-              const colorClasses = {
-                green: 'text-green-600',
-                red: 'text-red-600',
-                blue: 'text-blue-600',
-                orange: 'text-orange-600'
-              };
+          </thead>
+          
+          {/* Body da Tabela */}
+          <tbody>
+            {estimateItems.length === 0 ? (
+              <tr>
+                <td colSpan={3} className="text-center py-8 text-gray-600 font-semibold animate-fade-in">
+                  Nenhuma estimativa disponível
+                </td>
+              </tr>
+            ) : (
+              estimateItems.map((item, index) => {
+                const colorClasses = {
+                  green: 'text-green-600',
+                  red: 'text-red-600',
+                  blue: 'text-blue-600',
+                  orange: 'text-orange-600'
+                };
 
-              const bgColorClasses = {
-                green: 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-300',
-                red: 'bg-gradient-to-br from-red-50 to-pink-50 border-red-300',
-                blue: 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-300',
-                orange: 'bg-gradient-to-br from-orange-50 to-yellow-50 border-orange-300'
-              };
+                const bgColorClasses = {
+                  green: 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-300',
+                  red: 'bg-gradient-to-br from-red-50 to-pink-50 border-red-300',
+                  blue: 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-300',
+                  orange: 'bg-gradient-to-br from-orange-50 to-yellow-50 border-orange-300'
+                };
 
-              return (
-                <tr key={item.label}>
-                  <td colSpan={3} className="p-0">
-                    <div 
-                      className={`m-2 rounded-xl sm:rounded-2xl border-2 shadow-xl hover:shadow-2xl transition-all duration-500 hover-lift interactive-card animate-scale-in touch-target ${
-                        bgColorClasses[item.color as keyof typeof bgColorClasses]
-                      }`}
-                      style={{ animationDelay: `${index * 100}ms` }}
-                    >
-                      <table className="w-full">
-                        <tbody>
-                          <tr>
-                            <td className="text-left p-4 w-1/3">
-                              <span className="text-xs sm:text-sm lg:text-lg font-black text-gray-900 tracking-wide">
-                                {item.label}
-                              </span>
-                            </td>
-                            <td className="text-right p-4 w-1/3">
-                              <span className={`text-xs sm:text-sm lg:text-lg font-black tracking-tight ${
-                                colorClasses[item.color as keyof typeof colorClasses]
-                              }`}>
-                                <span className="hidden sm:inline">{formatCurrency(item.current)}</span>
-                                <span className="sm:hidden">R$ {(item.current / 1000).toFixed(1)}k</span>
-                              </span>
-                            </td>
-                            <td className="text-right p-4 w-1/3">
-                              <div className="flex flex-col items-end">
+                return (
+                  <tr key={item.label}>
+                    <td colSpan={3} className="p-0">
+                      <div 
+                        className={`m-2 rounded-xl sm:rounded-2xl border-2 shadow-xl hover:shadow-2xl transition-all duration-500 hover-lift interactive-card animate-scale-in touch-target ${
+                          bgColorClasses[item.color as keyof typeof bgColorClasses]
+                        }`}
+                        style={{ animationDelay: `${index * 100}ms` }}
+                      >
+                        <table className="w-full">
+                          <tbody>
+                            <tr>
+                              <td className="text-left p-4 w-1/3">
+                                <span className="text-xs sm:text-sm lg:text-lg font-black text-gray-900 tracking-wide">
+                                  {item.label}
+                                </span>
+                              </td>
+                              <td className="text-right p-4 w-1/3">
                                 <span className={`text-xs sm:text-sm lg:text-lg font-black tracking-tight ${
                                   colorClasses[item.color as keyof typeof colorClasses]
                                 }`}>
-                                  <span className="hidden sm:inline">{formatCurrency(item.estimated)}</span>
-                                  <span className="sm:hidden">R$ {(item.estimated / 1000).toFixed(1)}k</span>
+                                  <span className="hidden sm:inline">{formatCurrency(item.current)}</span>
+                                  <span className="sm:hidden">R$ {(item.current / 1000).toFixed(1)}k</span>
                                 </span>
-                                <div className="flex items-center mt-1 hidden lg:flex">
-                                  <TrendingUp size={14} className="mr-1" />
-                                  <span className="text-xs font-bold">
-                                    {item.current > 0 ? 
-                                      `+${((item.estimated - item.current) / item.current * 100).toFixed(1)}%` : 
-                                      'N/A'
-                                    }
+                              </td>
+                              <td className="text-right p-4 w-1/3">
+                                <div className="flex flex-col items-end">
+                                  <span className={`text-xs sm:text-sm lg:text-lg font-black tracking-tight ${
+                                    colorClasses[item.color as keyof typeof colorClasses]
+                                  }`}>
+                                    <span className="hidden sm:inline">{formatCurrency(item.estimated)}</span>
+                                    <span className="sm:hidden">R$ {(item.estimated / 1000).toFixed(1)}k</span>
                                   </span>
+                                  <div className="flex items-center mt-1 hidden lg:flex">
+                                    <TrendingUp size={14} className="mr-1" />
+                                    <span className="text-xs font-bold">
+                                      {item.current > 0 ? 
+                                        `+${((item.estimated - item.current) / item.current * 100).toFixed(1)}%` : 
+                                        'N/A'
+                                      }
+                                    </span>
+                                  </div>
                                 </div>
-                              </div>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })
-          )}
-        </tbody>
-      </table>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
