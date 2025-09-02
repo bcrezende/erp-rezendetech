@@ -138,8 +138,6 @@ const AccountsPayable: React.FC = () => {
             .eq('id', editingTransaction.id);
 
           if (error) throw error;
-          
-          console.log('✅ DEBUG - Transação atual atualizada com sucesso');
           alert('Conta a pagar atualizada com sucesso!');
         }
       } else {
@@ -157,20 +155,6 @@ const AccountsPayable: React.FC = () => {
       }
 
       await loadData();
-      
-      // Debug: Verificar se a data de vencimento foi atualizada após recarregamento
-      if (editingTransaction) {
-        setTimeout(() => {
-          const updatedTransaction = transactions.find(t => t.id === editingTransaction.id);
-          console.log('🔍 DEBUG - Transação após recarregamento:', {
-            transactionId: editingTransaction.id,
-            updatedDueDate: updatedTransaction?.data_vencimento,
-            expectedDueDate: transactionData.data_vencimento,
-            fullTransaction: updatedTransaction
-          });
-        }, 1000);
-      }
-      
       resetForm();
     } catch (error) {
       console.error('Error saving transaction:', error);
@@ -341,28 +325,26 @@ const AccountsPayable: React.FC = () => {
           e_recorrente: true,
           tipo_recorrencia: 'parcelada',
           numero_parcelas: formData.numero_parcelas,
-          parcela_atual: i,
           data_inicio_recorrencia: formData.data_inicio_recorrencia,
           valor_parcela: Number(formData.valor_parcela),
-          id_transacao_pai: transacaoPai.id,
-          ativa_recorrencia: true
+          ativa_recorrencia: true,
+          parcela_atual: i,
+          id_transacao_pai: transacaoPai.id
         };
-        
+
         parcelasFuturas.push(parcelaData);
       }
 
-      // Inserir todas as parcelas futuras em lote
+      // 3. Inserir todas as parcelas futuras
       if (parcelasFuturas.length > 0) {
-        const { error: parcelasError } = await supabase
+        const { error: futurasError } = await supabase
           .from('transacoes')
           .insert(parcelasFuturas);
 
-        if (parcelasError) throw parcelasError;
-
-        console.log('✅ Parcelas futuras criadas:', parcelasFuturas.length);
+        if (futurasError) throw futurasError;
       }
 
-      alert(`Despesa parcelada criada com sucesso! ${formData.numero_parcelas} parcelas de ${formatCurrency(Number(formData.valor_parcela))} foram geradas.`);
+      alert(`✅ Sucesso! Despesa parcelada criada com ${formData.numero_parcelas} parcelas.`);
 
     } catch (error) {
       console.error('Error creating parcelada transactions:', error);
@@ -370,18 +352,18 @@ const AccountsPayable: React.FC = () => {
     }
   };
 
-  const handleStatusChange = async (transactionId: string, newStatus: string) => {
+  const handleStatusChange = async (id: string, newStatus: string) => {
     try {
       const { error } = await supabase
         .from('transacoes')
         .update({ status: newStatus })
-        .eq('id', transactionId);
+        .eq('id', id);
 
       if (error) throw error;
       await loadData();
     } catch (error) {
       console.error('Error updating status:', error);
-      alert('Erro ao atualizar status da conta.');
+      alert('Erro ao atualizar status. Tente novamente.');
     }
   };
 
@@ -1146,56 +1128,6 @@ const AccountsPayable: React.FC = () => {
                   <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(viewingTransaction.status)}`}>
                     {getStatusLabel(viewingTransaction.status)}
                   </span>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600">Data da Transação</label>
-                  <p className="text-lg font-semibold text-gray-900">{formatDate(viewingTransaction.data_transacao)}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600">Data de Vencimento</label>
-                  <p className="text-lg font-semibold text-gray-900">
-                    {formatDate(viewingTransaction.data_vencimento || viewingTransaction.data_transacao)}
-                  </p>
-                  {isOverdue(viewingTransaction.data_vencimento || viewingTransaction.data_transacao, viewingTransaction.status) && (
-                    <p className="text-sm text-red-600 font-medium">⚠️ Vencida</p>
-                  )}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600">Fornecedor</label>
-                  <p className="text-lg font-semibold text-gray-900">
-                    {viewingTransaction.nome_razao_social || getPessoaName(viewingTransaction.id_pessoa)}
-                  </p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600">Categoria</label>
-                  <p className="text-lg font-semibold text-gray-900">{getCategoryName(viewingTransaction.id_categoria)}</p>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-600 mb-2">Descrição</label>
-                <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{viewingTransaction.descricao}</p>
-              </div>
-
-              {viewingTransaction.observacoes && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-2">Observações</label>
-                  <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{viewingTransaction.observacoes}</p>
-                </div>
-              )}
-
-              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
-                <div>
-                  <label className="block text-sm font-medium text-gray-600">Criado em</label>
-                  <p className="text-sm text-gray-900">
-                    {new Date(viewingTransaction.criado_em).toLocaleDateString('pt-BR')} às {new Date(viewingTransaction.criado_em).toLocaleTimeString('pt-BR')}
-                  </p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600">Atualizado em</label>
-                  <p className="text-sm text-gray-900">
-                    {new Date(viewingTransaction.atualizado_em).toLocaleDateString('pt-BR')} às {new Date(viewingTransaction.atualizado_em).toLocaleTimeString('pt-BR')}
-                  </p>
                 </div>
               </div>
             </div>
