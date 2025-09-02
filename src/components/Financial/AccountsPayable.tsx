@@ -119,23 +119,28 @@ const AccountsPayable: React.FC = () => {
 
     try {
       if (editingTransaction) {
-        // Para edição, apenas atualizar a transação existente (sem criar novas parcelas)
-        const transactionData = {
-          ...formData,
-          id_empresa: profile.id_empresa,
-          valor: formData.e_recorrente ? Number(formData.valor_parcela) : Number(formData.valor),
-          tipo: 'despesa' as const,
-          id_categoria: formData.id_categoria || null,
-          id_pessoa: formData.id_pessoa || null,
-        };
+        // Verificar se é uma transação recorrente e se deve atualizar parcelas futuras
+        if (editingTransaction.e_recorrente && editingTransaction.tipo_recorrencia === 'parcelada') {
+          await updateParceladaTransactions(editingTransaction);
+        } else {
+          // Para transações não recorrentes ou assinaturas, apenas atualizar a transação atual
+          const transactionData = {
+            ...formData,
+            id_empresa: profile.id_empresa,
+            valor: formData.e_recorrente ? Number(formData.valor_parcela) : Number(formData.valor),
+            tipo: 'despesa' as const,
+            id_categoria: formData.id_categoria || null,
+            id_pessoa: formData.id_pessoa || null,
+          };
 
-        const { error } = await supabase
-          .from('transacoes')
-          .update(transactionData)
-          .eq('id', editingTransaction.id);
+          const { error } = await supabase
+            .from('transacoes')
+            .update(transactionData)
+            .eq('id', editingTransaction.id);
 
-        if (error) throw error;
-        alert('Conta a pagar atualizada com sucesso!');
+          if (error) throw error;
+          alert('Conta a pagar atualizada com sucesso!');
+        }
       } else {
         // Para criação nova
         if (formData.e_recorrente && formData.tipo_recorrencia === 'parcelada' && formData.numero_parcelas && formData.numero_parcelas > 1) {
@@ -170,6 +175,108 @@ const AccountsPayable: React.FC = () => {
     } catch (error) {
       console.error('Error saving transaction:', error);
       alert('Erro ao salvar conta a pagar. Tente novamente.');
+    }
+  };
+
+  const updateParceladaTransactions = async (currentTransaction: Transaction) => {
+    if (!profile?.id_empresa) return;
+
+    try {
+      // Determinar se é a transação pai ou uma parcela
+      const isTransacaoPai = !currentTransaction.id_transacao_pai;
+      const transacaoPaiId = isTransacaoPai ? currentTransaction.id : currentTransaction.id_transacao_pai;
+
+      // Buscar todas as parcelas da série (incluindo a atual)
+      const { data: allParcelas, error: parcelasError } = await supabase
+        .from('transacoes')
+        .select('*')
+        .or(`id.eq.${transacaoPaiId},id_transacao_pai.eq.${transacaoPaiId}`)
+        .eq('id_empresa', profile.id_empresa)
+        .order('parcela_atual');
+
+      if (parcelasError) throw parcelasError;
+
+      if (!allParcelas || allParcelas.length === 0) {
+        throw new Error('Não foi possível encontrar as parcelas da série');
+      }
+
+      // Confirmar com o usuário se deseja atualizar todas as parcelas futuras
+      const shouldUpdateFuture = confirm(
+        `Esta é uma despesa parcelada com ${allParcelas.length} parcela(s).\n\n` +
+        `Deseja atualizar TODAS as parcelas futuras com as mesmas alterações?\n\n` +
+        `• Descrição: ${formData.descricao}\n` +
+        `• Valor por parcela: ${formatCurrency(Number(formData.valor_parcela))}\n` +
+        `• Categoria: ${getCategoryName(formData.id_categoria)}\n` +
+        `• Pessoa: ${getPessoaName(formData.id_pessoa)}\n\n` +
+        `Clique OK para atualizar todas as parcelas futuras ou Cancelar para atualizar apenas esta parcela.`
+      );
+
+      if (shouldUpdateFuture) {
+        // Atualizar todas as parcelas futuras (incluindo a atual)
+        const parcelasParaAtualizar = allParcelas.filter(p => 
+          new Date(p.data_vencimento || p.data_transacao) >= new Date(currentTransaction.data_vencimento || currentTransaction.data_transacao)
+        );
+
+        console.log('🔄 Atualizando parcelas futuras:', {
+          total: allParcelas.length,
+          futuras: parcelasParaAtualizar.length,
+          currentParcelaAtual: currentTransaction.parcela_atual
+        });
+
+        // Preparar dados para atualização
+        const updatePromises = parcelasParaAtualizar.map(async (parcela, index) => {
+          const parcelaAtual = currentTransaction.parcela_atual! + index;
+          const totalParcelas = currentTransaction.numero_parcelas!;
+          
+          const updateData = {
+            valor: Number(formData.valor_parcela),
+            descricao: `${formData.descricao?.replace(/ \(Parcela \d+\/\d+\)$/, '')} (Parcela ${parcelaAtual}/${totalParcelas})`,
+            id_categoria: formData.id_categoria || null,
+            id_pessoa: formData.id_pessoa || null,
+            observacoes: formData.observacoes,
+            valor_parcela: Number(formData.valor_parcela)
+          };
+
+          return supabase
+            .from('transacoes')
+            .update(updateData)
+            .eq('id', parcela.id);
+        });
+
+        // Executar todas as atualizações
+        const results = await Promise.all(updatePromises);
+        
+        // Verificar se houve erros
+        const errors = results.filter(result => result.error);
+        if (errors.length > 0) {
+          console.error('Erros ao atualizar parcelas:', errors);
+          throw new Error(`Erro ao atualizar ${errors.length} parcela(s). Algumas podem ter sido atualizadas com sucesso.`);
+        }
+
+        alert(`✅ Sucesso! ${parcelasParaAtualizar.length} parcela(s) futura(s) foram atualizadas com as mesmas informações.`);
+      } else {
+        // Atualizar apenas a parcela atual
+        const transactionData = {
+          ...formData,
+          id_empresa: profile.id_empresa,
+          valor: Number(formData.valor_parcela),
+          tipo: 'despesa' as const,
+          id_categoria: formData.id_categoria || null,
+          id_pessoa: formData.id_pessoa || null,
+        };
+
+        const { error } = await supabase
+          .from('transacoes')
+          .update(transactionData)
+          .eq('id', currentTransaction.id);
+
+        if (error) throw error;
+        alert('Apenas esta parcela foi atualizada com sucesso!');
+      }
+
+    } catch (error) {
+      console.error('Error updating parcelada transactions:', error);
+      throw error;
     }
   };
 
