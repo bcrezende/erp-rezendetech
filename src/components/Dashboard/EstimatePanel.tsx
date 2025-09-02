@@ -210,63 +210,102 @@ const EstimatePanel: React.FC<EstimatePanelProps> = ({ dateFilter }) => {
             orange: 'bg-gradient-to-br from-orange-50 to-yellow-50 border-orange-300'
           };
 
-          return (
-            <div 
-              key={item.label}
-              className={`grid grid-cols-3 gap-2 sm:gap-4 lg:gap-6 p-3 sm:p-4 lg:p-6 rounded-xl sm:rounded-2xl border-2 shadow-xl hover:shadow-2xl transition-all duration-500 hover-lift interactive-card animate-scale-in touch-target ${
-                bgColorClasses[item.color as keyof typeof bgColorClasses]
-              }`}
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <span className="text-xs sm:text-sm lg:text-lg font-black text-gray-900 tracking-wide truncate">
-                {item.label}
-              </span>
-              <span className={`text-right text-xs sm:text-sm lg:text-lg font-black tracking-tight truncate ${
-                colorClasses[item.color as keyof typeof colorClasses]
-              }`}>
-                <span className="hidden sm:inline">{formatCurrency(item.current)}</span>
-                <span className="sm:hidden">R$ {(item.current / 1000).toFixed(1)}k</span>
-              </span>
-              <span className={`text-right text-xs sm:text-sm lg:text-lg font-black tracking-tight truncate ${
-                colorClasses[item.color as keyof typeof colorClasses]
-              }`}>
-                <span className="hidden sm:inline">{formatCurrency(item.estimated)}</span>
-                <span className="sm:hidden">R$ {(item.estimated / 1000).toFixed(1)}k</span>
-                <div className="flex items-center justify-end mt-1 sm:mt-2 hidden lg:flex">
-                  <TrendingUp size={14} className="mr-1" />
-                  <span className="text-xs font-bold">
-                    {item.current > 0 ? 
-                      `+${((item.estimated - item.current) / item.current * 100).toFixed(1)}%` : 
-                      'N/A'
-                    }
-                  </span>
-                </div>
-              </span>
-            </div>
-          );
-        })}
-      </div>
+    <div className="relative z-10 overflow-hidden">
+      <table className="w-full">
+        {/* Header da Tabela */}
+        <thead className="sticky top-0 z-30 bg-gradient-to-r from-white/95 to-slate-50/95 backdrop-blur-lg shadow-lg">
+          <tr>
+            <th className="text-left p-4 font-black text-gray-800 text-sm lg:text-base border-b-2 border-white/40 w-1/3">
+              Categoria
+            </th>
+            <th className="text-right p-4 font-black text-gray-800 text-sm lg:text-base border-b-2 border-white/40 w-1/3">
+              Atual
+            </th>
+            <th className="text-right p-4 font-black text-gray-800 text-sm lg:text-base border-b-2 border-white/40 w-1/3">
+              Estimativa
+            </th>
+          </tr>
+        </thead>
+        
+        {/* Body da Tabela */}
+        <tbody>
+          {estimateItems.length === 0 ? (
+            <tr>
+              <td colSpan={3} className="text-center py-8 text-gray-600 font-semibold animate-fade-in">
+                Nenhuma estimativa disponível
+              </td>
+            </tr>
+          ) : (
+            estimateItems.map((item, index) => {
+              const colorClasses = {
+                green: 'text-green-600',
+                red: 'text-red-600',
+                blue: 'text-blue-600',
+                orange: 'text-orange-600'
+              };
 
-      {/* Insight */}
-      <div className="mt-4 sm:mt-8 p-3 sm:p-6 glass rounded-xl sm:rounded-2xl shadow-xl border border-white/30 relative z-10 animate-slide-in-up">
-        <h4 className="text-sm sm:text-lg font-black text-gray-900 mb-2 sm:mb-3 tracking-wide">📈 Análise Rápida</h4>
-        <div className="space-y-1 sm:space-y-2 text-xs sm:text-base text-gray-700 font-semibold">
-          <p>
-            • Base de cálculo: {estimateData.daysElapsed} dias decorridos de {estimateData.totalDays} dias no período
-          </p>
-          <p className="hidden lg:block">
-            • Média diária de receita: {formatCurrency(estimateData.daysElapsed > 0 ? estimateData.currentRevenue / estimateData.daysElapsed : 0)}
-          </p>
-          <p className="hidden lg:block">
-            • Média diária de despesas: {formatCurrency(estimateData.daysElapsed > 0 ? estimateData.currentExpenses / estimateData.daysElapsed : 0)}
-          </p>
-          <p className={`font-black text-xs sm:text-base ${
-            estimateData.estimatedProfit >= 0 ? 'text-green-600' : 'text-red-600'
-          }`}>
-            • Resultado projetado: {estimateData.estimatedProfit >= 0 ? 'Lucro' : 'Prejuízo'} de {formatCurrency(Math.abs(estimateData.estimatedProfit))}
-          </p>
-        </div>
-      </div>
+              const bgColorClasses = {
+                green: 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-300',
+                red: 'bg-gradient-to-br from-red-50 to-pink-50 border-red-300',
+                blue: 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-300',
+                orange: 'bg-gradient-to-br from-orange-50 to-yellow-50 border-orange-300'
+              };
+
+              return (
+                <tr key={item.label}>
+                  <td colSpan={3} className="p-0">
+                    <div 
+                      className={`m-2 rounded-xl sm:rounded-2xl border-2 shadow-xl hover:shadow-2xl transition-all duration-500 hover-lift interactive-card animate-scale-in touch-target ${
+                        bgColorClasses[item.color as keyof typeof bgColorClasses]
+                      }`}
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
+                      <table className="w-full">
+                        <tbody>
+                          <tr>
+                            <td className="text-left p-4 w-1/3">
+                              <span className="text-xs sm:text-sm lg:text-lg font-black text-gray-900 tracking-wide">
+                                {item.label}
+                              </span>
+                            </td>
+                            <td className="text-right p-4 w-1/3">
+                              <span className={`text-xs sm:text-sm lg:text-lg font-black tracking-tight ${
+                                colorClasses[item.color as keyof typeof colorClasses]
+                              }`}>
+                                <span className="hidden sm:inline">{formatCurrency(item.current)}</span>
+                                <span className="sm:hidden">R$ {(item.current / 1000).toFixed(1)}k</span>
+                              </span>
+                            </td>
+                            <td className="text-right p-4 w-1/3">
+                              <div className="flex flex-col items-end">
+                                <span className={`text-xs sm:text-sm lg:text-lg font-black tracking-tight ${
+                                  colorClasses[item.color as keyof typeof colorClasses]
+                                }`}>
+                                  <span className="hidden sm:inline">{formatCurrency(item.estimated)}</span>
+                                  <span className="sm:hidden">R$ {(item.estimated / 1000).toFixed(1)}k</span>
+                                </span>
+                                <div className="flex items-center mt-1 hidden lg:flex">
+                                  <TrendingUp size={14} className="mr-1" />
+                                  <span className="text-xs font-bold">
+                                    {item.current > 0 ? 
+                                      `+${((item.estimated - item.current) / item.current * 100).toFixed(1)}%` : 
+                                      'N/A'
+                                    }
+                                  </span>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })
+          )}
+        </tbody>
+      </table>
     </div>
   );
 };
