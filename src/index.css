@@ -349,28 +349,36 @@
   border-radius: 2rem;
 }
 
-/* Grid alignment improvements */
-.device-desktop .grid {
-  align-items: start;
+/* Table-like grid alignment for cash flow */
+.cash-flow-table {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1.5fr 1.5fr;
+  gap: 1rem;
+  align-items: center;
 }
 
-.device-desktop .grid-cols-4 {
-  grid-template-columns: 2fr 1fr 1fr 1fr;
-}
-
-.device-desktop .grid-cols-3 {
-  grid-template-columns: 2fr 1fr 1fr;
-}
-
-/* Text alignment for better readability */
-.device-desktop .text-right {
-  text-align: right;
-  justify-self: end;
-}
-
-.device-desktop .text-left {
-  text-align: left;
+.cash-flow-table > div:first-child {
   justify-self: start;
+}
+
+.cash-flow-table > div:not(:first-child) {
+  justify-self: end;
+  text-align: right;
+}
+
+/* Responsive table adjustments */
+@media (max-width: 768px) {
+  .cash-flow-table {
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .cash-flow-table {
+    grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr;
+    gap: 0.25rem;
+  }
 }
 
 /* Responsive spacing for different devices */

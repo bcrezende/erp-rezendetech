@@ -204,18 +204,23 @@ const CashFlowPanel: React.FC = () => {
       </div>
 
       {/* Detalhamento por Data */}
-      <div className={`space-y-3 overflow-y-auto relative z-10 custom-scrollbar mobile-scroll ${
+      <div className={`overflow-y-auto relative z-10 custom-scrollbar mobile-scroll ${
         isMobile ? 'max-h-[500px]' : 'max-h-[700px]'
       }`}>
-        <div className="grid grid-cols-4 gap-1 sm:gap-4 text-xs sm:text-base font-black text-gray-800 pb-3 sm:pb-4 border-b-2 border-white/40 bg-gradient-to-r from-white/70 to-slate-50/70 rounded-xl p-3 sm:p-4 sticky top-0 backdrop-blur-lg shadow-lg z-30">
-          <span className="truncate">Data</span>
-          <span className="text-right truncate">Entradas</span>
-          <span className="text-right truncate">Saídas</span>
-          <span className="text-right truncate">Saldo</span>
+        {/* Header da Tabela */}
+        <div className="sticky top-0 z-30 bg-gradient-to-r from-white/90 to-slate-50/90 backdrop-blur-lg shadow-lg rounded-xl mb-2">
+          <div className="grid grid-cols-4 gap-4 p-4 text-sm font-black text-gray-800 border-b-2 border-white/40">
+            <div className="text-left">Data</div>
+            <div className="text-right">Entradas</div>
+            <div className="text-right">Saídas</div>
+            <div className="text-right">Saldo</div>
+          </div>
         </div>
 
+        {/* Linhas da Tabela */}
+        <div className="space-y-2">
         {cashFlowData.length === 0 ? (
-          <div className={`text-center text-gray-600 font-semibold animate-fade-in ${
+          <div className={`text-center text-gray-600 font-semibold animate-fade-in p-8 ${
             isMobile ? 'py-8 text-sm' : 'py-12 text-base'
           }`}>
             Nenhuma movimentação encontrada
@@ -225,68 +230,53 @@ const CashFlowPanel: React.FC = () => {
             <React.Fragment key={day.date}>
               <button
                 onClick={() => toggleExpanded(day.date)}
-                className="w-full grid grid-cols-4 gap-2 sm:gap-4 py-3 sm:py-4 px-3 sm:px-4 rounded-xl hover:bg-gradient-to-r hover:from-white/60 hover:to-slate-50/60 text-xs sm:text-base text-left transition-smooth hover:shadow-xl backdrop-blur-sm group interactive-card relative z-20 touch-target no-select"
+                className="w-full grid grid-cols-4 gap-4 py-3 px-4 rounded-xl hover:bg-gradient-to-r hover:from-white/60 hover:to-slate-50/60 text-sm text-left transition-smooth hover:shadow-xl backdrop-blur-sm group interactive-card relative z-20 touch-target no-select"
               >
-                <span className="font-black text-gray-900 flex items-center space-x-1 sm:space-x-2 min-w-0 justify-start">
-                  <div className={`p-2 rounded-xl transition-all duration-300 shadow-md ${
+                <div className="font-black text-gray-900 flex items-center space-x-2 min-w-0">
+                  <div className={`p-1.5 rounded-lg transition-all duration-300 shadow-md ${
                     expandedDate === day.date ? 'bg-gradient-to-br from-blue-500 to-purple-600 text-white' : 'bg-white/80 text-gray-600 group-hover:bg-gradient-to-br group-hover:from-blue-500 group-hover:to-purple-600 group-hover:text-white'
                   }`}>
-                    {expandedDate === day.date ? <Minus size={12} className="sm:w-[14px] sm:h-[14px]" /> : <Plus size={12} className="sm:w-[14px] sm:h-[14px]" />}
+                    {expandedDate === day.date ? <Minus size={12} /> : <Plus size={12} />}
                   </div>
-                  <span className="text-xs sm:text-base truncate">{formatDate(day.date)}</span>
-                </span>
-                <span className={`text-right text-xs sm:text-base font-black tracking-tight truncate ${
+                  <span className="text-sm font-black truncate">{formatDate(day.date)}</span>
+                </div>
+                <div className={`text-right font-black tracking-tight ${
                   day.income > 0 ? 'text-green-600' : 'text-gray-400'
                 }`}>
-                  {day.income > 0 ? (
-                    <span className="hidden sm:inline">{formatCurrency(day.income)}</span>
-                  ) : (
-                    <span className="hidden sm:inline">-</span>
-                  )}
-                  <span className="sm:hidden">{day.income > 0 ? `R$ ${(day.income / 1000).toFixed(1)}k` : '-'}</span>
-                </span>
-                <span className={`text-right text-xs sm:text-base font-black tracking-tight truncate ${
+                  {day.income > 0 ? formatCurrency(day.income) : '-'}
+                </div>
+                <div className={`text-right font-black tracking-tight ${
                   day.expenses > 0 ? 'text-red-600' : 'text-gray-400'
                 }`}>
-                  {day.expenses > 0 ? (
-                    <span className="hidden sm:inline">{formatCurrency(day.expenses)}</span>
-                  ) : (
-                    <span className="hidden sm:inline">-</span>
-                  )}
-                  <span className="sm:hidden">{day.expenses > 0 ? `R$ ${(day.expenses / 1000).toFixed(1)}k` : '-'}</span>
-                </span>
-                <span className={`text-right font-black text-xs sm:text-base tracking-tight truncate ${
+                  {day.expenses > 0 ? formatCurrency(day.expenses) : '-'}
+                </div>
+                <div className={`text-right font-black tracking-tight ${
                   day.balance >= 0 ? 'text-blue-600' : 'text-orange-600'
                 } drop-shadow-lg`}>
-                  <span className="hidden sm:inline">{formatCurrency(day.balance)}</span>
-                  <span className="sm:hidden">R$ {(day.balance / 1000).toFixed(1)}k</span>
-                </span>
+                  {formatCurrency(day.balance)}
+                </div>
               </button>
 
               {expandedDate === day.date && (
-                <div className={`border-l-4 border-blue-400 space-y-3 animate-slide-in-left bg-gradient-to-r from-blue-50/90 to-purple-50/60 rounded-r-xl shadow-inner backdrop-blur-sm overflow-y-auto mobile-scroll ${
+                <div className={`border-l-4 border-blue-400 space-y-2 animate-slide-in-left bg-gradient-to-r from-blue-50/90 to-purple-50/60 rounded-r-xl shadow-inner backdrop-blur-sm overflow-y-auto mobile-scroll ${
                   isMobile ? 'ml-4 pl-4 py-3 max-h-48' : 'ml-8 pl-6 py-4 max-h-60'
                 } relative z-10`}>
                   {day.dailyTransactions
                     .sort((a, b) => new Date(a.criado_em).getTime() - new Date(b.criado_em).getTime()) // Sort by creation time
                     .map((transaction) => (
-                      <div key={transaction.id} className={`flex justify-between items-center text-gray-800 bg-white/90 rounded-xl shadow-lg hover:shadow-xl transition-smooth border border-white/60 hover:bg-white/95 backdrop-blur-sm touch-target ${
+                      <div key={transaction.id} className={`flex justify-between items-center text-gray-800 bg-white/90 rounded-lg shadow-md hover:shadow-lg transition-smooth border border-white/60 hover:bg-white/95 backdrop-blur-sm touch-target ${
                         isMobile ? 'text-xs p-3' : 'text-base p-4'
                       } relative z-30`}>
                         <span className="flex-1 truncate mr-2">
                           <span className="font-semibold">{transaction.descricao}</span>
-                          <span className={`text-gray-600 ${isMobile ? 'text-xs block' : 'text-xs inline ml-1'}`}>
-                            {isMobile ? getCategoryName(transaction.id_categoria) : `(${getCategoryName(transaction.id_categoria)})`}
+                          <span className="text-gray-600 text-xs block">
+                            {getCategoryName(transaction.id_categoria)}
                           </span>
                         </span>
-                        <span className={`font-black flex-shrink-0 drop-shadow-lg ${
+                        <span className={`font-bold flex-shrink-0 drop-shadow-lg ${
                           transaction.tipo === 'receita' ? 'text-green-600' : 'text-red-600'
-                        } ${isMobile ? 'text-xs' : 'text-base'}`}>
-                          {isMobile ? (
-                            `${transaction.tipo === 'despesa' ? '-' : ''}R$ ${(transaction.valor / 1000).toFixed(1)}k`
-                          ) : (
-                            `${transaction.tipo === 'despesa' ? '-' : ''}${formatCurrency(transaction.valor)}`
-                          )}
+                        } text-sm`}>
+                          {`${transaction.tipo === 'despesa' ? '-' : ''}${formatCurrency(transaction.valor)}`}
                         </span>
                       </div>
                     ))}
@@ -295,6 +285,7 @@ const CashFlowPanel: React.FC = () => {
             </React.Fragment>
           ))
         )}
+        </div>
       </div>
     </div>
   );
