@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useAuth } from '../Auth/AuthProvider';
 import { CashFlowData } from '../../types'; // Ensure CashFlowData type is updated
-import { TrendingUp, TrendingDown, Plus, Minus } from 'lucide-react';
+import { TrendingUp, TrendingDown, Plus, Minus, DollarSign } from 'lucide-react';
 import { Database } from '../../types/supabase'; // Import Database type for Transaction and Category
 
 type Transaction = Database['public']['Tables']['transacoes']['Row'];
