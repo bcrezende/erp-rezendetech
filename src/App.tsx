@@ -315,13 +315,6 @@ const AppContent: React.FC = () => {
         <main className={`flex-1 overflow-y-auto animate-fade-in custom-scrollbar mobile-scroll ${
           isMobile ? 'p-3' : 'p-6 lg:p-8'
         }`}>
-          {/* Device Info Debug (remover em produção) */}
-          {process.env.NODE_ENV === 'development' && (
-            <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-xs">
-              <strong>Device Info:</strong> {isMobile ? 'Mobile' : isTablet ? 'Tablet' : 'Desktop'} 
-              {isPWA && ' (PWA)'} | Touch: {hasTouch ? 'Yes' : 'No'} | Orientation: {orientation}
-            </div>
-          )}
           <div className="min-h-full">
             {renderPageContent()}
           </div>
