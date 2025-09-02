@@ -58,6 +58,7 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
         setVendas([]);
         setPessoas([]);
         return;
+      }
       const [transactionsRes, categoriesRes, vendasRes, pessoasRes] = await Promise.all([
         supabase
           .from('transacoes')
