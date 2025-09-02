@@ -127,18 +127,18 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mob
         >
           <div className="flex items-center space-x-2 sm:space-x-3">
             <item.icon size={20} className="drop-shadow-sm" />
-            {(!isDesktopCollapsed || mobileOpen) && (
+            {(!isDesktopCollapsed || isMobile) && (
               <span className="text-sm sm:text-base font-bold tracking-wide">{item.label}</span>
             )}
           </div>
-          {hasChildren && (!isDesktopCollapsed || mobileOpen) && (
+          {hasChildren && (!isDesktopCollapsed || isMobile) && (
             <div className="transition-transform duration-300">
               {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
             </div>
           )}
         </button>
 
-        {hasChildren && isExpanded && (!isDesktopCollapsed || mobileOpen) && (
+        {hasChildren && isExpanded && (!isDesktopCollapsed || isMobile) && (
           <div className="mt-1 sm:mt-2 space-y-1 sm:space-y-2 animate-slide-in-up">
             {item.children.map(child => renderMenuItem(child, level + 1))}
           </div>
@@ -170,7 +170,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mob
           isMobile ? 'p-4' : 'p-6'
         }`}>
           <div className="flex items-center justify-between">
-            {(!isDesktopCollapsed || isMobile) && (
+            {!isDesktopCollapsed && (
               <div className="animate-slide-in-from-left">
                 <h1 className={`font-black bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 bg-clip-text text-transparent tracking-tight ${
                   isMobile ? 'text-lg' : 'text-xl'
@@ -224,7 +224,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mob
                 {profile?.nome_completo?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'U'}
               </span>
             </div>
-            {(!isDesktopCollapsed || isMobile) && (
+            {!isDesktopCollapsed && (
               <div className="min-w-0 flex-1 animate-slide-in-from-left">
                 <p className={`font-bold text-gray-900 truncate tracking-wide ${
                   isMobile ? 'text-xs' : 'text-sm'
