@@ -119,6 +119,15 @@ const AccountsPayable: React.FC = () => {
 
     try {
       if (editingTransaction) {
+        console.log('🔍 DEBUG - Editando transação:', {
+          transactionId: editingTransaction.id,
+          originalDueDate: editingTransaction.data_vencimento,
+          newDueDate: formData.data_vencimento,
+          formDataComplete: formData
+        });
+        
+        console.log('🔍 DEBUG - Dados sendo enviados para atualização:', transactionData);
+        
         // Verificar se é uma transação recorrente e se deve atualizar parcelas futuras
         if (editingTransaction.e_recorrente && editingTransaction.tipo_recorrencia === 'parcelada') {
           await updateParceladaTransactions(editingTransaction);
@@ -171,6 +180,20 @@ const AccountsPayable: React.FC = () => {
       }
 
       await loadData();
+      
+      // Debug: Verificar se a data de vencimento foi atualizada após recarregamento
+      if (editingTransaction) {
+        setTimeout(() => {
+          const updatedTransaction = transactions.find(t => t.id === editingTransaction.id);
+          console.log('🔍 DEBUG - Transação após recarregamento:', {
+            transactionId: editingTransaction.id,
+            updatedDueDate: updatedTransaction?.data_vencimento,
+            expectedDueDate: transactionData.data_vencimento,
+            fullTransaction: updatedTransaction
+          });
+        }, 1000);
+      }
+      
       resetForm();
     } catch (error) {
       console.error('Error saving transaction:', error);
@@ -271,6 +294,8 @@ const AccountsPayable: React.FC = () => {
           .eq('id', currentTransaction.id);
 
         if (error) throw error;
+        
+        console.log('✅ DEBUG - Transação atual atualizada com sucesso');
         alert('Apenas esta parcela foi atualizada com sucesso!');
       }
 
