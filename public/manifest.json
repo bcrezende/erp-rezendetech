@@ -3,15 +3,16 @@
   "short_name": "ERP System",
   "description": "Sistema ERP completo com agente IA integrado",
   "start_url": "/",
-  "display": "fullscreen",
-  "display_override": ["fullscreen", "standalone", "minimal-ui"],
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
   "theme_color": "#1E40AF",
   "background_color": "#ffffff",
-  "orientation": "portrait",
+  "orientation": "any",
   "prefer_related_applications": false,
   "scope": "/",
   "lang": "pt-BR",
   "dir": "ltr",
+  "categories": ["business", "finance", "productivity"],
   "icons": [
     {
       "src": "/icon-192.png",
@@ -24,6 +25,32 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Visão geral do negócio",
+      "url": "/?page=dashboard",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Transações",
+      "short_name": "Transações",
+      "description": "Gerenciar receitas e despesas",
+      "url": "/?page=transactions",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }

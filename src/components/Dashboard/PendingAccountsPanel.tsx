@@ -89,13 +89,14 @@ const PendingAccountsPanel: React.FC<PendingAccountsPanelProps> = ({ dateFilter 
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="mobile-grid">
       <MetricCard
         title="Contas a Receber Pendentes"
         value={formatCurrency(pendingReceivables)}
         icon={DollarSign}
         color="orange"
         changeType="neutral"
+        delay={0}
       />
       <MetricCard
         title="Contas a Pagar Pendentes"
@@ -103,6 +104,7 @@ const PendingAccountsPanel: React.FC<PendingAccountsPanelProps> = ({ dateFilter 
         icon={Clock}
         color="red"
         changeType="neutral"
+        delay={100}
       />
     </div>
   );
