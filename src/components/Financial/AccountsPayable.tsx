@@ -319,6 +319,24 @@ const AccountsPayable: React.FC = () => {
 
     try {
       // 1. Criar a transação pai (primeira parcela)
+      const transacaoPaiData = {
+        id_empresa: profile.id_empresa,
+        valor: Number(formData.valor_parcela),
+        tipo: 'despesa' as const,
+        descricao: `${formData.descricao} (Parcela 1/${formData.numero_parcelas})`,
+        data_transacao: formData.data_inicio_recorrencia,
+        data_vencimento: formData.data_inicio_recorrencia,
+        id_categoria: formData.id_categoria || null,
+        id_pessoa: formData.id_pessoa || null,
+        status: 'pendente',
+        origem: 'manual',
+        observacoes: formData.observacoes,
+        e_recorrente: true,
+        tipo_recorrencia: 'parcelada',
+        numero_parcelas: formData.numero_parcelas,
+        data_inicio_recorrencia: formData.data_inicio_recorrencia,
+        valor_parcela: Number(formData.valor_parcela),
+        ativa_recorrencia: true,
         data_vencimento: formData.data_inicio_recorrencia,
         parcela_atual: 1,
         id_transacao_pai: null,
