@@ -150,7 +150,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mob
   return (
     <>
       {/* Mobile Overlay */}
-      {mobileOpen && (
+      {isMobile && mobileOpen && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
           onClick={onClose}
@@ -159,10 +159,9 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mob
 
       {/* Sidebar */}
       <div className={`
-        ${isMobile ? 'fixed inset-y-0 left-0 z-50 w-80' : 'relative z-auto'} 
+        ${isMobile ? `fixed inset-y-0 left-0 z-50 w-80 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}` : 'relative z-auto'} 
         glass-strong shadow-2xl transform transition-all duration-500 ease-in-out safe-top safe-bottom
-        ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}
-        ${!isMobile && isDesktopCollapsed ? 'w-20' : !isMobile ? 'w-72' : ''}
+        ${!isMobile ? (isDesktopCollapsed ? 'w-20' : 'w-72') : ''}
         h-full flex flex-col border-r border-white/30 backdrop-blur-xl
       `}>
         {/* Header */}
@@ -170,7 +169,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mob
           isMobile ? 'p-4' : 'p-6'
         }`}>
           <div className="flex items-center justify-between">
-            {!isDesktopCollapsed && (
+            {(!isDesktopCollapsed || isMobile) && (
               <div className="animate-slide-in-from-left">
                 <h1 className={`font-black bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 bg-clip-text text-transparent tracking-tight ${
                   isMobile ? 'text-lg' : 'text-xl'
@@ -224,7 +223,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mob
                 {profile?.nome_completo?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'U'}
               </span>
             </div>
-            {!isDesktopCollapsed && (
+            {(!isDesktopCollapsed || isMobile) && (
               <div className="min-w-0 flex-1 animate-slide-in-from-left">
                 <p className={`font-bold text-gray-900 truncate tracking-wide ${
                   isMobile ? 'text-xs' : 'text-sm'

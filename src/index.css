@@ -145,6 +145,27 @@
   animation: float 6s ease-in-out infinite reverse;
 }
 
+/* Sidebar visibility fixes */
+.sidebar-desktop {
+  display: block !important;
+  position: relative !important;
+  transform: none !important;
+}
+
+.sidebar-mobile {
+  position: fixed;
+  z-index: 50;
+}
+
+/* Ensure sidebar is always visible on desktop */
+@media (min-width: 768px) {
+  .sidebar-container {
+    display: block !important;
+    position: relative !important;
+    transform: none !important;
+  }
+}
+
 /* Mobile optimizations */
 @media (max-width: 640px) {
   .glass-card {
