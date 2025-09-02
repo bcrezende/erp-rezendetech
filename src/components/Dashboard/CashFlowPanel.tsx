@@ -236,6 +236,8 @@ const CashFlowPanel: React.FC = () => {
                   <span className="text-xs sm:text-base truncate">{formatDate(day.date)}</span>
                 </span>
                 <span className={`text-right text-xs sm:text-base font-black tracking-tight truncate ${
+                  day.income > 0 ? 'text-green-600' : 'text-gray-400'
+                }`}>
                   {day.income > 0 ? (
                     <span className="hidden sm:inline">{formatCurrency(day.income)}</span>
                   ) : (
@@ -244,6 +246,8 @@ const CashFlowPanel: React.FC = () => {
                   <span className="sm:hidden">{day.income > 0 ? `R$ ${(day.income / 1000).toFixed(1)}k` : '-'}</span>
                 </span>
                 <span className={`text-right text-xs sm:text-base font-black tracking-tight truncate ${
+                  day.expenses > 0 ? 'text-red-600' : 'text-gray-400'
+                }`}>
                   {day.expenses > 0 ? (
                     <span className="hidden sm:inline">{formatCurrency(day.expenses)}</span>
                   ) : (
