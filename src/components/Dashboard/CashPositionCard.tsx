@@ -115,19 +115,26 @@ const CashPositionCard: React.FC<CashPositionCardProps> = ({ dateFilter }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+    <div className="card-premium rounded-3xl shadow-2xl border border-white/30 p-6 sm:p-8 hover-lift relative overflow-hidden animate-slide-in-up">
+      {/* Background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-cyan-50/60 via-blue-50/40 to-indigo-50/60 rounded-3xl" />
+      
+      {/* Floating elements */}
+      <div className="absolute top-4 left-4 w-24 h-24 bg-gradient-to-br from-cyan-400/10 to-blue-400/10 rounded-full blur-xl animate-float" />
+      <div className="absolute bottom-4 right-4 w-16 h-16 bg-gradient-to-br from-blue-400/10 to-indigo-400/10 rounded-full blur-lg animate-float" style={{ animationDelay: '1s' }} />
+      
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-2 sm:space-x-3">
+        <div className="flex items-center space-x-3 relative z-10">
           <div className={`p-3 rounded-full ${
             cashPosition.caixaAtual >= 0 ? 'bg-blue-50' : 'bg-orange-50'
-          }`}>
+          } shadow-xl hover-glow animate-scale-in`}>
             <Wallet className={`h-6 w-6 ${
               cashPosition.caixaAtual >= 0 ? 'text-blue-600' : 'text-orange-600'
-            }`} />
+            } drop-shadow-lg`} />
           </div>
           <div>
-            <h3 className="text-base sm:text-lg font-semibold text-gray-900">Caixa Atual</h3>
-            <p className="text-xs sm:text-sm text-gray-600">Receitas pagas - Despesas pagas</p>
+            <h3 className="text-lg sm:text-xl font-black bg-gradient-to-r from-gray-900 via-cyan-900 to-blue-900 bg-clip-text text-transparent tracking-tight">Caixa Atual</h3>
+            <p className="text-sm text-gray-700 font-bold tracking-wide">Receitas pagas - Despesas pagas</p>
           </div>
         </div>
       </div>
@@ -308,23 +315,28 @@ const CashPositionCard: React.FC<CashPositionCardProps> = ({ dateFilter }) => {
       )}
       <div className="space-y-4">
         {/* Caixa Atual - Destaque */}
-        <div className={`p-4 rounded-lg border-2 ${
+        <div className={`p-6 sm:p-8 rounded-2xl border-3 shadow-2xl hover:shadow-3xl transition-all duration-500 hover-lift relative overflow-hidden animate-scale-in ${
           cashPosition.caixaAtual >= 0 
-            ? 'bg-blue-50 border-blue-200' 
-            : 'bg-orange-50 border-orange-200'
+            ? 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-300' 
+            : 'bg-gradient-to-br from-orange-50 to-yellow-50 border-orange-300'
         }`}>
+          <div className={`absolute inset-0 ${
+            cashPosition.caixaAtual >= 0 
+              ? 'bg-gradient-to-r from-blue-600/5 to-indigo-600/5' 
+              : 'bg-gradient-to-r from-orange-600/5 to-yellow-600/5'
+          }`} />
           <div className="text-center">
-            <p className={`text-sm font-medium ${
+            <p className={`text-base sm:text-lg font-black tracking-wider uppercase ${
               cashPosition.caixaAtual >= 0 ? 'text-blue-800' : 'text-orange-800'
             }`}>
               Saldo em Caixa
             </p>
-            <p className={`text-4xl font-bold ${
+            <p className={`text-4xl sm:text-6xl font-black tracking-tight drop-shadow-xl ${
               cashPosition.caixaAtual >= 0 ? 'text-blue-900' : 'text-orange-900'
             }`}>
               {formatCurrency(cashPosition.caixaAtual)}
             </p>
-            <p className={`text-xs mt-1 ${
+            <p className={`text-sm mt-3 font-bold tracking-wide ${
               cashPosition.caixaAtual >= 0 ? 'text-blue-700' : 'text-orange-700'
             }`}>
               {cashPosition.caixaAtual >= 0 ? 'Posição positiva' : 'Posição negativa'}
@@ -333,53 +345,53 @@ const CashPositionCard: React.FC<CashPositionCardProps> = ({ dateFilter }) => {
         </div>
 
         {/* Detalhamento */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-6 relative z-10">
           <button
             onClick={() => setShowReceitasDetail(true)}
-            className="bg-green-50 p-4 rounded-lg border border-green-200 hover:bg-green-100 transition-colors text-left group"
+            className="bg-gradient-to-br from-green-50 to-emerald-50 p-5 sm:p-6 rounded-2xl border-2 border-green-300 hover:bg-gradient-to-br hover:from-green-100 hover:to-emerald-100 transition-all duration-500 text-left group shadow-xl hover:shadow-2xl hover-lift interactive-card animate-slide-in-from-left"
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-green-800">Receitas Pagas</p>
-                <p className="text-xl font-bold text-green-900">
+                <p className="text-base font-black text-green-800 tracking-wider uppercase">Receitas Pagas</p>
+                <p className="text-2xl sm:text-3xl font-black text-green-900 tracking-tight drop-shadow-lg">
                   {formatCurrency(cashPosition.receitasPagas)}
                 </p>
-                <p className="text-xs text-green-700 mt-1">
+                <p className="text-sm text-green-700 mt-2 font-bold">
                   {receitasDetalhe.length} transação(ões) • Clique para detalhes
                 </p>
               </div>
               <div className="flex items-center space-x-1">
-                <TrendingUp className="text-green-600" size={20} />
-                <Eye className="text-green-600 opacity-0 group-hover:opacity-100 transition-opacity" size={16} />
+                <TrendingUp className="text-green-600 drop-shadow-lg" size={24} />
+                <Eye className="text-green-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={18} />
               </div>
             </div>
           </button>
 
           <button
             onClick={() => setShowDespesasDetail(true)}
-            className="bg-red-50 p-4 rounded-lg border border-red-200 hover:bg-red-100 transition-colors text-left group"
+            className="bg-gradient-to-br from-red-50 to-pink-50 p-5 sm:p-6 rounded-2xl border-2 border-red-300 hover:bg-gradient-to-br hover:from-red-100 hover:to-pink-100 transition-all duration-500 text-left group shadow-xl hover:shadow-2xl hover-lift interactive-card animate-slide-in-from-right"
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-red-800">Custos Pagos</p>
-                <p className="text-xl font-bold text-red-900">
+                <p className="text-base font-black text-red-800 tracking-wider uppercase">Custos Pagos</p>
+                <p className="text-2xl sm:text-3xl font-black text-red-900 tracking-tight drop-shadow-lg">
                   {formatCurrency(cashPosition.despesasPagas)}
                 </p>
-                <p className="text-xs text-red-700 mt-1">
+                <p className="text-sm text-red-700 mt-2 font-bold">
                   {despesasDetalhe.length} transação(ões) • Clique para detalhes
                 </p>
               </div>
               <div className="flex items-center space-x-1">
-                <TrendingDown className="text-red-600" size={20} />
-                <Eye className="text-red-600 opacity-0 group-hover:opacity-100 transition-opacity" size={16} />
+                <TrendingDown className="text-red-600 drop-shadow-lg" size={24} />
+                <Eye className="text-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={18} />
               </div>
             </div>
           </button>
         </div>
 
         {/* Fórmula */}
-        <div className="bg-gray-50 p-3 rounded-lg">
-          <p className="text-xs text-gray-600 text-center">
+        <div className="glass p-4 sm:p-5 rounded-2xl shadow-lg border border-white/30 relative z-10 animate-slide-in-up">
+          <p className="text-sm text-gray-700 text-center font-bold tracking-wide">
             <strong>Fórmula:</strong> Receitas (pagas/recebidas) - Despesas (pagas) = Caixa Atual
           </p>
         </div>

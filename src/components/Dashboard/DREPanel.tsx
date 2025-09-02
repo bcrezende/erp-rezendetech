@@ -307,50 +307,50 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
     const isExpanded = expandedSections.includes(id);
     
     return (
-      <div className="border border-gray-200 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden bg-white/60 backdrop-blur-sm">
+      <div className="border-2 border-white/40 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden glass-strong hover-lift interactive-card">
         <button
           onClick={() => toggleSection(id)}
-          className="w-full flex items-center justify-between p-4 hover:bg-gradient-to-r hover:from-gray-50 hover:to-slate-50 transition-all duration-200 group"
+          className="w-full flex items-center justify-between p-5 sm:p-6 hover:bg-gradient-to-r hover:from-white/20 hover:to-slate-50/20 transition-smooth group"
         >
           <div className="flex items-center space-x-3">
-            <div className={`p-1 rounded-lg transition-all duration-200 ${
-              isExpanded ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600'
+            <div className={`p-2 rounded-xl transition-all duration-300 shadow-lg ${
+              isExpanded ? 'bg-gradient-to-br from-blue-500 to-purple-600 text-white' : 'bg-white/80 text-gray-600 group-hover:bg-gradient-to-br group-hover:from-blue-500 group-hover:to-purple-600 group-hover:text-white'
             }`}>
-              {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+              {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
             </div>
             <div className="text-left">
-              <span className="font-bold text-gray-900 text-base tracking-wide">{title}</span>
-              <p className="text-xs text-gray-500 mt-1 font-medium">{description}</p>
+              <span className="font-black text-gray-900 text-lg tracking-wide">{title}</span>
+              <p className="text-xs text-gray-600 mt-1 font-semibold tracking-wide">{description}</p>
             </div>
           </div>
-          <span className={`font-bold text-lg ${
+          <span className={`font-black text-xl sm:text-2xl ${
             isExpense ? 'text-red-600' : 
             value < 0 ? 'text-red-600' : 'text-green-600'
-          } drop-shadow-sm`}>
+          } drop-shadow-lg tracking-tight`}>
             {isExpense ? '-' : ''}{formatCurrency(Math.abs(value))}
           </span>
         </button>
 
         {isExpanded && detalhes.length > 0 && (
-          <div className="border-t border-gray-200 bg-gradient-to-r from-gray-50 to-slate-50">
+          <div className="border-t border-white/30 bg-gradient-to-r from-white/40 to-slate-50/40 backdrop-blur-sm animate-slide-in-up">
             {detalhes.map((categoria, catIndex) => (
-              <div key={catIndex} className="border-b border-gray-100 last:border-b-0 animate-fade-in">
-                <div className="p-3 bg-gradient-to-r from-gray-100 to-slate-100">
+              <div key={catIndex} className="border-b border-white/20 last:border-b-0 animate-fade-in hover:bg-white/20 transition-smooth">
+                <div className="p-4 bg-gradient-to-r from-white/30 to-slate-100/30 backdrop-blur-sm">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-gray-800 tracking-wide">{categoria.categoria}</span>
-                    <span className={`font-bold ${isExpense ? 'text-red-600' : 'text-green-600'} drop-shadow-sm`}>
+                    <span className="font-black text-gray-900 tracking-wide text-base">{categoria.categoria}</span>
+                    <span className={`font-black text-lg ${isExpense ? 'text-red-600' : 'text-green-600'} drop-shadow-lg`}>
                       {formatCurrency(categoria.valor)}
                     </span>
                   </div>
                 </div>
-                <div className="p-2">
+                <div className="p-3">
                   {categoria.itens.map((item, itemIndex) => (
-                    <div key={itemIndex} className="flex items-center justify-between py-2 px-3 text-sm hover:bg-white/80 rounded-lg transition-all duration-200 hover:shadow-sm">
+                    <div key={itemIndex} className="flex items-center justify-between py-3 px-4 text-sm hover:bg-white/60 rounded-xl transition-smooth hover:shadow-lg hover-lift">
                       <div>
-                        <span className="text-gray-900 font-medium">{item.descricao}</span>
-                        <span className="text-gray-500 ml-2 text-xs">({formatDate(item.data)})</span>
+                        <span className="text-gray-900 font-bold">{item.descricao}</span>
+                        <span className="text-gray-600 ml-2 text-xs font-semibold">({formatDate(item.data)})</span>
                       </div>
-                      <span className={`font-bold ${isExpense ? 'text-red-600' : 'text-green-600'} drop-shadow-sm`}>
+                      <span className={`font-black ${isExpense ? 'text-red-600' : 'text-green-600'} drop-shadow-lg`}>
                         {formatCurrency(item.valor)}
                       </span>
                     </div>
@@ -362,7 +362,7 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
         )}
 
         {isExpanded && detalhes.length === 0 && (
-          <div className="border-t border-gray-200 bg-gradient-to-r from-gray-50 to-slate-50 p-4 text-center text-gray-500 animate-fade-in">
+          <div className="border-t border-white/30 bg-gradient-to-r from-white/40 to-slate-50/40 p-6 text-center text-gray-600 animate-fade-in font-semibold">
             Nenhum lançamento encontrado nesta categoria
           </div>
         )}
@@ -371,20 +371,24 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
   };
 
   return (
-    <div className="card-modern rounded-2xl shadow-xl border border-white/20 p-4 sm:p-6 hover-lift relative overflow-hidden">
+    <div className="card-premium rounded-3xl shadow-2xl border border-white/30 p-6 sm:p-8 hover-lift relative overflow-hidden animate-slide-in-from-left">
       {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-purple-50/50 rounded-2xl" />
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/60 via-purple-50/40 to-pink-50/60 rounded-3xl" />
+      
+      {/* Floating elements */}
+      <div className="absolute top-6 right-6 w-24 h-24 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-full blur-xl animate-float" />
+      <div className="absolute bottom-6 left-6 w-16 h-16 bg-gradient-to-br from-purple-400/10 to-pink-400/10 rounded-full blur-lg animate-float" style={{ animationDelay: '3s' }} />
       
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-2 sm:space-x-3 relative z-10">
-          <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg">
-            <BarChart3 className="h-6 w-6 text-white" />
+          <div className="p-3 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 rounded-2xl shadow-xl hover-glow animate-scale-in">
+            <BarChart3 className="h-7 w-7 text-white drop-shadow-lg" />
           </div>
-          <h3 className="text-base sm:text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+          <h3 className="text-lg sm:text-xl font-black bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 bg-clip-text text-transparent tracking-tight">
             Demonstrativo do Resultado do Exercício (DRE)
           </h3>
         </div>
-        <div className="text-xs sm:text-sm text-gray-600 text-right relative z-10 bg-white/60 backdrop-blur-sm rounded-lg px-3 py-1">
+        <div className="text-xs sm:text-sm text-gray-700 text-right relative z-10 glass rounded-xl px-4 py-2 font-semibold animate-slide-in-from-right">
           Período: {dreData.period}
         </div>
       </div>
@@ -411,16 +415,17 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
         )}
 
         {/* MARGEM DE CONTRIBUIÇÃO */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-indigo-600/5" />
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-300 rounded-2xl p-5 sm:p-6 shadow-xl hover:shadow-2xl transition-all duration-500 hover-lift relative overflow-hidden animate-scale-in">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-indigo-600/10" />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/10 to-indigo-400/10 rounded-full blur-2xl animate-float" />
           <div className="flex items-center justify-between">
             <div className="relative z-10">
-              <span className="font-bold text-blue-900 text-lg tracking-wide">MARGEM DE CONTRIBUIÇÃO</span>
-              <p className="text-xs text-blue-700 mt-1 font-medium">Receita Bruta - Despesa Operacional</p>
+              <span className="font-black text-blue-900 text-xl tracking-wide">MARGEM DE CONTRIBUIÇÃO</span>
+              <p className="text-sm text-blue-800 mt-2 font-bold tracking-wide">Receita Bruta - Despesa Operacional</p>
             </div>
-            <span className={`font-bold text-xl ${
+            <span className={`font-black text-2xl sm:text-3xl ${
               dreData.margemContribuicao >= 0 ? 'text-blue-900' : 'text-red-600'
-            } drop-shadow-sm`}>
+            } drop-shadow-xl tracking-tight`}>
               {formatCurrency(dreData.margemContribuicao)}
             </span>
           </div>
@@ -437,32 +442,37 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
         )}
 
         {/* RESULTADO DO NEGÓCIO */}
-        <div className={`border-2 rounded-xl p-4 shadow-xl hover:shadow-2xl transition-all duration-300 relative overflow-hidden ${
+        <div className={`border-3 rounded-2xl p-6 sm:p-8 shadow-2xl hover:shadow-3xl transition-all duration-500 relative overflow-hidden hover-lift animate-scale-in ${
           dreData.resultadoNegocio >= 0 
-            ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200' 
-            : 'bg-gradient-to-r from-red-50 to-pink-50 border-red-200'
+            ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-300' 
+            : 'bg-gradient-to-r from-red-50 to-pink-50 border-red-300'
         }`}>
           <div className={`absolute inset-0 ${
             dreData.resultadoNegocio >= 0 
-              ? 'bg-gradient-to-r from-green-600/5 to-emerald-600/5' 
-              : 'bg-gradient-to-r from-red-600/5 to-pink-600/5'
+              ? 'bg-gradient-to-r from-green-600/10 to-emerald-600/10' 
+              : 'bg-gradient-to-r from-red-600/10 to-pink-600/10'
+          }`} />
+          <div className={`absolute top-0 right-0 w-40 h-40 rounded-full blur-3xl animate-float ${
+            dreData.resultadoNegocio >= 0 
+              ? 'bg-gradient-to-br from-green-400/20 to-emerald-400/20' 
+              : 'bg-gradient-to-br from-red-400/20 to-pink-400/20'
           }`} />
           <div className="flex items-center justify-between">
             <div className="relative z-10">
-              <span className={`font-bold text-xl ${
+              <span className={`font-black text-2xl ${
                 dreData.resultadoNegocio >= 0 ? 'text-green-900' : 'text-red-900'
               } tracking-wide`}>
                 RESULTADO DO NEGÓCIO
               </span>
-              <p className={`text-xs mt-1 ${
+              <p className={`text-sm mt-2 ${
                 dreData.resultadoNegocio >= 0 ? 'text-green-700' : 'text-red-700'
-              } font-medium`}>
+              } font-bold tracking-wide`}>
                 Margem de Contribuição - Custo Fixo
               </p>
             </div>
-            <span className={`font-bold text-2xl ${
+            <span className={`font-black text-3xl sm:text-4xl ${
               dreData.resultadoNegocio >= 0 ? 'text-green-900' : 'text-red-900'
-            } drop-shadow-sm relative z-10`}>
+            } drop-shadow-2xl relative z-10 tracking-tight`}>
               {formatCurrency(dreData.resultadoNegocio)}
             </span>
           </div>
@@ -470,30 +480,30 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
       </div>
 
       {/* Análise Percentual */}
-      <div className="mt-6 p-4 bg-gradient-to-r from-gray-50 to-slate-50 rounded-xl shadow-inner relative z-10">
-        <h4 className="font-bold text-gray-900 mb-3 tracking-wide">Análise Percentual</h4>
-        <div className="grid grid-cols-2 gap-4 text-sm">
+      <div className="mt-8 p-5 sm:p-6 bg-gradient-to-r from-white/60 to-slate-50/60 rounded-2xl shadow-inner relative z-10 backdrop-blur-sm border border-white/30 animate-slide-in-up">
+        <h4 className="font-black text-gray-900 mb-4 tracking-wide text-lg">📊 Análise Percentual</h4>
+        <div className="grid grid-cols-2 gap-6 text-sm">
           <div className="flex items-center justify-between">
-            <span className="text-gray-600 font-medium">Margem de Contribuição:</span>
-            <span className="font-bold text-blue-600">
+            <span className="text-gray-700 font-bold">Margem de Contribuição:</span>
+            <span className="font-black text-blue-600 text-base">
               {dreData.receitaBruta > 0 ? ((dreData.margemContribuicao / dreData.receitaBruta) * 100).toFixed(1) : '0.0'}%
             </span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-600 font-medium">Margem Líquida:</span>
-            <span className="font-bold text-green-600">
+            <span className="text-gray-700 font-bold">Margem Líquida:</span>
+            <span className="font-black text-green-600 text-base">
               {dreData.receitaBruta > 0 ? ((dreData.resultadoNegocio / dreData.receitaBruta) * 100).toFixed(1) : '0.0'}%
             </span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-600 font-medium">Despesas/Receita:</span>
-            <span className="font-bold text-orange-600">
+            <span className="text-gray-700 font-bold">Despesas/Receita:</span>
+            <span className="font-black text-orange-600 text-base">
               {dreData.receitaBruta > 0 ? ((dreData.despesaOperacional / dreData.receitaBruta) * 100).toFixed(1) : '0.0'}%
             </span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-600 font-medium">Custos Fixos/Receita:</span>
-            <span className="font-bold text-red-600">
+            <span className="text-gray-700 font-bold">Custos Fixos/Receita:</span>
+            <span className="font-black text-red-600 text-base">
               {dreData.receitaBruta > 0 ? ((dreData.custoFixo / dreData.receitaBruta) * 100).toFixed(1) : '0.0'}%
             </span>
           </div>

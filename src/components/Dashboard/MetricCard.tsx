@@ -42,24 +42,28 @@ const MetricCard: React.FC<MetricCardProps> = ({
 
   return (
     <div 
-      className={`bg-gradient-to-br ${bgColorClasses[color]} rounded-2xl shadow-lg border border-white/20 p-4 sm:p-6 hover-lift card-modern animate-slide-in-up group relative overflow-hidden`}
+      className={`bg-gradient-to-br ${bgColorClasses[color]} rounded-3xl shadow-2xl border border-white/30 p-6 sm:p-8 hover-lift card-premium animate-scale-in group relative overflow-hidden interactive-card`}
       style={{ animationDelay: `${delay}ms` }}
     >
       {/* Background pattern */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-50" />
+      <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/10 to-transparent opacity-60" />
+      
+      {/* Animated background orbs */}
+      <div className="absolute -top-4 -right-4 w-20 h-20 bg-white/10 rounded-full blur-xl animate-float" style={{ animationDelay: '0s' }} />
+      <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-white/5 rounded-full blur-lg animate-float" style={{ animationDelay: '3s' }} />
       
       {/* Shimmer effect on hover */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
         <div className="absolute inset-0 animate-shimmer" />
       </div>
       
       <div className="flex items-center justify-between">
         <div className="flex-1 relative z-10">
-          <h3 className="text-xs sm:text-sm font-semibold text-gray-700 mb-3 tracking-wide uppercase">{title}</h3>
-          <p className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 tracking-tight">{value}</p>
+          <h3 className="text-sm sm:text-base font-bold text-gray-800 mb-4 tracking-wider uppercase opacity-90">{title}</h3>
+          <p className="text-3xl sm:text-4xl font-black text-gray-900 mb-3 tracking-tight drop-shadow-sm">{value}</p>
           {change && (
-            <p className={`text-xs sm:text-sm font-semibold ${changeColorClasses[changeType]} flex items-center space-x-1`}>
-              <span className={`w-2 h-2 rounded-full ${
+            <p className={`text-sm sm:text-base font-bold ${changeColorClasses[changeType]} flex items-center space-x-2`}>
+              <span className={`w-3 h-3 rounded-full animate-pulse ${
                 changeType === 'positive' ? 'bg-green-500' :
                 changeType === 'negative' ? 'bg-red-500' : 'bg-gray-500'
               }`} />
@@ -69,8 +73,8 @@ const MetricCard: React.FC<MetricCardProps> = ({
             </p>
           )}
         </div>
-        <div className={`p-3 sm:p-4 rounded-2xl bg-gradient-to-br ${colorClasses[color]} shadow-lg relative z-10 group-hover:scale-110 transition-transform duration-300`}>
-          <Icon size={20} className="sm:w-6 sm:h-6 drop-shadow-sm" />
+        <div className={`p-4 sm:p-5 rounded-2xl bg-gradient-to-br ${colorClasses[color]} shadow-xl relative z-10 group-hover:scale-125 group-hover:rotate-12 transition-all duration-500 animate-glow`}>
+          <Icon size={24} className="sm:w-8 sm:h-8 drop-shadow-lg" />
         </div>
       </div>
       

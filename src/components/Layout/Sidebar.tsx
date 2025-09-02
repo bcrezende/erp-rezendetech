@@ -108,25 +108,27 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mob
               handleNavigate(item.id);
             }
           }}
-          className={`w-full flex items-center justify-between px-4 py-3 text-left rounded-lg transition-all duration-200 ${
+          className={`w-full flex items-center justify-between px-4 py-3 text-left rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl ${
             isActive 
-              ? 'bg-blue-600 text-white shadow-md' 
-              : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+              ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-xl animate-glow' 
+              : 'text-gray-700 hover:bg-white/60 hover:text-gray-900 backdrop-blur-sm'
           } ${level > 0 ? 'ml-4 pl-8' : ''}`}
         >
           <div className="flex items-center space-x-3">
-            <item.icon size={20} />
+            <item.icon size={20} className="drop-shadow-sm" />
             {(!isDesktopCollapsed || mobileOpen) && (
-              <span className="font-medium">{item.label}</span>
+              <span className="font-bold tracking-wide">{item.label}</span>
             )}
           </div>
           {hasChildren && (!isDesktopCollapsed || mobileOpen) && (
-            isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />
+            <div className="transition-transform duration-300">
+              {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+            </div>
           )}
         </button>
 
         {hasChildren && isExpanded && (!isDesktopCollapsed || mobileOpen) && (
-          <div className="mt-1 space-y-1">
+          <div className="mt-2 space-y-2 animate-slide-in-up">
             {item.children.map(child => renderMenuItem(child, level + 1))}
           </div>
         )}
@@ -146,26 +148,26 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mob
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 left-0 z-50 w-80 bg-white shadow-xl transform transition-transform duration-300 ease-in-out
+        fixed inset-y-0 left-0 z-50 w-80 glass-strong shadow-2xl transform transition-all duration-500 ease-in-out
         md:relative md:translate-x-0 md:z-auto md:shadow-xl
         ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}
         ${isDesktopCollapsed ? 'md:w-20' : 'md:w-64'}
-        h-full flex flex-col
+        h-full flex flex-col border-r border-white/30 backdrop-blur-xl
       `}>
         {/* Header */}
-        <div className="p-4 sm:p-6 border-b border-gray-200">
+        <div className="p-4 sm:p-6 border-b border-white/30 bg-gradient-to-r from-white/20 to-transparent">
           <div className="flex items-center justify-between">
             {(!isDesktopCollapsed || mobileOpen) && (
-              <div>
-                <h1 className="text-lg sm:text-xl font-bold text-gray-900">Sistema ERP</h1>
-                <p className="text-xs sm:text-sm text-gray-500">Gestão Empresarial</p>
+              <div className="animate-slide-in-from-left">
+                <h1 className="text-lg sm:text-xl font-black bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 bg-clip-text text-transparent tracking-tight">Sistema ERP</h1>
+                <p className="text-xs sm:text-sm text-gray-600 font-bold tracking-wide">Gestão Empresarial</p>
               </div>
             )}
             
             {/* Mobile Close Button */}
             <button
               onClick={onClose}
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors md:hidden"
+              className="p-3 rounded-xl hover:bg-white/60 transition-smooth md:hidden hover-glow"
             >
               <X size={20} />
             </button>
@@ -173,7 +175,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mob
             {/* Desktop Collapse Button */}
             <button
               onClick={() => setIsDesktopCollapsed(!isDesktopCollapsed)}
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors hidden md:block"
+              className="p-3 rounded-xl hover:bg-white/60 transition-smooth hidden md:block hover-glow"
             >
               {isDesktopCollapsed ? <Menu size={20} /> : <X size={20} />}
             </button>
@@ -181,22 +183,22 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mob
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-3 sm:p-4 space-y-2 overflow-y-auto">
+        <nav className="flex-1 p-3 sm:p-4 space-y-3 overflow-y-auto custom-scrollbar">
           {menuItems.map(item => renderMenuItem(item))}
         </nav>
 
         {/* User Info */}
-        <div className="p-3 sm:p-4 border-t border-gray-200">
+        <div className="p-4 sm:p-6 border-t border-white/30 bg-gradient-to-r from-white/20 to-transparent">
           <div className={`flex items-center ${isDesktopCollapsed && !mobileOpen ? 'justify-center' : 'space-x-3'}`}>
-            <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="text-white text-sm font-medium">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-xl hover-glow animate-scale-in">
+              <span className="text-white text-sm font-bold">
                 {profile?.nome_completo?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'U'}
               </span>
             </div>
             {(!isDesktopCollapsed || mobileOpen) && (
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-gray-900 truncate">{profile?.nome_completo || 'Usuário'}</p>
-                <p className="text-xs text-gray-500 capitalize truncate">{profile?.papel || 'Usuário'}</p>
+              <div className="min-w-0 flex-1 animate-slide-in-from-left">
+                <p className="text-sm font-bold text-gray-900 truncate tracking-wide">{profile?.nome_completo || 'Usuário'}</p>
+                <p className="text-xs text-gray-600 capitalize truncate font-semibold">{profile?.papel || 'Usuário'}</p>
               </div>
             )}
           </div>

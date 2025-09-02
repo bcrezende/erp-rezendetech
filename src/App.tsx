@@ -220,7 +220,7 @@ const AppContent: React.FC = () => {
   const { title, subtitle } = getPageTitle(currentPage);
 
   return (
-    <div className={`flex h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 ${isMobileSidebarOpen ? 'overflow-hidden' : ''}`}>
+    <div className={`flex h-screen bg-gradient-dashboard animate-gradient-shift ${isMobileSidebarOpen ? 'overflow-hidden' : ''}`}>
       <Sidebar 
         currentPage={currentPage} 
         onNavigate={setCurrentPage} 
@@ -230,44 +230,55 @@ const AppContent: React.FC = () => {
       />
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="bg-white/80 backdrop-blur-md shadow-lg border-b border-white/20 px-4 sm:px-6 py-4 relative">
+        <div className="glass-strong shadow-2xl border-b border-white/30 px-4 sm:px-6 py-6 relative overflow-hidden">
           {/* Header gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-purple-600/5" />
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 animate-gradient-shift" />
+          
+          {/* Floating particles effect */}
+          <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+            <div className="absolute top-4 left-10 w-2 h-2 bg-blue-400/30 rounded-full animate-float" style={{ animationDelay: '0s' }}></div>
+            <div className="absolute top-8 right-20 w-1 h-1 bg-purple-400/40 rounded-full animate-float" style={{ animationDelay: '2s' }}></div>
+            <div className="absolute bottom-6 left-1/3 w-1.5 h-1.5 bg-pink-400/30 rounded-full animate-float" style={{ animationDelay: '4s' }}></div>
+          </div>
           
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMobileSidebarOpen(true)}
-                className="p-2 rounded-xl hover:bg-white/60 transition-all duration-200 md:hidden backdrop-blur-sm"
+                className="p-3 rounded-xl hover:bg-white/60 transition-smooth md:hidden backdrop-blur-sm hover-glow"
               >
                 <Menu size={20} className="text-gray-600" />
               </button>
               
               <div className="relative z-10">
-                <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">{title}</h2>
+                <h2 className="text-xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 bg-clip-text text-transparent tracking-tight animate-slide-in-from-left">
+                  {title}
+                </h2>
                 {subtitle && (
-                  <p className="text-xs sm:text-sm text-gray-600 mt-1 font-medium">{subtitle}</p>
+                  <p className="text-xs sm:text-sm text-gray-700 mt-2 font-semibold tracking-wide animate-slide-in-from-left stagger-1">
+                    {subtitle}
+                  </p>
                 )}
               </div>
             </div>
 
             <div className="flex items-center space-x-2 sm:space-x-4 relative z-10">
-              <div className="text-right hidden sm:block bg-white/60 backdrop-blur-sm rounded-xl px-3 py-2">
-                <p className="text-sm font-medium text-gray-900">{profile?.nome_completo}</p>
-                <p className="text-xs text-gray-500">{profile?.empresas?.nome}</p>
+              <div className="text-right hidden sm:block glass rounded-xl px-4 py-3 hover-lift animate-slide-in-from-right">
+                <p className="text-sm font-bold text-gray-900 tracking-wide">{profile?.nome_completo}</p>
+                <p className="text-xs text-gray-600 font-medium mt-1">{profile?.empresas?.nome}</p>
               </div>
               
               {/* Mobile User Avatar */}
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center sm:hidden shadow-lg">
-                <span className="text-white text-xs font-medium">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 rounded-full flex items-center justify-center sm:hidden shadow-xl hover-glow animate-scale-in">
+                <span className="text-white text-sm font-bold">
                   {profile?.nome_completo?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'U'}
                 </span>
               </div>
               
               <button
                 onClick={handleSignOut}
-                className="p-2 text-gray-600 hover:text-red-600 hover:bg-white/60 rounded-xl transition-all duration-200 backdrop-blur-sm"
+                className="p-3 text-gray-600 hover:text-red-600 hover:bg-white/60 rounded-xl transition-smooth backdrop-blur-sm hover-glow animate-slide-in-from-right stagger-1"
               >
                 <LogOut size={18} className="sm:w-5 sm:h-5" />
               </button>
@@ -275,7 +286,7 @@ const AppContent: React.FC = () => {
           </div>
         </div>
         
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 animate-fade-in">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-8 animate-fade-in custom-scrollbar">
           {renderPageContent()}
         </main>
       </div>
