@@ -61,14 +61,8 @@ const AccountsReceivable: React.FC<AccountsReceivableProps> = () => {
 
   const loadData = async () => {
     try {
-      if (!profile?.id || !profile?.id_empresa) {
         setTransactions([]);
         setCategories([]);
-        setPessoas([]);
-        setLoading(false);
-        return;
-      }
-
       const [transactionsRes, categoriesRes, pessoasRes] = await Promise.all([
         supabase
           .from('transacoes')
@@ -82,22 +76,9 @@ const AccountsReceivable: React.FC<AccountsReceivableProps> = () => {
           .from('categorias')
           .select('*')
           .eq('id_empresa', profile.id_empresa)
-          .eq('tipo', 'receita')
           .eq('ativo', true)
           .order('nome'),
         supabase
-          .from('pessoas')
-          .select('*')
-          .eq('id_empresa', profile.id_empresa)
-          .eq('tipo_cadastro', 'cliente')
-          .eq('ativo', true)
-          .order('nome_razao_social')
-      ]);
-
-      if (transactionsRes.error) throw transactionsRes.error;
-      if (categoriesRes.error) throw categoriesRes.error;
-      if (pessoasRes.error) throw pessoasRes.error;
-
       setTransactions(transactionsRes.data || []);
       setCategories(categoriesRes.data || []);
       setPessoas(pessoasRes.data || []);

@@ -46,18 +46,12 @@ const TransactionsManager: React.FC = () => {
   const loadData = async () => {
     try {
       if (!profile?.id || !profile?.id_empresa) {
-        console.log('❌ No profile or company ID found', { profile });
         setTransactions([]);
         setCategories([]);
         setPessoas([]);
         setLoading(false);
         return;
       }
-
-      console.log('🔍 Loading transactions data for company:', profile.id_empresa, {
-        userId: profile.id,
-        userRole: profile.papel
-      });
 
       const [transactionsRes, categoriesRes, pessoasRes] = await Promise.all([
         supabase
@@ -80,33 +74,14 @@ const TransactionsManager: React.FC = () => {
       ]);
 
       if (transactionsRes.error) {
-        console.error('❌ Error loading transactions:', transactionsRes.error, {
-          code: transactionsRes.error.code,
-          message: transactionsRes.error.message,
-          details: transactionsRes.error.details
-        });
         throw transactionsRes.error;
       }
       if (categoriesRes.error) {
-        console.error('❌ Error loading categories:', categoriesRes.error);
         throw categoriesRes.error;
       }
       if (pessoasRes.error) {
-        console.error('❌ Error loading pessoas:', pessoasRes.error);
         throw pessoasRes.error;
       }
-
-      console.log('✅ Raw data from Supabase:', {
-        transactions: transactionsRes.data?.length || 0,
-        categories: categoriesRes.data?.length || 0,
-        pessoas: pessoasRes.data?.length || 0,
-        transactionsData: transactionsRes.data,
-        query: {
-          table: 'transacoes',
-          filters: { id_empresa: profile.id_empresa },
-          orderBy: 'data_transacao desc'
-        }
-      });
 
       setTransactions(transactionsRes.data || []);
       setCategories(categoriesRes.data || []);

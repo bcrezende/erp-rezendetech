@@ -58,8 +58,6 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
         setVendas([]);
         setPessoas([]);
         return;
-      }
-
       const [transactionsRes, categoriesRes, vendasRes, pessoasRes] = await Promise.all([
         supabase
           .from('transacoes')
@@ -91,8 +89,6 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
       if (transactionsRes.error) throw transactionsRes.error;
       if (categoriesRes.error) throw categoriesRes.error;
       if (vendasRes.error) throw vendasRes.error;
-      if (pessoasRes.error) throw pessoasRes.error;
-
       setTransactions(transactionsRes.data || []);
       setCategories(categoriesRes.data || []);
       setVendas(vendasRes.data || []);
