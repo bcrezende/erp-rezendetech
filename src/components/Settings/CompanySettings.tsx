@@ -541,6 +541,144 @@ const CompanySettings: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Seção de Planos e Assinatura */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center space-x-3 mb-6">
+          <CreditCard className="h-6 w-6 text-purple-600" />
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">Planos e Assinatura</h3>
+            <p className="text-gray-600">Gerencie sua assinatura e upgrade de plano</p>
+          </div>
+        </div>
+
+        {/* Status do Plano Atual */}
+        <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="font-semibold text-purple-900 mb-1">Plano Atual</h4>
+              <p className="text-purple-700 capitalize font-medium">
+                {empresa?.plano || 'Básico'} 
+                {empresa?.plano === 'basico' && ' - Gratuito'}
+                {empresa?.plano === 'premium' && ' - R$ 49,90/mês'}
+                {empresa?.plano === 'enterprise' && ' - R$ 99,90/mês'}
+              </p>
+            </div>
+            <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+              empresa?.plano === 'enterprise' ? 'bg-purple-100 text-purple-700' :
+              empresa?.plano === 'premium' ? 'bg-blue-100 text-blue-700' :
+              'bg-gray-100 text-gray-700'
+            }`}>
+              {empresa?.plano === 'enterprise' ? '🚀 Enterprise' :
+               empresa?.plano === 'premium' ? '⭐ Premium' :
+               '🆓 Básico'}
+            </div>
+          </div>
+        </div>
+
+        {/* Botões de Assinatura */}
+        <div className="space-y-4">
+          {empresa?.plano === 'basico' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <a
+                href="https://sandbox.asaas.com/c/52etrpbztyd8msz9"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full text-center bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+              >
+                <div className="flex items-center justify-center space-x-2 mb-2">
+                  <span className="text-2xl">⭐</span>
+                  <span className="text-lg">Upgrade para Premium</span>
+                </div>
+                <div className="text-sm opacity-90">
+                  R$ 49,90/mês • Transações ilimitadas • Chat IA
+                </div>
+              </a>
+
+              <a
+                href="https://sandbox.asaas.com/c/52etrpbztyd8msz9"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full text-center bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+              >
+                <div className="flex items-center justify-center space-x-2 mb-2">
+                  <span className="text-2xl">🚀</span>
+                  <span className="text-lg">Upgrade para Enterprise</span>
+                </div>
+                <div className="text-sm opacity-90">
+                  R$ 99,90/mês • Usuários ilimitados • WhatsApp
+                </div>
+              </a>
+            </div>
+          )}
+
+          {empresa?.plano === 'premium' && (
+            <div className="grid grid-cols-1 gap-4">
+              <a
+                href="https://sandbox.asaas.com/c/52etrpbztyd8msz9"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full text-center bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+              >
+                <div className="flex items-center justify-center space-x-2 mb-2">
+                  <span className="text-2xl">🚀</span>
+                  <span className="text-lg">Upgrade para Enterprise</span>
+                </div>
+                <div className="text-sm opacity-90">
+                  R$ 99,90/mês • Usuários ilimitados • API • WhatsApp
+                </div>
+              </a>
+
+              <div className="text-center p-4 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-green-800 font-medium">✅ Você já tem o plano Premium ativo!</p>
+                <p className="text-sm text-green-700 mt-1">Aproveite todas as funcionalidades disponíveis</p>
+              </div>
+            </div>
+          )}
+
+          {empresa?.plano === 'enterprise' && (
+            <div className="text-center p-6 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-xl">
+              <div className="flex items-center justify-center space-x-2 mb-3">
+                <span className="text-3xl">🎉</span>
+                <h4 className="text-xl font-bold text-purple-900">Plano Enterprise Ativo!</h4>
+              </div>
+              <p className="text-purple-700 font-medium mb-2">
+                Você tem acesso a todas as funcionalidades premium do sistema
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4 text-sm">
+                <div className="bg-white p-3 rounded-lg border border-purple-200">
+                  <span className="font-semibold text-purple-900">✨ Usuários Ilimitados</span>
+                </div>
+                <div className="bg-white p-3 rounded-lg border border-purple-200">
+                  <span className="font-semibold text-purple-900">🤖 Chat IA Avançado</span>
+                </div>
+                <div className="bg-white p-3 rounded-lg border border-purple-200">
+                  <span className="font-semibold text-purple-900">📱 WhatsApp Bot</span>
+                </div>
+                <div className="bg-white p-3 rounded-lg border border-purple-200">
+                  <span className="font-semibold text-purple-900">🔗 API Personalizada</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Informações sobre Teste */}
+        <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="flex items-start space-x-3">
+            <span className="text-2xl">🧪</span>
+            <div>
+              <h4 className="font-semibold text-yellow-900 mb-1">Ambiente de Teste</h4>
+              <div className="text-sm text-yellow-800 space-y-1">
+                <p>• Este é um ambiente de teste para validação do sistema de pagamentos</p>
+                <p>• Nenhuma cobrança real será efetuada</p>
+                <p>• Use dados fictícios para testar o fluxo de assinatura</p>
+                <p>• O sistema irá simular o processo completo de upgrade</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
