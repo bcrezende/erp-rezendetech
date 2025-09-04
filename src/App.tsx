@@ -20,6 +20,7 @@ import BusinessForecastPanel from './components/Dashboard/BusinessForecastPanel'
 import UserSettings from './components/Settings/UserSettings';
 import RemindersManager from './components/Reminders/RemindersManager';
 import PendingAccountsPanel from './components/Dashboard/PendingAccountsPanel';
+import PendingRemindersPanel from './components/Dashboard/PendingRemindersPanel';
 import CompanySettings from './components/Settings/CompanySettings';
 import { 
   DollarSign, 
@@ -165,12 +166,15 @@ const AppContent: React.FC = () => {
                 <PendingAccountsPanel dateFilter={dateFilter} />
               </div>
               <div className="animate-slide-in-up stagger-4">
-                <BusinessForecastPanel dateFilter={dateFilter} />
+                <PendingRemindersPanel dateFilter={dateFilter} />
               </div>
             </div>
             
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6">
               <div className="animate-slide-in-up stagger-5">
+                <BusinessForecastPanel dateFilter={dateFilter} />
+              </div>
+              <div className="animate-slide-in-up stagger-6">
                 <EstimatePanel dateFilter={dateFilter} />
               </div>
             </div>
