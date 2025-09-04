@@ -619,55 +619,52 @@ const AccountsPayable: React.FC = () => {
               </button>
             </div>
           </div>
-        </div>
-      </div>
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-            <input
-              type="text"
-              placeholder="Buscar contas a pagar..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-            />
+          <div>
+            <label className="block text-xs text-gray-600 mb-1">Status</label>
+            <select
+              value={filters.status}
+              onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
+            >
+              <option value="all">Todos</option>
+              <option value="pendente">Pendente</option>
+              <option value="pago">Pago</option>
+              <option value="vencido">Vencido</option>
+              <option value="cancelado">Cancelado</option>
+            </select>
           </div>
 
-          <select
-            value={filters.status}
-            onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
-          >
-            <option value="all">Todos os status</option>
-            <option value="pendente">Pendente</option>
-            <option value="pago">Pago</option>
-            <option value="vencido">Vencido</option>
-            <option value="cancelado">Cancelado</option>
-          </select>
+          <div>
+            <label className="block text-xs text-gray-600 mb-1">Categoria</label>
+            <select
+              value={filters.categoria}
+              onChange={(e) => setFilters({ ...filters, categoria: e.target.value })}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
+            >
+              <option value="all">Todas</option>
+              {categories.map(category => (
+                <option key={category.id} value={category.id}>
+                  {category.nome}
+                </option>
+              ))}
+            </select>
+          </div>
 
-          <select
-            value={filters.categoria}
-            onChange={(e) => setFilters({ ...filters, categoria: e.target.value })}
-            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
-          >
-            <option value="all">Todas as categorias</option>
-            {categories.map(category => (
-              <option key={category.id} value={category.id}>
-                {category.nome}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={filters.pessoa}
-            onChange={(e) => setFilters({ ...filters, pessoa: e.target.value })}
-            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
-          >
-            <option value="all">Todos os fornecedores</option>
-            {pessoas.map(pessoa => (
-              <option key={pessoa.id} value={pessoa.id}>
-                {pessoa.nome_razao_social}
-              </option>
-            ))}
-          </select>
+          <div>
+            <label className="block text-xs text-gray-600 mb-1">Fornecedor</label>
+            <select
+              value={filters.pessoa}
+              onChange={(e) => setFilters({ ...filters, pessoa: e.target.value })}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
+            >
+              <option value="all">Todos</option>
+              {pessoas.filter(p => p.tipo_cadastro === 'fornecedor').map(pessoa => (
+                <option key={pessoa.id} value={pessoa.id}>
+                  {pessoa.nome_razao_social}
+                </option>
+              ))}
+            </select>
+          </div>
 
           <select
             value={filters.periodo}
