@@ -562,14 +562,16 @@ const SalesManager: React.FC = () => {
                     </td>
                     <td className="p-4">
                       <div>
-                        <p className="font-medium text-gray-900">{venda.pessoa_nome}</p>
-                        <p className="text-sm text-gray-500">{venda.itens.length} item(s)</p>
+                        <p className="font-medium text-gray-900 dark:text-white">{venda.pessoa_nome}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{venda.itens.length} item(s)</p>
                       </div>
                     </td>
                     <td className="p-4 text-gray-900">
+                    <td className="p-4 text-gray-900 dark:text-white">
                       {formatDate(venda.data_venda)}
                     </td>
                     <td className="p-4 text-right font-semibold text-gray-900">
+                    <td className="p-4 text-right font-semibold text-gray-900 dark:text-white">
                       {formatCurrency(venda.total)}
                     </td>
                     <td className="p-4 text-center">

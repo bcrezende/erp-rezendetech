@@ -312,7 +312,7 @@ const PeopleManager: React.FC = () => {
                 <div className="flex-1">
                   <div className="flex items-center space-x-2 mb-2">
                     <TypeIcon size={20} className="text-gray-600" />
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                       {pessoa.nome_razao_social}
                     </h3>
                   </div>
@@ -349,19 +349,19 @@ const PeopleManager: React.FC = () => {
 
               <div className="space-y-2">
                 {pessoa.email && (
-                  <div className="flex items-center space-x-2 text-sm text-gray-600">
+                  <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300">
                     <Mail size={14} />
                     <span>{pessoa.email}</span>
                   </div>
                 )}
                 {pessoa.telefone && (
-                  <div className="flex items-center space-x-2 text-sm text-gray-600">
+                  <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300">
                     <Phone size={14} />
                     <span>{pessoa.telefone}</span>
                   </div>
                 )}
                 {pessoa.endereco && (
-                  <div className="flex items-center space-x-2 text-sm text-gray-600">
+                  <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300">
                     <MapPin size={14} />
                     <span className="line-clamp-2">{pessoa.endereco}</span>
                   </div>
@@ -370,7 +370,7 @@ const PeopleManager: React.FC = () => {
 
               {pessoa.cpf_cnpj && (
                 <div className="mt-3 pt-3 border-t border-gray-100">
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
                     Doc: {pessoa.cpf_cnpj}
                   </span>
                 </div>

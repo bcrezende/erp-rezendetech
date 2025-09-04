@@ -227,6 +227,7 @@ const ProductsManager: React.FC = () => {
               <div className="flex-1">
                 <div className="flex items-center space-x-2 mb-2">
                   <h3 className="text-lg font-semibold text-gray-900">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     {product.nome}
                   </h3>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -238,6 +239,7 @@ const ProductsManager: React.FC = () => {
                   </span>
                 </div>
                 <span className="text-sm text-gray-500">
+                <span className="text-sm text-gray-500 dark:text-gray-400">
                   ID: {product.id_sequencial}
                 </span>
               </div>
@@ -258,14 +260,14 @@ const ProductsManager: React.FC = () => {
             </div>
 
             {product.descricao && (
-              <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-2">
                 {product.descricao}
               </p>
             )}
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2 text-sm text-gray-600">
+                <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300">
                   <DollarSign size={14} />
                   <span>Preço:</span>
                 </div>
@@ -275,14 +277,14 @@ const ProductsManager: React.FC = () => {
               </div>
 
               {product.sku && (
-                <div className="flex items-center space-x-2 text-sm text-gray-600">
+                <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300">
                   <Hash size={14} />
                   <span>SKU: {product.sku}</span>
                 </div>
               )}
 
               {product.categoria && (
-                <div className="flex items-center space-x-2 text-sm text-gray-600">
+                <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300">
                   <Tag size={14} />
                   <span>{product.categoria}</span>
                 </div>
@@ -290,11 +292,11 @@ const ProductsManager: React.FC = () => {
 
               {!product.e_servico && (
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Estoque:</span>
+                  <span className="text-gray-600 dark:text-gray-300">Estoque:</span>
                   <span className={`font-medium ${
                     product.estoque_atual <= product.estoque_minimo 
-                      ? 'text-red-600' 
-                      : 'text-gray-900'
+                      ? 'text-red-600 dark:text-red-400' 
+                      : 'text-gray-900 dark:text-white'
                   }`}>
                     {product.estoque_atual} un.
                   </span>

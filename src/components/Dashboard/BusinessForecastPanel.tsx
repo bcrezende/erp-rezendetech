@@ -191,14 +191,14 @@ const BusinessForecastPanel: React.FC<BusinessForecastPanelProps> = ({ dateFilte
             }`}>
               Previsão do Negócio
             </h3>
-            <p className={`text-gray-700 font-bold tracking-wide ${
+            <p className={`text-xs sm:text-sm text-gray-700 dark:text-gray-300 font-bold tracking-wide ${
               isMobile ? 'text-xs' : 'text-sm'
             }`}>
               {isMobile ? 'Receitas - Despesas' : 'Total a Receber - Total Despesas'}
             </p>
           </div>
         </div>
-        <div className="text-xs sm:text-sm text-gray-700 text-center sm:text-right relative z-10 glass rounded-lg sm:rounded-xl px-2 sm:px-3 lg:px-4 py-1 sm:py-2 font-semibold animate-slide-in-from-right">
+        <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 text-center sm:text-right relative z-10 glass rounded-lg sm:rounded-xl px-2 sm:px-3 lg:px-4 py-1 sm:py-2 font-semibold animate-slide-in-from-right">
           {formatDateFromString(dateFilter.startDate)} - {formatDateFromString(dateFilter.endDate)}
         </div>
       </div>
@@ -491,7 +491,7 @@ const BusinessForecastPanel: React.FC<BusinessForecastPanelProps> = ({ dateFilte
         <div className={`glass shadow-lg border border-white/30 relative z-10 animate-slide-in-up ${
           isMobile ? 'p-3 rounded-xl' : 'p-5 rounded-2xl'
         }`}>
-          <p className={`text-gray-700 text-center font-bold tracking-wide ${
+          <p className={`text-gray-700 dark:text-gray-300 text-center font-bold tracking-wide ${
             isMobile ? 'text-xs' : 'text-sm'
           }`}>
             <strong>Fórmula:</strong> Total a Receber (recebido + pendente) - Total Despesas (pago + pendente) = Previsão do Negócio

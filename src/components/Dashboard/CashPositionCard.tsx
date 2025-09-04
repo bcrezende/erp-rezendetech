@@ -140,7 +140,7 @@ const CashPositionCard: React.FC<CashPositionCardProps> = ({ dateFilter }) => {
             }`}>
               Caixa Atual
             </h3>
-            <p className={`text-gray-700 font-bold tracking-wide ${
+            <p className={`text-gray-700 dark:text-gray-300 font-bold tracking-wide ${
               isMobile ? 'text-xs' : 'text-sm'
             }`}>
               {isMobile ? 'Receitas - Despesas' : 'Receitas pagas - Despesas pagas'}
