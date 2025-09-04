@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './components/Auth/AuthProvider';
-import { AppProvider } from './contexts/AppContext';
+import { AppProvider, useAppContext } from './contexts/AppContext';
 import { useDeviceDetection } from './hooks/useDeviceDetection';
 import LoginForm from './components/Auth/LoginForm';
 import ResetPasswordForm from './components/Auth/ResetPasswordForm';
