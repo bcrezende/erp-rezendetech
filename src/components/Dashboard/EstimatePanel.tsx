@@ -159,6 +159,7 @@ const EstimatePanel: React.FC<EstimatePanelProps> = ({ dateFilter }) => {
             Período
           </span>
         </div>
+        </div>
       </div>
 
       {/* Progresso do Mês */}
