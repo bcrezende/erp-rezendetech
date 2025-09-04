@@ -1190,7 +1190,6 @@ const AccountsReceivable: React.FC<AccountsReceivableProps> = () => {
           </div>
         </div>
       )}
-    <div className="space-y-6">
     </div>
   );
 };
