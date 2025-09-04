@@ -581,7 +581,7 @@ const CompanySettings: React.FC = () => {
           {empresa?.plano === 'basico' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <a
-                href="https://sandbox.asaas.com/c/52etrpbztyd8msz9"
+                href="https://sandbox.asaas.com/c/9p35djzc5y3w18tk"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block w-full text-center bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
