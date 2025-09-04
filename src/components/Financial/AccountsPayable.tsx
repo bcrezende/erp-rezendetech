@@ -538,13 +538,6 @@ const AccountsPayable: React.FC = () => {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
                 <input
-          {/* Outros Filtros */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className="sm:col-span-2 lg:col-span-1">
-              <label className="block text-xs text-gray-600 mb-1">Buscar</label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-                <input
                   type="text"
                   placeholder="Buscar contas..."
                   value={searchTerm}
