@@ -403,97 +403,135 @@ const AccountsReceivable: React.FC = () => {
 
       {/* Filters */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="space-y-4">
           {/* Filtro de Data */}
-          <div className="flex items-center space-x-2">
-            <label className="text-sm font-medium text-gray-700 whitespace-nowrap">Período:</label>
-            <input
-              type="date"
-              value={filters.startDate}
-              onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
-            />
-            <span className="text-gray-500">até</span>
-            <input
-              type="date"
-              value={filters.endDate}
-              onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
-            />
-            <button
-              onClick={() => {
-                const monthRange = getCurrentMonthRange();
-                setFilters(prev => ({
-                  ...prev,
-                  startDate: monthRange.startDate,
-                  endDate: monthRange.endDate
-                }));
-              }}
-              className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm whitespace-nowrap"
-            >
-              Mês Atual
-            </button>
+          <div className="space-y-3">
+            <label className="block text-sm font-medium text-gray-700">Período de Análise:</label>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label className="block text-xs text-gray-600 mb-1">Data Inicial</label>
+                <input
+                  type="date"
+                  value={filters.startDate}
+                  onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-600 mb-1">Data Final</label>
+                <input
+                  type="date"
+                  value={filters.endDate}
+                  onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                />
+              </div>
+              <div className="flex items-end">
+                <button
+                  onClick={() => {
+                    const monthRange = getCurrentMonthRange();
+                    setFilters(prev => ({
+                      ...prev,
+                      startDate: monthRange.startDate,
+                      endDate: monthRange.endDate
+                    }));
+                  }}
+                  className="w-full px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                >
+                  Mês Atual
+                </button>
+              </div>
+            </div>
           </div>
 
-          <div className="relative flex-1 min-w-64">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-            <input
-              type="text"
-              placeholder="Buscar contas a receber..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-            />
+          {/* Outros Filtros */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="sm:col-span-2 lg:col-span-1">
+              <label className="block text-xs text-gray-600 mb-1">Buscar</label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                <input
+                  type="text"
+                  placeholder="Buscar contas..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs text-gray-600 mb-1">Status</label>
+              <select
+                value={filters.status}
+                onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+              >
+                <option value="all">Todos</option>
+                <option value="pendente">Pendente</option>
+                <option value="recebido">Recebido</option>
+                <option value="vencido">Vencido</option>
+                <option value="cancelado">Cancelado</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs text-gray-600 mb-1">Categoria</label>
+              <select
+                value={filters.categoria}
+                onChange={(e) => setFilters({ ...filters, categoria: e.target.value })}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+              >
+                <option value="all">Todas</option>
+                {categories.map(category => (
+                  <option key={category.id} value={category.id}>
+                    {category.nome}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs text-gray-600 mb-1">Cliente</label>
+              <select
+                value={filters.pessoa}
+                onChange={(e) => setFilters({ ...filters, pessoa: e.target.value })}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+              >
+                <option value="all">Todos</option>
+                {pessoas.map(pessoa => (
+                  <option key={pessoa.id} value={pessoa.id}>
+                    {pessoa.nome_razao_social}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          <select
-            value={filters.status}
-            onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-          >
-            <option value="all">Todos os status</option>
-            <option value="pendente">Pendente</option>
-            <option value="recebido">Recebido</option>
-            <option value="vencido">Vencido</option>
-            <option value="cancelado">Cancelado</option>
-          </select>
-
-          <select
-            value={filters.categoria}
-            onChange={(e) => setFilters({ ...filters, categoria: e.target.value })}
-            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-          >
-            <option value="all">Todas as categorias</option>
-            {categories.map(category => (
-              <option key={category.id} value={category.id}>
-                {category.nome}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={filters.pessoa}
-            onChange={(e) => setFilters({ ...filters, pessoa: e.target.value })}
-            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-          >
-            <option value="all">Todos os clientes</option>
-            {pessoas.map(pessoa => (
-              <option key={pessoa.id} value={pessoa.id}>
-                {pessoa.nome_razao_social}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={filters.periodo}
-            onChange={(e) => setFilters({ ...filters, periodo: e.target.value })}
-            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-          >
-            <option value="all">Todos os períodos</option>
-            <option value="hoje">Vence hoje</option>
-            <option value="proximos7">Próximos 7 dias</option>
-            <option value="vencidas">Vencidas</option>
-          </select>
+          {/* Filtros de Período Rápido */}
+          <div>
+            <label className="block text-xs text-gray-600 mb-2">Filtros Rápidos:</label>
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setFilters({ ...filters, periodo: 'hoje' })}
+                className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium hover:bg-blue-200 transition-colors"
+              >
+                Vence Hoje
+              </button>
+              <button
+                onClick={() => setFilters({ ...filters, periodo: 'proximos7' })}
+                className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium hover:bg-yellow-200 transition-colors"
+              >
+                Próximos 7 dias
+              </button>
+              <button
+                onClick={() => setFilters({ ...filters, periodo: 'vencidas' })}
+                className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium hover:bg-red-200 transition-colors"
+              >
+                Vencidas
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
