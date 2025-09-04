@@ -421,21 +421,6 @@ const AccountsReceivable: React.FC<AccountsReceivableProps> = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <Banknote className="h-8 w-8 text-green-600" />
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Contas a Receber</h1>
-            <p className="text-gray-600">Gerencie suas receitas e recebimentos</p>
-          </div>
-        </div>
-        <button
-          onClick={() => setShowTypeSelection(true)}
-          className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-        >
-          <Plus size={20} />
-          <span>Nova Conta a Receber</span>
-        </button>
-      </div>
-
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
