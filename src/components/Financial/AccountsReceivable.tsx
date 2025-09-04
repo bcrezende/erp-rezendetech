@@ -48,12 +48,26 @@ const AccountsReceivable: React.FC<AccountsReceivableProps> = () => {
   // Filtro de data fixo para o mês atual
   const getMonthDateRange = () => {
     const today = new Date();
-    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    
+    // Usar UTC para evitar problemas de fuso horário
+    const year = today.getFullYear();
+    const month = today.getMonth();
+    
+    // Criar datas em UTC
+    const firstDayOfMonth = new Date(Date.UTC(year, month, 1));
+    const lastDayOfMonth = new Date(Date.UTC(year, month + 1, 0));
+    
+    // Função para formatar data em UTC para YYYY-MM-DD
+    const formatToYYYYMMDD = (date: Date) => {
+      const year = date.getUTCFullYear();
+      const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+      const day = String(date.getUTCDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
 
     return {
-      startDate: firstDayOfMonth.toISOString().split('T')[0],
-      endDate: lastDayOfMonth.toISOString().split('T')[0]
+      startDate: formatToYYYYMMDD(firstDayOfMonth),
+      endDate: formatToYYYYMMDD(lastDayOfMonth)
     };
   };
   
