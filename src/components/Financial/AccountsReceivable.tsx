@@ -12,6 +12,20 @@ interface AccountsReceivableProps {}
 
 const AccountsReceivable: React.FC<AccountsReceivableProps> = () => {
   const { supabase, profile } = useAuth();
+  
+  // Calculate initial date filter for the entire current month
+  const getInitialMonthDateRange = () => {
+    const today = new Date();
+    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+    return {
+      startDate: firstDayOfMonth.toISOString().split('T')[0],
+      endDate: lastDayOfMonth.toISOString().split('T')[0]
+    };
+  };
+  
+  const [dateFilter, setDateFilter] = useState(getInitialMonthDateRange());
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [pessoas, setPessoas] = useState<Pessoa[]>([]);
