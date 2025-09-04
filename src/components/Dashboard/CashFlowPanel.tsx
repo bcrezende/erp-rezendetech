@@ -138,7 +138,6 @@ const CashFlowPanel: React.FC = () => {
             Fluxo de Caixa
           </h3>
         </div>
-        <div className="text-xs sm:text-sm text-gray-700 text-center sm:text-right relative z-10 glass rounded-xl px-3 sm:px-4 py-2 font-semibold animate-slide-in-from-right">
         <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 text-center sm:text-right relative z-10 glass rounded-xl px-3 sm:px-4 py-2 font-semibold animate-slide-in-from-right">
           <span className="hidden sm:inline">Todas as </span>Movimentações
         </div>
