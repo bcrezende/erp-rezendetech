@@ -310,7 +310,7 @@ const CategoriesManager: React.FC = () => {
                       className="w-4 h-4 rounded-full"
                       style={{ backgroundColor: category.cor }}
                     ></div>
-                    <h4 className="font-semibold text-gray-900">{category.nome}</h4>
+                    <h4 className="font-semibold text-gray-900 dark:text-white">{category.nome}</h4>
                     {category.id_usuario && (
                       <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
                         Pessoal
@@ -335,7 +335,7 @@ const CategoriesManager: React.FC = () => {
                     )}
                   </div>
                 </div>
-                <span className="text-xs text-gray-500">ID: {category.id_sequencial}</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">ID: {category.id_sequencial}</span>
               </div>
             ))}
           </div>
@@ -357,7 +357,7 @@ const CategoriesManager: React.FC = () => {
                       className="w-4 h-4 rounded-full"
                       style={{ backgroundColor: category.cor }}
                     ></div>
-                    <h4 className="font-semibold text-gray-900">{category.nome}</h4>
+                    <h4 className="font-semibold text-gray-900 dark:text-white">{category.nome}</h4>
                     {category.id_usuario && (
                       <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
                         Pessoal
@@ -386,7 +386,7 @@ const CategoriesManager: React.FC = () => {
                   <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getClassificationColor(category.classificacao_dre)}`}>
                     {getClassificationLabel(category.classificacao_dre)}
                   </span>
-                  <p className="text-xs text-gray-500">ID: {category.id_sequencial}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">ID: {category.id_sequencial}</p>
                 </div>
               </div>
             ))}

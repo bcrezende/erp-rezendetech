@@ -402,6 +402,7 @@ const RemindersManager: React.FC = () => {
                       'text-gray-600'
                     } />
                     <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                       {lembrete.titulo}
                     </h3>
                   </div>
@@ -410,6 +411,7 @@ const RemindersManager: React.FC = () => {
                       {getStatusLabel(lembrete.status)}
                     </span>
                     <span className="text-sm text-gray-500">
+                     <span className="text-sm text-gray-500 dark:text-gray-400">
                       ID: {lembrete.id_sequencial}
                     </span>
                   </div>
@@ -437,13 +439,14 @@ const RemindersManager: React.FC = () => {
               </div>
 
               {lembrete.descricao && (
-                <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-2">
                   {lembrete.descricao}
                 </p>
               )}
 
               <div className="space-y-2">
                 <div className="flex items-center space-x-2 text-sm text-gray-600">
+                <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300">
                   <Calendar size={14} />
                   <span className={`font-medium ${
                     isReminderOverdue ? 'text-red-600' :
@@ -465,7 +468,7 @@ const RemindersManager: React.FC = () => {
                 </div>
 
                 {lembrete.valor && (
-                  <div className="flex items-center space-x-2 text-sm text-gray-600">
+                  <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300">
                     <DollarSign size={14} />
                     <span className="font-semibold text-green-600">
                       {formatCurrency(lembrete.valor)}
@@ -474,7 +477,7 @@ const RemindersManager: React.FC = () => {
                 )}
 
                 {lembrete.status === 'pendente' && !isReminderOverdue && !isReminderToday && (
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
                     {daysUntil > 0 ? `Em ${daysUntil} dias` : 'Data passada'}
                   </div>
                 )}
