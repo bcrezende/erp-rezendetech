@@ -1191,6 +1191,7 @@ const AccountsReceivable: React.FC<AccountsReceivableProps> = () => {
         </div>
       )}
     </div>
+  </div>
   );
 };
 
