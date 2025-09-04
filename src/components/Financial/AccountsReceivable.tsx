@@ -22,8 +22,32 @@ const AccountsReceivable: React.FC = () => {
     status: 'all',
     categoria: 'all',
     pessoa: 'all',
-    periodo: 'all'
+    periodo: 'all',
+    startDate: '',
+    endDate: ''
   });
+
+  // Função para obter o primeiro e último dia do mês atual
+  const getCurrentMonthRange = () => {
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    
+    return {
+      startDate: firstDay.toISOString().split('T')[0],
+      endDate: lastDay.toISOString().split('T')[0]
+    };
+  };
+
+  // Inicializar filtros com o mês atual
+  useEffect(() => {
+    const monthRange = getCurrentMonthRange();
+    setFilters(prev => ({
+      ...prev,
+      startDate: monthRange.startDate,
+      endDate: monthRange.endDate
+    }));
+  }, []);
 
   const [formData, setFormData] = useState<Partial<TransactionInsert>>({
     valor: 0,
@@ -42,7 +66,7 @@ const AccountsReceivable: React.FC = () => {
     if (profile?.id_empresa) {
       loadData();
     }
-  }, [profile]);
+  }, [profile, filters.startDate, filters.endDate]);
 
   const loadData = async () => {
     try {
@@ -60,6 +84,8 @@ const AccountsReceivable: React.FC = () => {
           .select('*')
           .eq('id_empresa', profile.id_empresa)
           .eq('tipo', 'receita')
+          .gte('data_vencimento', filters.startDate)
+          .lte('data_vencimento', filters.endDate)
           .order('data_vencimento', { ascending: true }),
         supabase
           .from('categorias')
@@ -384,6 +410,37 @@ const AccountsReceivable: React.FC = () => {
       {/* Filters */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex flex-wrap items-center gap-4">
+          {/* Filtro de Data */}
+          <div className="flex items-center space-x-2">
+            <label className="text-sm font-medium text-gray-700 whitespace-nowrap">Período:</label>
+            <input
+              type="date"
+              value={filters.startDate}
+              onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            />
+            <span className="text-gray-500">até</span>
+            <input
+              type="date"
+              value={filters.endDate}
+              onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            />
+            <button
+              onClick={() => {
+                const monthRange = getCurrentMonthRange();
+                setFilters(prev => ({
+                  ...prev,
+                  startDate: monthRange.startDate,
+                  endDate: monthRange.endDate
+                }));
+              }}
+              className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm whitespace-nowrap"
+            >
+              Mês Atual
+            </button>
+          </div>
+
           <div className="relative flex-1 min-w-64">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
             <input
