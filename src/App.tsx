@@ -105,6 +105,48 @@ const AppContent: React.FC = () => {
       case 'dashboard':
         return (
           <div className="space-y-6 lg:space-y-8">
+            {/* Filtro Global de Data */}
+            <div className="card-modern rounded-xl lg:rounded-2xl shadow-xl border border-white/20 p-4 lg:p-6 hover-lift animate-slide-in-up">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-purple-600/5 rounded-2xl" />
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between space-y-4 lg:space-y-0">
+                <div className="flex flex-col lg:flex-row lg:items-center space-y-3 lg:space-y-0 lg:space-x-3 w-full lg:w-auto">
+                  <div className="p-2 lg:p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg">
+                    <Calendar className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="relative z-10">
+                    <h3 className="text-sm lg:text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">Filtro de Período</h3>
+                    <p className="text-xs lg:text-sm text-gray-600 font-medium">Selecione o período para análise</p>
+                  </div>
+                </div>
+                <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 w-full lg:w-auto">
+                  <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
+                    <label className="text-xs sm:text-sm font-semibold text-gray-700 whitespace-nowrap">De:</label>
+                    <input
+                      type="date"
+                      value={dateFilter.startDate}
+                      onChange={(e) => setDateFilter({ ...dateFilter, startDate: e.target.value })}
+                      className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-auto bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-200"
+                    />
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
+                    <label className="text-xs sm:text-sm font-semibold text-gray-700 whitespace-nowrap">Até:</label>
+                    <input
+                      type="date"
+                      value={dateFilter.endDate}
+                      onChange={(e) => setDateFilter({ ...dateFilter, endDate: e.target.value })}
+                      className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-auto bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-md transition-all duration-200"
+                    />
+                  </div>
+                  <button
+                    onClick={() => { setDateFilter(getInitialMonthDateRange());
+                    }}
+                    className="px-4 py-2 lg:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 text-sm w-full sm:w-auto whitespace-nowrap shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold"
+                  >
+                    Mês Atual
+                  </button>
+                </div>
+              </div>
+            </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6">
               <div className="animate-slide-in-left stagger-1">
