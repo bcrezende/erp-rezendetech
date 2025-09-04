@@ -338,10 +338,10 @@ const SalesManager: React.FC = () => {
     if (!confirm('Tem certeza que deseja excluir esta venda? Esta ação não pode ser desfeita.')) return;
 
     try {
-      // Soft delete - marcar como inativo
+      // Hard delete - remover permanentemente
       const { error } = await supabase
         .from('vendas')
-        .update({ ativo: false })
+        .delete()
         .eq('id', id);
 
       if (error) throw error;

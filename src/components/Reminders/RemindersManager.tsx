@@ -125,10 +125,10 @@ const RemindersManager: React.FC = () => {
     if (!confirm('Tem certeza que deseja excluir este lembrete? Esta ação não pode ser desfeita.')) return;
 
     try {
-      // Soft delete - marcar como inativo
+      // Hard delete - remover permanentemente
       const { error } = await supabase
         .from('lembretes')
-        .update({ ativo: false })
+        .delete()
         .eq('id', id);
 
       if (error) throw error;

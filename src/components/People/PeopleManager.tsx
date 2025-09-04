@@ -110,7 +110,7 @@ const PeopleManager: React.FC = () => {
     try {
       const { error } = await supabase
         .from('pessoas')
-        .update({ ativo: false })
+        .delete()
         .eq('id', id);
 
       if (error) throw error;

@@ -140,7 +140,7 @@ const ProductsManager: React.FC = () => {
     try {
       const { error } = await supabase
         .from('produtos_servicos')
-        .update({ ativo: false })
+        .delete()
         .eq('id', id);
 
       if (error) throw error;
