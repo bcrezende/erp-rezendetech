@@ -354,6 +354,8 @@ const AccountsReceivable: React.FC<AccountsReceivableProps> = () => {
     const [year, month, day] = dateString.split('-');
     // Criar data com horário fixo no meio do dia para evitar problemas de fuso horário
     const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), 12, 0, 0);
+    return date.toLocaleDateString('pt-BR');
+  };
 
   const isOverdue = (dueDate: string, status: string) => {
     if (status === 'recebido' || status === 'cancelado') return false;
