@@ -417,11 +417,11 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/10 to-indigo-400/10 rounded-full blur-2xl animate-float" />
           <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-2 sm:space-y-0">
             <div className="relative z-10">
-              <span className="font-black text-blue-900 dark:text-blue-100 text-base sm:text-xl tracking-wide">MARGEM DE CONTRIBUIÇÃO</span>
-              <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-200 mt-1 sm:mt-2 font-bold tracking-wide">Receita Bruta - Despesa Operacional</p>
+              <span className="font-black text-blue-900 dark:text-white text-base sm:text-xl tracking-wide">MARGEM DE CONTRIBUIÇÃO</span>
+              <p className="text-xs sm:text-sm text-blue-800 dark:text-gray-200 mt-1 sm:mt-2 font-bold tracking-wide">Receita Bruta - Despesa Operacional</p>
             </div>
             <span className={`font-black text-xl sm:text-3xl ${
-              dreData.margemContribuicao >= 0 ? 'text-blue-900' : 'text-red-600'
+              dreData.margemContribuicao >= 0 ? 'text-blue-900 dark:text-white' : 'text-red-600 dark:text-red-400'
             } drop-shadow-xl tracking-tight text-right sm:text-left`}>
               {formatCurrency(dreData.margemContribuicao)}
             </span>
@@ -457,18 +457,18 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-2 sm:space-y-0">
             <div className="relative z-10">
               <span className={`font-black text-2xl ${
-                dreData.resultadoNegocio >= 0 ? 'text-green-900 dark:text-green-100' : 'text-red-900 dark:text-red-100'
+                dreData.resultadoNegocio >= 0 ? 'text-green-900 dark:text-white' : 'text-red-900 dark:text-white'
               } tracking-wide text-base sm:text-2xl`}>
                 RESULTADO DO NEGÓCIO
               </span>
               <p className={`text-sm mt-2 ${
-                dreData.resultadoNegocio >= 0 ? 'text-green-700 dark:text-green-200' : 'text-red-700 dark:text-red-200'
+                dreData.resultadoNegocio >= 0 ? 'text-green-700 dark:text-gray-200' : 'text-red-700 dark:text-gray-200'
               } font-bold tracking-wide text-xs sm:text-sm`}>
                 Margem de Contribuição - Custo Fixo
               </p>
             </div>
             <span className={`font-black text-2xl sm:text-4xl ${
-              dreData.resultadoNegocio >= 0 ? 'text-green-900 dark:text-green-100' : 'text-red-900 dark:text-red-100'
+              dreData.resultadoNegocio >= 0 ? 'text-green-900 dark:text-white' : 'text-red-900 dark:text-white'
             } drop-shadow-2xl relative z-10 tracking-tight text-right sm:text-left`}>
               {formatCurrency(dreData.resultadoNegocio)}
             </span>
@@ -478,7 +478,6 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
 
       {/* Análise Percentual */}
       <div className="mt-6 sm:mt-8 p-4 sm:p-6 bg-gradient-to-r from-white/60 to-slate-50/60 rounded-xl sm:rounded-2xl shadow-inner relative z-10 backdrop-blur-sm border border-white/30 animate-slide-in-up">
-        <h4 className="font-black text-gray-900 mb-3 sm:mb-4 tracking-wide text-base sm:text-lg">📊 Análise Percentual</h4>
         <h4 className="font-black text-gray-900 dark:text-white mb-3 sm:mb-4 tracking-wide text-base sm:text-lg">📊 Análise Percentual</h4>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6 text-xs sm:text-sm">
           <div className="flex items-center justify-between">
