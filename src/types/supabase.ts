@@ -616,7 +616,6 @@ export interface Database {
         id: string;
         id_sequencial: number;
         id_empresa: string;
-        id_usuario: string;
         titulo: string;
         descricao: string | null;
         valor: number | null;
@@ -630,7 +629,6 @@ export interface Database {
         id?: string;
         id_sequencial?: number;
         id_empresa: string;
-        id_usuario: string;
         titulo: string;
         descricao?: string | null;
         valor?: number | null;
@@ -644,7 +642,6 @@ export interface Database {
         id?: string;
         id_sequencial?: number;
         id_empresa?: string;
-        id_usuario?: string;
         titulo?: string;
         descricao?: string | null;
         valor?: number | null;
