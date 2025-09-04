@@ -150,6 +150,7 @@ const EstimatePanel: React.FC<EstimatePanelProps> = ({ dateFilter }) => {
           </h3>
         </div>
         <div className="text-xs sm:text-sm text-gray-700 text-center sm:text-right relative z-10 glass rounded-lg sm:rounded-xl px-2 sm:px-3 lg:px-4 py-1 sm:py-2 font-semibold animate-slide-in-from-right">
+        <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 text-center sm:text-right relative z-10 glass rounded-lg sm:rounded-xl px-2 sm:px-3 lg:px-4 py-1 sm:py-2 font-semibold animate-slide-in-from-right">
           <Calendar size={14} className="inline mr-1 sm:mr-2" />
           <span className="hidden sm:inline">
             {formatDate(dateFilter.startDate)} - {formatDate(dateFilter.endDate)}
@@ -163,10 +164,10 @@ const EstimatePanel: React.FC<EstimatePanelProps> = ({ dateFilter }) => {
       {/* Progresso do Mês */}
       <div className="mb-6 sm:mb-8 relative z-10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 space-y-1 sm:space-y-0">
-          <span className="text-xs sm:text-base font-black text-gray-800 tracking-wide">
+          <span className="text-xs sm:text-base font-black text-gray-800 dark:text-white tracking-wide">
             Progresso do Mês
           </span>
-          <span className="text-xs sm:text-base font-black text-gray-900">
+          <span className="text-xs sm:text-base font-black text-gray-900 dark:text-white">
             {estimateData.daysElapsed} de {estimateData.totalDays} dias ({progressPercentage.toFixed(1)}%)
           </span>
         </div>

@@ -139,6 +139,7 @@ const CashFlowPanel: React.FC = () => {
           </h3>
         </div>
         <div className="text-xs sm:text-sm text-gray-700 text-center sm:text-right relative z-10 glass rounded-xl px-3 sm:px-4 py-2 font-semibold animate-slide-in-from-right">
+        <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 text-center sm:text-right relative z-10 glass rounded-xl px-3 sm:px-4 py-2 font-semibold animate-slide-in-from-right">
           <span className="hidden sm:inline">Todas as </span>Movimentações
         </div>
       </div>
@@ -298,8 +299,8 @@ const CashFlowPanel: React.FC = () => {
                                   isMobile ? 'text-xs p-3' : 'text-base p-4'
                                 } relative z-30`}>
                                   <span className="flex-1 truncate mr-2">
-                                    <span className="font-semibold">{transaction.descricao}</span>
-                                    <span className="text-gray-600 text-xs block">
+                                    <span className="font-semibold text-gray-900 dark:text-white">{transaction.descricao}</span>
+                                    <span className="text-gray-600 dark:text-gray-300 text-xs block">
                                       {getCategoryName(transaction.id_categoria)}
                                     </span>
                                   </span>
