@@ -64,7 +64,7 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
           .from('transacoes')
           .select('*')
           .eq('id_empresa', profile.id_empresa)
-          .in('status', ['concluida', 'pago', 'recebido', 'concluída'])
+          .in('status', ['concluida', 'pago', 'recebido', 'concluída', 'pendente'])
           .gte('data_transacao', dateFilter.startDate)
           .lte('data_transacao', dateFilter.endDate),
         supabase
@@ -76,7 +76,7 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
           .from('vendas')
           .select('*')
           .eq('id_empresa', profile.id_empresa)
-          .in('status', ['confirmed', 'delivered'])
+          .in('status', ['draft', 'confirmed', 'delivered'])
           .eq('ativo', true)
           .gte('data_venda', dateFilter.startDate)
           .lte('data_venda', dateFilter.endDate),
@@ -125,31 +125,31 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
     return date.toLocaleDateString('pt-BR');
   };
   const dreData = useMemo((): DREData => {
-    // As transações e vendas já vêm filtradas pela data do useEffect
+    // IMPORTANTE: Agora incluímos TODOS os lançamentos (pagos + pendentes) no período
     const filteredTransactions = transactions;
     const filteredVendas = vendas;
 
-    // RECEITA BRUTA = Vendas + Contas a Receber (pagas/recebidas)
+    // RECEITA BRUTA = Vendas (todos os status) + Transações de Receita (pagas + pendentes)
     const receitaVendas = filteredVendas.reduce((sum, v) => sum + v.total, 0);
     const receitasTransacoes = filteredTransactions.filter(t => t.tipo === 'receita');
     
     // Agrupar receitas por categoria
     const receitasPorCategoria = new Map<string, { categoria: string; valor: number; itens: Array<{ descricao: string; valor: number; data: string }> }>();
     
-    // Adicionar vendas como "Vendas de Produtos/Serviços"
+    // Adicionar vendas como "Vendas de Produtos/Serviços" (incluindo rascunhos)
     if (receitaVendas > 0) {
       receitasPorCategoria.set('vendas', {
         categoria: 'Vendas de Produtos/Serviços',
         valor: receitaVendas,
         itens: filteredVendas.map(v => ({
-          descricao: `Venda #${v.id_sequencial}`,
+          descricao: `Venda #${v.id_sequencial} (${v.status === 'draft' ? 'Rascunho' : v.status === 'confirmed' ? 'Confirmada' : 'Entregue'})`,
           valor: v.total,
           data: v.data_venda
         }))
       });
     }
 
-    // Adicionar transações de receita
+    // Adicionar transações de receita (pagas + pendentes)
     receitasTransacoes.forEach(t => {
       const categoryName = getCategoryName(t.id_categoria) || 'Outras Receitas';
       const key = t.id_categoria || 'outras';
@@ -165,7 +165,7 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
       const categoria = receitasPorCategoria.get(key)!;
       categoria.valor += t.valor;
       categoria.itens.push({
-        descricao: t.descricao,
+        descricao: `${t.descricao} (${t.status === 'pendente' ? 'Pendente' : 'Pago/Recebido'})`,
         valor: t.valor,
         data: t.data_transacao
       });
@@ -173,7 +173,7 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
 
     const receitaBruta = Array.from(receitasPorCategoria.values()).reduce((sum, cat) => sum + cat.valor, 0);
 
-    // DESPESAS OPERACIONAIS = Despesas classificadas como operacionais (pagas)
+    // DESPESAS OPERACIONAIS = Despesas classificadas como operacionais (pagas + pendentes)
     const despesasOperacionais = filteredTransactions.filter(t => {
       if (t.tipo !== 'despesa') return false;
       
@@ -182,7 +182,7 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
         return !categoria?.classificacao_dre || categoria.classificacao_dre === 'despesa_operacional';
       }
       
-      return true; // Se não tem categoria, considera operacional
+      return true; // Se não tem categoria, considera operacional (inclui pendentes)
     });
 
     // Agrupar despesas operacionais por categoria
@@ -203,7 +203,7 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
       const categoria = despesasOperacionaisPorCategoria.get(key)!;
       categoria.valor += t.valor;
       categoria.itens.push({
-        descricao: `${t.descricao}${getPessoaName(t.id_pessoa) ? ` - ${getPessoaName(t.id_pessoa)}` : ''}`,
+        descricao: `${t.descricao}${getPessoaName(t.id_pessoa) ? ` - ${getPessoaName(t.id_pessoa)}` : ''} (${t.status === 'pendente' ? 'Pendente' : 'Pago'})`,
         valor: t.valor,
         data: t.data_transacao
       });
@@ -214,7 +214,7 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
     // MARGEM DE CONTRIBUIÇÃO
     const margemContribuicao = receitaBruta - despesaOperacional;
 
-    // CUSTOS FIXOS = Despesas classificadas como custo fixo (pagas)
+    // CUSTOS FIXOS = Despesas classificadas como custo fixo (pagas + pendentes)
     const custosFixos = filteredTransactions.filter(t => {
       if (t.tipo !== 'despesa') return false;
       
@@ -244,7 +244,7 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
       const categoria = custosFixosPorCategoria.get(key)!;
       categoria.valor += t.valor;
       categoria.itens.push({
-        descricao: `${t.descricao}${getPessoaName(t.id_pessoa) ? ` - ${getPessoaName(t.id_pessoa)}` : ''}`,
+        descricao: `${t.descricao}${getPessoaName(t.id_pessoa) ? ` - ${getPessoaName(t.id_pessoa)}` : ''} (${t.status === 'pendente' ? 'Pendente' : 'Pago'})`,
         valor: t.valor,
         data: t.data_transacao
       });
