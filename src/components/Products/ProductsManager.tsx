@@ -226,7 +226,6 @@ const ProductsManager: React.FC = () => {
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
                 <div className="flex items-center space-x-2 mb-2">
-                  <h3 className="text-lg font-semibold text-gray-900">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     {product.nome}
                   </h3>
@@ -238,7 +237,6 @@ const ProductsManager: React.FC = () => {
                     {product.e_servico ? 'Serviço' : 'Produto'}
                   </span>
                 </div>
-                <span className="text-sm text-gray-500">
                 <span className="text-sm text-gray-500 dark:text-gray-400">
                   ID: {product.id_sequencial}
                 </span>
