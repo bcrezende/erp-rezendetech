@@ -444,6 +444,12 @@ const AccountsReceivable: React.FC<AccountsReceivableProps> = () => {
               <p className="text-sm font-medium text-gray-600">Total a Receber</p>
               <p className="text-2xl font-bold text-gray-900">
                 {formatCurrency(totals.total)}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
         <div className="flex items-center justify-center space-x-3">
           <Calendar size={20} className="text-blue-600" />
