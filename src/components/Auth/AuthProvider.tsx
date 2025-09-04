@@ -155,10 +155,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
-    if (!error) {
-      setUser(null);
-      setProfile(null);
-    }
+    // Always clear local state, even if server session is already invalid
+    setUser(null);
+    setProfile(null);
     return { error };
   };
 
