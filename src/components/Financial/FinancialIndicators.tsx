@@ -400,15 +400,15 @@ const FinancialIndicators: React.FC = () => {
                           <tr key={item.transaction.id} className="border-b border-gray-100 hover:bg-gray-50">
                             <td className="p-4">
                               <div>
-                                <p className="font-medium text-gray-900">{item.transaction.descricao}</p>
-                                <p className="text-sm text-gray-500">ID: {item.transaction.id_sequencial}</p>
+                                <p className="font-medium text-gray-900 dark:text-white">{item.transaction.descricao}</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">ID: {item.transaction.id_sequencial}</p>
                               </div>
                             </td>
-                            <td className="p-4 text-gray-900">
+                            <td className="p-4 text-gray-900 dark:text-white">
                               {item.transaction.nome_razao_social || item.pessoaName}
                             </td>
                             <td className="p-4">
-                              <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
+                              <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm">
                                 {item.categoryName}
                               </span>
                             </td>
@@ -545,15 +545,15 @@ const FinancialIndicators: React.FC = () => {
                           <tr key={item.transaction.id} className="border-b border-gray-100 hover:bg-gray-50">
                             <td className="p-4">
                               <div>
-                                <p className="font-medium text-gray-900">{item.transaction.descricao}</p>
-                                <p className="text-sm text-gray-500">ID: {item.transaction.id_sequencial}</p>
+                                <p className="font-medium text-gray-900 dark:text-white">{item.transaction.descricao}</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">ID: {item.transaction.id_sequencial}</p>
                               </div>
                             </td>
-                            <td className="p-4 text-gray-900">
+                            <td className="p-4 text-gray-900 dark:text-white">
                               {item.transaction.nome_razao_social || item.pessoaName}
                             </td>
                             <td className="p-4">
-                              <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
+                              <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm">
                                 {item.categoryName}
                               </span>
                             </td>

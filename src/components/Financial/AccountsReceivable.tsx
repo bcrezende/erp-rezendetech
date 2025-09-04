@@ -582,20 +582,20 @@ const AccountsReceivable: React.FC = () => {
                       </td>
                       <td className="p-4">
                         <div className="max-w-xs">
-                          <p className="font-medium text-gray-900 truncate">{transaction.descricao}</p>
-                          <p className="text-sm text-gray-500">
+                          <p className="font-medium text-gray-900 dark:text-white truncate">{transaction.descricao}</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
                             {transaction.origem === 'whatsapp_ia' ? '🤖 WhatsApp IA' : 
                              transaction.origem === 'api' ? '🔗 API' : '✏️ Manual'}
                           </p>
                         </div>
                       </td>
                       <td className="p-4">
-                        <span className="text-gray-900 truncate block max-w-32">
+                        <span className="text-gray-900 dark:text-white truncate block max-w-32">
                           {transaction.nome_razao_social || getPessoaName(transaction.id_pessoa)}
                         </span>
                       </td>
                       <td className="p-4">
-                        <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
+                        <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm">
                           {getCategoryName(transaction.id_categoria)}
                         </span>
                       </td>
@@ -605,14 +605,14 @@ const AccountsReceivable: React.FC = () => {
                       <td className="p-4">
                         <div>
                           <p className={`font-medium ${
-                            isTransactionOverdue ? 'text-red-600' : 'text-gray-900'
+                            isTransactionOverdue ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'
                           }`}>
                             {formatDate(transaction.data_vencimento || transaction.data_transacao)}
                           </p>
                           {transaction.status === 'pendente' && (
                             <p className={`text-xs ${
                               isTransactionOverdue ? 'text-red-600' : 
-                              daysUntilDue <= 3 ? 'text-yellow-600' : 'text-gray-500'
+                              daysUntilDue <= 3 ? 'text-yellow-600 dark:text-yellow-400' : 'text-gray-500 dark:text-gray-400'
                             }`}>
                               {isTransactionOverdue 
                                 ? `${Math.abs(daysUntilDue)} dias em atraso`
