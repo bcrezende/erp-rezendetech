@@ -35,6 +35,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         if (error) {
           // If refresh token is invalid, clear it by signing out
           if (error.message && error.message.includes('Invalid Refresh Token')) {
+            console.log('Invalid refresh token detected, clearing session...');
             await supabase.auth.signOut();
           }
           
