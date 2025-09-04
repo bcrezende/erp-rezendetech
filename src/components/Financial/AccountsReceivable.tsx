@@ -421,6 +421,21 @@ const AccountsReceivable: React.FC<AccountsReceivableProps> = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
+          <Banknote className="h-8 w-8 text-green-600" />
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Contas a Receber</h1>
+            <p className="text-gray-600">Gerencie suas receitas e recebimentos</p>
+          </div>
+        </div>
+        <button
+          onClick={() => setShowTypeSelection(true)}
+          className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+        >
+          <Plus size={20} />
+          <span>Nova Conta a Receber</span>
+        </button>
+      </div>
+
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -430,6 +445,51 @@ const AccountsReceivable: React.FC<AccountsReceivableProps> = () => {
               <p className="text-2xl font-bold text-gray-900">
                 {formatCurrency(totals.total)}
               </p>
+            </div>
+            <div className="p-3 bg-blue-100 rounded-full">
+              <Banknote className="text-blue-600" size={24} />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Pendente</p>
+              <p className="text-2xl font-bold text-yellow-600">
+                {formatCurrency(totals.pendente)}
+              </p>
+            </div>
+            <div className="p-3 bg-yellow-100 rounded-full">
+              <Calendar className="text-yellow-600" size={24} />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Recebido</p>
+              <p className="text-2xl font-bold text-green-600">
+                {formatCurrency(totals.recebido)}
+              </p>
+            </div>
+            <div className="p-3 bg-green-100 rounded-full">
+              <CheckCircle className="text-green-600" size={24} />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Vencido</p>
+              <p className="text-2xl font-bold text-red-600">
+                {formatCurrency(totals.vencido)}
+              </p>
+            </div>
+            <div className="p-3 bg-red-100 rounded-full">
+              <AlertTriangle className="text-red-600" size={24} />
             </div>
           </div>
         </div>
@@ -542,7 +602,7 @@ const AccountsReceivable: React.FC<AccountsReceivableProps> = () => {
           </select>
 
           <select
-            value={filters.cliente}
+            value={filters.pessoa}
             onChange={(e) => setFilters({ ...filters, pessoa: e.target.value })}
             className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
           >
