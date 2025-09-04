@@ -57,7 +57,6 @@ const AccountsReceivable: React.FC<AccountsReceivableProps> = () => {
     };
   };
   
-  const [dateFilter] = useState(getMonthDateRange());
   const [formData, setFormData] = useState<Partial<TransactionInsert>>({
     valor: 0,
     tipo: 'receita',
