@@ -401,7 +401,6 @@ const RemindersManager: React.FC = () => {
                       lembrete.status === 'concluido' ? 'text-green-600' :
                       'text-gray-600'
                     } />
-                    <h3 className="text-lg font-semibold text-gray-900">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                       {lembrete.titulo}
                     </h3>
@@ -410,8 +409,7 @@ const RemindersManager: React.FC = () => {
                     <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(lembrete.status)}`}>
                       {getStatusLabel(lembrete.status)}
                     </span>
-                    <span className="text-sm text-gray-500">
-                     <span className="text-sm text-gray-500 dark:text-gray-400">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
                       ID: {lembrete.id_sequencial}
                     </span>
                   </div>
@@ -445,7 +443,6 @@ const RemindersManager: React.FC = () => {
               )}
 
               <div className="space-y-2">
-                <div className="flex items-center space-x-2 text-sm text-gray-600">
                 <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300">
                   <Calendar size={14} />
                   <span className={`font-medium ${
