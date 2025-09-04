@@ -329,25 +329,25 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
         </button>
 
         {isExpanded && detalhes.length > 0 && (
-          <div className="border-t border-white/30 bg-gradient-to-r from-white/40 to-slate-50/40 backdrop-blur-sm animate-slide-in-up max-h-60 sm:max-h-80 overflow-y-auto mobile-scroll">
+          <div className="border-t border-white/30 dark:border-gray-600 bg-gradient-to-r from-white/90 to-slate-50/90 dark:from-gray-800/90 dark:to-gray-700/90 backdrop-blur-sm animate-slide-in-up max-h-60 sm:max-h-80 overflow-y-auto mobile-scroll relative z-20">
             {detalhes.map((categoria, catIndex) => (
-              <div key={catIndex} className="border-b border-white/20 last:border-b-0 animate-fade-in hover:bg-white/20 transition-smooth sticky top-0 z-10">
-                <div className="p-3 sm:p-4 bg-gradient-to-r from-white/30 to-slate-100/30 backdrop-blur-sm">
+              <div key={catIndex} className="border-b border-white/20 dark:border-gray-600/30 last:border-b-0 animate-fade-in hover:bg-white/30 dark:hover:bg-gray-700/30 transition-smooth">
+                <div className="p-3 sm:p-4 bg-gradient-to-r from-white/60 to-slate-100/60 dark:from-gray-800/80 dark:to-gray-700/80 backdrop-blur-sm sticky top-0 z-30 border-b border-white/20 dark:border-gray-600/20">
                   <div className="flex items-center justify-between">
-                    <span className="font-black text-gray-900 dark:text-white tracking-wide text-sm sm:text-base truncate flex-1 mr-2">{categoria.categoria}</span>
-                    <span className={`font-black text-base sm:text-lg ${isExpense ? 'text-red-600' : 'text-green-600'} drop-shadow-lg flex-shrink-0`}>
+                    <span className="font-black text-gray-900 dark:text-white tracking-wide text-sm sm:text-base truncate flex-1 mr-2 drop-shadow-sm">{categoria.categoria}</span>
+                    <span className={`font-black text-base sm:text-lg ${isExpense ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'} drop-shadow-lg flex-shrink-0`}>
                       {formatCurrency(categoria.valor)}
                     </span>
                   </div>
                 </div>
-                <div className="p-2 sm:p-3">
+                <div className="p-2 sm:p-3 bg-white/40 dark:bg-gray-800/40">
                   {categoria.itens.map((item, itemIndex) => (
-                    <div key={itemIndex} className="flex items-center justify-between py-2 sm:py-3 px-3 sm:px-4 text-xs sm:text-sm hover:bg-white/60 rounded-xl transition-smooth hover:shadow-lg hover-lift touch-target">
+                    <div key={itemIndex} className="flex items-center justify-between py-2 sm:py-3 px-3 sm:px-4 text-xs sm:text-sm hover:bg-white/80 dark:hover:bg-gray-700/60 rounded-xl transition-smooth hover:shadow-lg hover-lift touch-target relative z-10">
                       <div className="min-w-0 flex-1 mr-2">
-                        <span className="text-gray-900 dark:text-white font-bold block truncate">{item.descricao}</span>
-                        <span className="text-gray-600 dark:text-gray-300 text-xs font-semibold">({formatDate(item.data)})</span>
+                        <span className="text-gray-900 dark:text-gray-100 font-bold block truncate drop-shadow-sm">{item.descricao}</span>
+                        <span className="text-gray-600 dark:text-gray-300 text-xs font-semibold drop-shadow-sm">({formatDate(item.data)})</span>
                       </div>
-                      <span className={`font-black ${isExpense ? 'text-red-600' : 'text-green-600'} drop-shadow-lg flex-shrink-0 text-sm sm:text-base`}>
+                      <span className={`font-black ${isExpense ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'} drop-shadow-lg flex-shrink-0 text-sm sm:text-base`}>
                         {formatCurrency(item.valor)}
                       </span>
                     </div>
@@ -359,8 +359,8 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
         )}
 
         {isExpanded && detalhes.length === 0 && (
-          <div className="border-t border-white/30 bg-gradient-to-r from-white/40 to-slate-50/40 p-4 sm:p-6 text-center text-gray-600 animate-fade-in font-semibold text-sm sm:text-base">
-            <span className="text-gray-600 dark:text-gray-300">Nenhum lançamento encontrado nesta categoria</span>
+          <div className="border-t border-white/30 dark:border-gray-600 bg-gradient-to-r from-white/60 to-slate-50/60 dark:from-gray-800/60 dark:to-gray-700/60 p-4 sm:p-6 text-center animate-fade-in font-semibold text-sm sm:text-base">
+            <span className="text-gray-600 dark:text-gray-300 drop-shadow-sm">Nenhum lançamento encontrado nesta categoria</span>
           </div>
         )}
       </div>
@@ -412,16 +412,16 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
         )}
 
         {/* MARGEM DE CONTRIBUIÇÃO */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-300 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-xl hover:shadow-2xl transition-all duration-500 hover-lift relative overflow-hidden animate-scale-in touch-target">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-indigo-600/10" />
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 border-2 border-blue-300 dark:border-blue-600 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-xl hover:shadow-2xl transition-all duration-500 hover-lift relative overflow-hidden animate-scale-in touch-target">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-indigo-600/10 dark:from-blue-400/10 dark:to-indigo-400/10" />
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/10 to-indigo-400/10 rounded-full blur-2xl animate-float" />
           <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-2 sm:space-y-0">
             <div className="relative z-10">
-              <span className="font-black text-blue-900 dark:text-white text-base sm:text-xl tracking-wide">MARGEM DE CONTRIBUIÇÃO</span>
-              <p className="text-xs sm:text-sm text-blue-800 dark:text-gray-200 mt-1 sm:mt-2 font-bold tracking-wide">Receita Bruta - Despesa Operacional</p>
+              <span className="font-black text-blue-900 dark:text-blue-100 text-base sm:text-xl tracking-wide drop-shadow-sm">MARGEM DE CONTRIBUIÇÃO</span>
+              <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-200 mt-1 sm:mt-2 font-bold tracking-wide drop-shadow-sm">Receita Bruta - Despesa Operacional</p>
             </div>
             <span className={`font-black text-xl sm:text-3xl ${
-              dreData.margemContribuicao >= 0 ? 'text-blue-900 dark:text-white' : 'text-red-600 dark:text-red-400'
+              dreData.margemContribuicao >= 0 ? 'text-blue-900 dark:text-blue-100' : 'text-red-600 dark:text-red-400'
             } drop-shadow-xl tracking-tight text-right sm:text-left`}>
               {formatCurrency(dreData.margemContribuicao)}
             </span>
@@ -441,13 +441,13 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
         {/* RESULTADO DO NEGÓCIO */}
         <div className={`border-3 rounded-xl sm:rounded-2xl p-4 sm:p-8 shadow-2xl hover:shadow-3xl transition-all duration-500 relative overflow-hidden hover-lift animate-scale-in touch-target ${
           dreData.resultadoNegocio >= 0 
-            ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-300' 
-            : 'bg-gradient-to-r from-red-50 to-pink-50 border-red-300'
+            ? 'bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 border-green-300 dark:border-green-600' 
+            : 'bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900/30 dark:to-pink-900/30 border-red-300 dark:border-red-600'
         }`}>
           <div className={`absolute inset-0 ${
             dreData.resultadoNegocio >= 0 
-              ? 'bg-gradient-to-r from-green-600/10 to-emerald-600/10' 
-              : 'bg-gradient-to-r from-red-600/10 to-pink-600/10'
+              ? 'bg-gradient-to-r from-green-600/10 to-emerald-600/10 dark:from-green-400/10 dark:to-emerald-400/10' 
+              : 'bg-gradient-to-r from-red-600/10 to-pink-600/10 dark:from-red-400/10 dark:to-pink-400/10'
           }`} />
           <div className={`absolute top-0 right-0 w-40 h-40 rounded-full blur-3xl animate-float ${
             dreData.resultadoNegocio >= 0 
@@ -457,18 +457,18 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-2 sm:space-y-0">
             <div className="relative z-10">
               <span className={`font-black text-2xl ${
-                dreData.resultadoNegocio >= 0 ? 'text-green-900 dark:text-white' : 'text-red-900 dark:text-white'
+                dreData.resultadoNegocio >= 0 ? 'text-green-900 dark:text-green-100' : 'text-red-900 dark:text-red-100'
               } tracking-wide text-base sm:text-2xl`}>
                 RESULTADO DO NEGÓCIO
               </span>
               <p className={`text-sm mt-2 ${
-                dreData.resultadoNegocio >= 0 ? 'text-green-700 dark:text-gray-200' : 'text-red-700 dark:text-gray-200'
+                dreData.resultadoNegocio >= 0 ? 'text-green-700 dark:text-green-200' : 'text-red-700 dark:text-red-200'
               } font-bold tracking-wide text-xs sm:text-sm`}>
                 Margem de Contribuição - Custo Fixo
               </p>
             </div>
             <span className={`font-black text-2xl sm:text-4xl ${
-              dreData.resultadoNegocio >= 0 ? 'text-green-900 dark:text-white' : 'text-red-900 dark:text-white'
+              dreData.resultadoNegocio >= 0 ? 'text-green-900 dark:text-green-100' : 'text-red-900 dark:text-red-100'
             } drop-shadow-2xl relative z-10 tracking-tight text-right sm:text-left`}>
               {formatCurrency(dreData.resultadoNegocio)}
             </span>
@@ -477,30 +477,30 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
       </div>
 
       {/* Análise Percentual */}
-      <div className="mt-6 sm:mt-8 p-4 sm:p-6 bg-gradient-to-r from-white/60 to-slate-50/60 rounded-xl sm:rounded-2xl shadow-inner relative z-10 backdrop-blur-sm border border-white/30 animate-slide-in-up">
+      <div className="mt-6 sm:mt-8 p-4 sm:p-6 bg-gradient-to-r from-white/80 to-slate-50/80 dark:from-gray-800/80 dark:to-gray-700/80 rounded-xl sm:rounded-2xl shadow-inner relative z-10 backdrop-blur-sm border border-white/30 dark:border-gray-600 animate-slide-in-up">
         <h4 className="font-black text-gray-900 dark:text-white mb-3 sm:mb-4 tracking-wide text-base sm:text-lg">📊 Análise Percentual</h4>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6 text-xs sm:text-sm">
           <div className="flex items-center justify-between">
-            <span className="text-gray-700 dark:text-gray-300 font-bold">Margem de Contribuição:</span>
-            <span className="font-black text-blue-600 text-sm sm:text-base">
+            <span className="text-gray-700 dark:text-gray-200 font-bold drop-shadow-sm">Margem de Contribuição:</span>
+            <span className="font-black text-blue-600 dark:text-blue-400 text-sm sm:text-base drop-shadow-sm">
               {dreData.receitaBruta > 0 ? ((dreData.margemContribuicao / dreData.receitaBruta) * 100).toFixed(1) : '0.0'}%
             </span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-700 dark:text-gray-300 font-bold">Margem Líquida:</span>
-            <span className="font-black text-green-600 text-sm sm:text-base">
+            <span className="text-gray-700 dark:text-gray-200 font-bold drop-shadow-sm">Margem Líquida:</span>
+            <span className="font-black text-green-600 dark:text-green-400 text-sm sm:text-base drop-shadow-sm">
               {dreData.receitaBruta > 0 ? ((dreData.resultadoNegocio / dreData.receitaBruta) * 100).toFixed(1) : '0.0'}%
             </span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-700 dark:text-gray-300 font-bold">Despesas/Receita:</span>
-            <span className="font-black text-orange-600 text-sm sm:text-base">
+            <span className="text-gray-700 dark:text-gray-200 font-bold drop-shadow-sm">Despesas/Receita:</span>
+            <span className="font-black text-orange-600 dark:text-orange-400 text-sm sm:text-base drop-shadow-sm">
               {dreData.receitaBruta > 0 ? ((dreData.despesaOperacional / dreData.receitaBruta) * 100).toFixed(1) : '0.0'}%
             </span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-700 dark:text-gray-300 font-bold">Custos Fixos/Receita:</span>
-            <span className="font-black text-red-600 text-sm sm:text-base">
+            <span className="text-gray-700 dark:text-gray-200 font-bold drop-shadow-sm">Custos Fixos/Receita:</span>
+            <span className="font-black text-red-600 dark:text-red-400 text-sm sm:text-base drop-shadow-sm">
               {dreData.receitaBruta > 0 ? ((dreData.custoFixo / dreData.receitaBruta) * 100).toFixed(1) : '0.0'}%
             </span>
           </div>
