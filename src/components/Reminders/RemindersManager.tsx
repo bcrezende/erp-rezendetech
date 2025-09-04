@@ -64,7 +64,6 @@ const RemindersManager: React.FC = () => {
       const lembreteData = {
         ...formData,
         id_empresa: profile.id_empresa,
-        id_usuario: profile.id,
       };
 
       if (editingLembrete) {
