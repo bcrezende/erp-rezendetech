@@ -30,10 +30,20 @@ const AccountsReceivable: React.FC<AccountsReceivableProps> = () => {
     vencimento: 'all'
   });
 
-  const [dateFilter, setDateFilter] = useState({
-    startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-    endDate: new Date().toISOString().split('T')[0]
-  });
+  
+  // Filtro de data fixo para o mês atual
+  const getMonthDateRange = () => {
+    const today = new Date();
+    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+    return {
+      startDate: firstDayOfMonth.toISOString().split('T')[0],
+      endDate: lastDayOfMonth.toISOString().split('T')[0]
+    };
+  };
+  
+  const [dateFilter] = useState(getMonthDateRange());
   const [formData, setFormData] = useState<Partial<TransactionInsert>>({
     valor: 0,
     tipo: 'receita',
@@ -434,45 +444,14 @@ const AccountsReceivable: React.FC<AccountsReceivableProps> = () => {
               <p className="text-sm font-medium text-gray-600">Total a Receber</p>
               <p className="text-2xl font-bold text-gray-900">
                 {formatCurrency(totals.total)}
-              </p>
-            </div>
-            <Banknote className="text-gray-600" size={24} />
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Pendente</p>
-              <p className="text-2xl font-bold text-yellow-600">
-                {formatCurrency(totals.pendente)}
-              </p>
-            </div>
-            <Calendar className="text-yellow-600" size={24} />
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Vencido</p>
-              <p className="text-2xl font-bold text-red-600">
-                {formatCurrency(totals.vencido)}
-              </p>
-            </div>
-            <AlertTriangle className="text-red-600" size={24} />
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Recebido</p>
-              <p className="text-2xl font-bold text-green-600">
-                {formatCurrency(totals.recebido)}
-              </p>
-            </div>
-            <CheckCircle className="text-green-600" size={24} />
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+        <div className="flex items-center justify-center space-x-3">
+          <Calendar size={20} className="text-blue-600" />
+          <div className="text-center">
+            <span className="font-bold text-gray-900 text-lg">Período Fixo: Mês Atual</span>
+            <p className="text-sm text-gray-600 mt-1">
+              {new Date(dateFilter.startDate).toLocaleDateString('pt-BR')} até {new Date(dateFilter.endDate).toLocaleDateString('pt-BR')}
+            </p>
           </div>
         </div>
       </div>
