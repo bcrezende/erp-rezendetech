@@ -538,6 +538,13 @@ const AccountsPayable: React.FC = () => {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
                 <input
+          {/* Outros Filtros */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="sm:col-span-2 lg:col-span-1">
+              <label className="block text-xs text-gray-600 mb-1">Buscar</label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                <input
                   type="text"
                   placeholder="Buscar contas..."
                   value={searchTerm}
@@ -619,63 +626,6 @@ const AccountsPayable: React.FC = () => {
               </button>
             </div>
           </div>
-          <div>
-            <label className="block text-xs text-gray-600 mb-1">Status</label>
-            <select
-              value={filters.status}
-              onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
-            >
-              <option value="all">Todos</option>
-              <option value="pendente">Pendente</option>
-              <option value="pago">Pago</option>
-              <option value="vencido">Vencido</option>
-              <option value="cancelado">Cancelado</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-xs text-gray-600 mb-1">Categoria</label>
-            <select
-              value={filters.categoria}
-              onChange={(e) => setFilters({ ...filters, categoria: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
-            >
-              <option value="all">Todas</option>
-              {categories.map(category => (
-                <option key={category.id} value={category.id}>
-                  {category.nome}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-xs text-gray-600 mb-1">Fornecedor</label>
-            <select
-              value={filters.pessoa}
-              onChange={(e) => setFilters({ ...filters, pessoa: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
-            >
-              <option value="all">Todos</option>
-              {pessoas.filter(p => p.tipo_cadastro === 'fornecedor').map(pessoa => (
-                <option key={pessoa.id} value={pessoa.id}>
-                  {pessoa.nome_razao_social}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <select
-            value={filters.periodo}
-            onChange={(e) => setFilters({ ...filters, periodo: e.target.value })}
-            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
-          >
-            <option value="all">Todos os períodos</option>
-            <option value="hoje">Vence hoje</option>
-            <option value="proximos7">Próximos 7 dias</option>
-            <option value="vencidas">Vencidas</option>
-          </select>
         </div>
       </div>
 
