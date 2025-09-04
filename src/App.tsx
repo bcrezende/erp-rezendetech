@@ -37,6 +37,7 @@ const AppContent: React.FC = () => {
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const { user, profile, loading, signOut, supabase } = useAuth();
+  const { state } = useAppContext();
   const { isMobile, isTablet, isDesktop, isPWA, hasTouch, orientation } = useDeviceDetection();
 
   // Check if current URL is reset-password
@@ -240,7 +241,11 @@ const AppContent: React.FC = () => {
   ].filter(Boolean).join(' ');
 
   return (
-    <div className={`flex h-screen bg-gradient-dashboard animate-gradient-shift safe-top safe-bottom ${deviceClasses} ${isMobileSidebarOpen ? 'overflow-hidden' : ''}`}>
+    <div className={`flex h-screen ${
+      state.theme === 'dark' 
+        ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' 
+        : 'bg-gradient-dashboard animate-gradient-shift'
+    } safe-top safe-bottom ${deviceClasses} ${isMobileSidebarOpen ? 'overflow-hidden' : ''}`}>
       <Sidebar 
         currentPage={currentPage} 
         onNavigate={setCurrentPage} 
@@ -251,17 +256,31 @@ const AppContent: React.FC = () => {
       />
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        <div className={`glass-strong shadow-2xl border-b border-white/30 relative overflow-hidden ${
+        <div className={`${
+          state.theme === 'dark' 
+            ? 'bg-gray-800/95 backdrop-blur-xl border-gray-700' 
+            : 'glass-strong border-white/30'
+        } shadow-2xl border-b relative overflow-hidden ${
           isMobile ? 'px-3 py-4' : 'px-6 py-6'
         }`}>
           {/* Header gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 animate-gradient-shift" />
+          <div className={`absolute inset-0 ${
+            state.theme === 'dark'
+              ? 'bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-600/5'
+              : 'bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 animate-gradient-shift'
+          }`} />
           
           {/* Floating particles effect */}
           <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-            <div className="absolute top-4 left-10 w-2 h-2 bg-blue-400/30 rounded-full animate-float" style={{ animationDelay: '0s' }}></div>
-            <div className="absolute top-8 right-20 w-1 h-1 bg-purple-400/40 rounded-full animate-float" style={{ animationDelay: '2s' }}></div>
-            <div className="absolute bottom-6 left-1/3 w-1.5 h-1.5 bg-pink-400/30 rounded-full animate-float" style={{ animationDelay: '4s' }}></div>
+            <div className={`absolute top-4 left-10 w-2 h-2 rounded-full animate-float ${
+              state.theme === 'dark' ? 'bg-blue-400/20' : 'bg-blue-400/30'
+            }`} style={{ animationDelay: '0s' }}></div>
+            <div className={`absolute top-8 right-20 w-1 h-1 rounded-full animate-float ${
+              state.theme === 'dark' ? 'bg-purple-400/25' : 'bg-purple-400/40'
+            }`} style={{ animationDelay: '2s' }}></div>
+            <div className={`absolute bottom-6 left-1/3 w-1.5 h-1.5 rounded-full animate-float ${
+              state.theme === 'dark' ? 'bg-pink-400/20' : 'bg-pink-400/30'
+            }`} style={{ animationDelay: '4s' }}></div>
           </div>
           
           <div className="flex items-center justify-between">
@@ -270,20 +289,26 @@ const AppContent: React.FC = () => {
               {isMobile && (
                 <button
                   onClick={() => setIsMobileSidebarOpen(true)}
-                  className="p-3 rounded-xl hover:bg-white/60 transition-smooth backdrop-blur-sm hover-glow touch-target"
+                  className={`p-3 rounded-xl transition-smooth backdrop-blur-sm hover-glow touch-target ${
+                    state.theme === 'dark' ? 'hover:bg-gray-700/60' : 'hover:bg-white/60'
+                  }`}
                 >
-                  <Menu size={20} className="text-gray-600" />
+                  <Menu size={20} className={state.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} />
                 </button>
               )}
               
               <div className="relative z-10">
                 <h2 className={`font-bold bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 bg-clip-text text-transparent tracking-tight animate-slide-in-from-left ${
+                  state.theme === 'dark' ? 'from-white via-blue-200 to-purple-200' : 'from-gray-900 via-blue-900 to-purple-900'
+                } ${
                   isMobile ? 'text-lg' : 'text-3xl'
                 }`}>
                   {title}
                 </h2>
                 {subtitle && (
-                  <p className={`text-gray-700 font-semibold tracking-wide animate-slide-in-from-left stagger-1 ${
+                  <p className={`font-semibold tracking-wide animate-slide-in-from-left stagger-1 ${
+                    state.theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  } ${
                     isMobile ? 'text-xs mt-1' : 'text-sm mt-2'
                   }`}>
                     {subtitle}
@@ -294,9 +319,17 @@ const AppContent: React.FC = () => {
 
             <div className="flex items-center space-x-2 sm:space-x-4 relative z-10">
               {!isMobile && (
-                <div className="text-right glass rounded-xl px-4 py-3 hover-lift animate-slide-in-from-right">
-                  <p className="text-sm font-bold text-gray-900 tracking-wide">{profile?.nome_completo}</p>
-                  <p className="text-xs text-gray-600 font-medium mt-1">{profile?.empresas?.nome}</p>
+                <div className={`text-right rounded-xl px-4 py-3 hover-lift animate-slide-in-from-right ${
+                  state.theme === 'dark' 
+                    ? 'bg-gray-700/80 backdrop-blur-xl border border-gray-600' 
+                    : 'glass'
+                }`}>
+                  <p className={`text-sm font-bold tracking-wide ${
+                    state.theme === 'dark' ? 'text-white' : 'text-gray-900'
+                  }`}>{profile?.nome_completo}</p>
+                  <p className={`text-xs font-medium mt-1 ${
+                    state.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                  }`}>{profile?.empresas?.nome}</p>
                 </div>
               )}
               
@@ -311,7 +344,11 @@ const AppContent: React.FC = () => {
               
               <button
                 onClick={handleSignOut}
-                className="p-3 text-gray-600 hover:text-red-600 hover:bg-white/60 rounded-xl transition-smooth backdrop-blur-sm hover-glow animate-slide-in-from-right stagger-1 touch-target"
+                className={`p-3 hover:text-red-600 rounded-xl transition-smooth backdrop-blur-sm hover-glow animate-slide-in-from-right stagger-1 touch-target ${
+                  state.theme === 'dark' 
+                    ? 'text-gray-300 hover:bg-gray-700/60' 
+                    : 'text-gray-600 hover:bg-white/60'
+                }`}
               >
                 <LogOut size={18} className="sm:w-5 sm:h-5" />
               </button>
@@ -320,6 +357,8 @@ const AppContent: React.FC = () => {
         </div>
         
         <main className={`flex-1 overflow-y-auto animate-fade-in custom-scrollbar mobile-scroll ${
+          state.theme === 'dark' ? 'bg-gray-900' : ''
+        } ${
           isMobile ? 'p-3' : 'p-6 lg:p-8'
         }`}>
           <div className="min-h-full">

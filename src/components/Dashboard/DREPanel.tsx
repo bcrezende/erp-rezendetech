@@ -368,9 +368,9 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
   };
 
   return (
-    <div className="card-premium rounded-2xl sm:rounded-3xl shadow-2xl border border-white/30 p-4 sm:p-6 lg:p-8 hover-lift relative overflow-hidden animate-slide-in-from-left">
+    <div className="card-premium rounded-2xl sm:rounded-3xl shadow-2xl border border-white/30 dark:border-gray-700 p-4 sm:p-6 lg:p-8 hover-lift relative overflow-hidden animate-slide-in-from-left">
       {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/60 via-purple-50/40 to-pink-50/60 rounded-2xl sm:rounded-3xl" />
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/60 via-purple-50/40 to-pink-50/60 dark:from-blue-900/20 dark:via-purple-900/15 dark:to-pink-900/20 rounded-2xl sm:rounded-3xl" />
       
       {/* Floating elements */}
       <div className="absolute top-6 right-6 w-24 h-24 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-full blur-xl animate-float" />
@@ -381,11 +381,11 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
           <div className="p-2 sm:p-3 bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 rounded-xl sm:rounded-2xl shadow-xl hover-glow animate-scale-in">
             <BarChart3 className="h-5 w-5 sm:h-7 sm:w-7 text-white drop-shadow-lg" />
           </div>
-          <h3 className="text-base sm:text-lg lg:text-xl font-black bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 bg-clip-text text-transparent tracking-tight truncate">
+          <h3 className="text-base sm:text-lg lg:text-xl font-black bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 dark:from-white dark:via-blue-200 dark:to-purple-200 bg-clip-text text-transparent tracking-tight truncate">
             Demonstrativo do Resultado do Exercício (DRE)
           </h3>
         </div>
-        <div className="text-xs sm:text-sm text-gray-700 text-center sm:text-right relative z-10 glass rounded-lg sm:rounded-xl px-2 sm:px-3 lg:px-4 py-1 sm:py-2 font-semibold animate-slide-in-from-right">
+        <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 text-center sm:text-right relative z-10 glass rounded-lg sm:rounded-xl px-2 sm:px-3 lg:px-4 py-1 sm:py-2 font-semibold animate-slide-in-from-right">
           Período: {dreData.period}
         </div>
       </div>

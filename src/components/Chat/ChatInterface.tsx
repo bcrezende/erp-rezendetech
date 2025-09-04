@@ -284,7 +284,7 @@ const ChatInterface: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen sm:h-[calc(100vh-200px)] bg-white sm:rounded-xl shadow-sm border border-gray-200">
+    <div className="flex flex-col h-screen sm:h-[calc(100vh-200px)] bg-white dark:bg-gray-800 sm:rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
       {/* Header */}
       <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-purple-600 text-white sm:rounded-t-xl">
         <div className="flex items-center space-x-3">
@@ -304,7 +304,7 @@ const ChatInterface: React.FC = () => {
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 bg-gray-50">
+      <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 bg-gray-50 dark:bg-gray-900">
         {messages.map((message) => (
           <div
             key={message.id}
@@ -313,12 +313,12 @@ const ChatInterface: React.FC = () => {
             <div className={`max-w-[85%] sm:max-w-xs lg:max-w-md xl:max-w-lg ${
               message.type === 'user' 
                 ? 'bg-blue-600 text-white rounded-l-lg rounded-tr-lg' 
-                : 'bg-white text-gray-900 rounded-r-lg rounded-tl-lg shadow-sm border border-gray-200'
+                : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-r-lg rounded-tl-lg shadow-sm border border-gray-200 dark:border-gray-600'
             } p-2.5 sm:p-3`}>
               {message.type === 'assistant' && (
                 <div className="flex items-center space-x-2 mb-1.5 sm:mb-2">
-                  <Bot size={16} className="text-blue-600" />
-                  <span className="text-xs font-medium text-blue-600">IA</span>
+                  <Bot size={16} className="text-blue-600 dark:text-blue-400" />
+                  <span className="text-xs font-medium text-blue-600 dark:text-blue-400">IA</span>
                 </div>
               )}
               
@@ -327,7 +327,7 @@ const ChatInterface: React.FC = () => {
               </div>
               
               <div className={`flex items-center justify-end space-x-1 mt-2 ${
-                message.type === 'user' ? 'text-blue-100' : 'text-gray-400'
+                message.type === 'user' ? 'text-blue-100' : 'text-gray-400 dark:text-gray-500'
               }`}>
                 <span className="text-xs">
                   {formatTime(message.timestamp)}
@@ -340,14 +340,14 @@ const ChatInterface: React.FC = () => {
         
         {isProcessing && (
           <div className="flex justify-start">
-            <div className="bg-white text-gray-900 rounded-r-lg rounded-tl-lg shadow-sm border border-gray-200 p-2.5 sm:p-3 max-w-[85%] sm:max-w-xs">
+            <div className="bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-r-lg rounded-tl-lg shadow-sm border border-gray-200 dark:border-gray-600 p-2.5 sm:p-3 max-w-[85%] sm:max-w-xs">
               <div className="flex items-center space-x-2">
-                <Bot size={16} className="text-blue-600" />
-                <span className="text-xs font-medium text-blue-600">IA</span>
+                <Bot size={16} className="text-blue-600 dark:text-blue-400" />
+                <span className="text-xs font-medium text-blue-600 dark:text-blue-400">IA</span>
               </div>
               <div className="flex items-center space-x-2 mt-2">
                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent" />
-                <span className="text-xs sm:text-sm text-gray-600">Analisando...</span>
+                <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">Analisando...</span>
               </div>
             </div>
           </div>
@@ -357,7 +357,7 @@ const ChatInterface: React.FC = () => {
       </div>
 
       {/* Input Area */}
-      <div className="p-3 sm:p-4 border-t border-gray-200 bg-white sm:rounded-b-xl">
+      <div className="p-3 sm:p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 sm:rounded-b-xl">
         <form onSubmit={handleTextSubmit} className="flex items-end space-x-1.5 sm:space-x-2">
           <div className="flex-1">
             <textarea
@@ -370,7 +370,7 @@ const ChatInterface: React.FC = () => {
                 }
               }}
               placeholder="Digite sua mensagem ou pergunta financeira..."
-              className="w-full border border-gray-300 rounded-lg px-3 sm:px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm sm:text-base"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 sm:px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm sm:text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               rows={1}
               disabled={isProcessing}
             />
@@ -384,7 +384,7 @@ const ChatInterface: React.FC = () => {
             className={`p-2 sm:p-2.5 rounded-lg transition-colors ${
               isRecording 
                 ? 'bg-red-600 text-white hover:bg-red-700' 
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
             } disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             {isRecording ? <MicOff size={18} className="sm:w-5 sm:h-5" /> : <Mic size={18} className="sm:w-5 sm:h-5" />}
@@ -395,7 +395,7 @@ const ChatInterface: React.FC = () => {
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={isProcessing}
-            className="p-2 sm:p-2.5 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2 sm:p-2.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Image size={18} className="sm:w-5 sm:h-5" />
           </button>
@@ -429,8 +429,8 @@ const ChatInterface: React.FC = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="p-3 sm:p-4 bg-gray-50 border-t border-gray-200 sm:rounded-b-xl">
-        <p className="text-xs text-gray-500 mb-2">Ações rápidas:</p>
+      <div className="p-3 sm:p-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 sm:rounded-b-xl">
+        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Ações rápidas:</p>
         <div className="flex flex-wrap gap-1.5 sm:gap-2">
           {[
             'Qual meu saldo atual?',
@@ -445,7 +445,7 @@ const ChatInterface: React.FC = () => {
                 setInputText(quickAction);
               }}
               disabled={isProcessing}
-              className="px-2 sm:px-3 py-1 bg-white border border-gray-300 rounded-full text-xs text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50"
+              className="px-2 sm:px-3 py-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-full text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
             >
               {quickAction}
             </button>
@@ -453,12 +453,12 @@ const ChatInterface: React.FC = () => {
         </div>
         
         {/* Chat URL Info */}
-        <div className="mt-3 p-2.5 sm:p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-xs text-blue-800 font-medium mb-1">💡 Acesso Rápido ao Chat</p>
-          <p className="text-xs text-blue-700">
+        <div className="mt-3 p-2.5 sm:p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <p className="text-xs text-blue-800 dark:text-blue-200 font-medium mb-1">💡 Acesso Rápido ao Chat</p>
+          <p className="text-xs text-blue-700 dark:text-blue-300">
             Para usar o chat no celular, acesse: <strong>/chat.html</strong>
           </p>
-          <p className="text-xs text-blue-600 mt-1 hidden sm:block">
+          <p className="text-xs text-blue-600 dark:text-blue-400 mt-1 hidden sm:block">
             Você pode adicionar esta URL à tela inicial do seu dispositivo!
           </p>
         </div>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useAppContext } from '../../contexts/AppContext';
 import { 
   Home, 
   DollarSign, 
@@ -20,7 +21,9 @@ import {
   Bot,
   Bell,
   User,
-  Building
+  Building,
+  Moon,
+  Sun
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -85,6 +88,7 @@ const menuItems: MenuItem[] = [
 const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mobileOpen, onClose, deviceInfo }) => {
   const [isDesktopCollapsed, setIsDesktopCollapsed] = useState(false);
   const [expandedItems, setExpandedItems] = useState<string[]>(['cadastros', 'financeiro']);
+  const { state, toggleTheme } = useAppContext();
   
   const { isMobile, isTablet, isDesktop, isPWA, hasTouch } = deviceInfo || {};
 
@@ -160,23 +164,35 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mob
       {/* Sidebar */}
       <div className={`
         ${isMobile ? `fixed inset-y-0 left-0 z-50 w-80 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}` : 'relative z-auto'} 
-        glass-strong shadow-2xl transform transition-all duration-500 ease-in-out safe-top safe-bottom
+        ${
+          state.theme === 'dark' 
+            ? 'bg-gray-800/95 backdrop-blur-xl border-gray-700' 
+            : 'glass-strong border-white/30'
+        } shadow-2xl transform transition-all duration-500 ease-in-out safe-top safe-bottom
         ${!isMobile ? (isDesktopCollapsed ? 'w-20' : 'w-72') : ''}
-        h-full flex flex-col border-r border-white/30 backdrop-blur-xl
+        h-full flex flex-col border-r backdrop-blur-xl
       `}>
         {/* Header */}
-        <div className={`border-b border-white/30 bg-gradient-to-r from-white/20 to-transparent ${
+        <div className={`border-b ${
+          state.theme === 'dark' ? 'border-gray-700 bg-gradient-to-r from-gray-700/20 to-transparent' : 'border-white/30 bg-gradient-to-r from-white/20 to-transparent'
+        } ${
           isMobile ? 'p-4' : 'p-6'
         }`}>
           <div className="flex items-center justify-between">
             {(!isDesktopCollapsed || isMobile) && (
               <div className="animate-slide-in-from-left">
-                <h1 className={`font-black bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 bg-clip-text text-transparent tracking-tight ${
+                <h1 className={`font-black bg-gradient-to-r ${
+                  state.theme === 'dark' 
+                    ? 'from-white via-blue-200 to-purple-200' 
+                    : 'from-gray-900 via-blue-900 to-purple-900'
+                } bg-clip-text text-transparent tracking-tight ${
                   isMobile ? 'text-lg' : 'text-xl'
                 }`}>
                   {isPWA ? 'ERP Mobile' : 'Sistema ERP'}
                 </h1>
-                <p className={`text-gray-600 font-bold tracking-wide ${
+                <p className={`font-bold tracking-wide ${
+                  state.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                } ${
                   isMobile ? 'text-xs' : 'text-sm'
                 }`}>
                   {isPWA ? 'App Instalado' : 'Gestão Empresarial'}
@@ -188,9 +204,11 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mob
             {isMobile && (
               <button
                 onClick={onClose}
-                className="p-3 rounded-xl hover:bg-white/60 transition-smooth hover-glow touch-target"
+                className={`p-3 rounded-xl transition-smooth hover-glow touch-target ${
+                  state.theme === 'dark' ? 'hover:bg-gray-700/60' : 'hover:bg-white/60'
+                }`}
               >
-                <X size={20} />
+                <X size={20} className={state.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} />
               </button>
             )}
             
@@ -198,9 +216,14 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mob
             {!isMobile && (
               <button
                 onClick={() => setIsDesktopCollapsed(!isDesktopCollapsed)}
-                className="p-3 rounded-xl hover:bg-white/60 transition-smooth hover-glow touch-target"
+                className={`p-3 rounded-xl transition-smooth hover-glow touch-target ${
+                  state.theme === 'dark' ? 'hover:bg-gray-700/60' : 'hover:bg-white/60'
+                }`}
               >
-                {isDesktopCollapsed ? <Menu size={20} /> : <X size={20} />}
+                {isDesktopCollapsed ? 
+                  <Menu size={20} className={state.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} /> : 
+                  <X size={20} className={state.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'} />
+                }
               </button>
             )}
           </div>
@@ -211,10 +234,37 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mob
           isMobile ? 'p-3' : 'p-4'
         }`}>
           {menuItems.map(item => renderMenuItem(item))}
+          
+          {/* Theme Toggle Button */}
+          <div className="pt-4 border-t border-white/30 dark:border-gray-700">
+            <button
+              onClick={toggleTheme}
+              className={`w-full flex items-center justify-between px-3 sm:px-4 py-3 sm:py-3 text-left rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl touch-target no-select ${
+                state.theme === 'dark'
+                  ? 'text-gray-300 hover:bg-gray-700/60 hover:text-white backdrop-blur-sm'
+                  : 'text-gray-700 hover:bg-white/60 hover:text-gray-900 backdrop-blur-sm'
+              }`}
+            >
+              <div className="flex items-center space-x-2 sm:space-x-3">
+                {state.theme === 'dark' ? (
+                  <Sun size={20} className="drop-shadow-sm" />
+                ) : (
+                  <Moon size={20} className="drop-shadow-sm" />
+                )}
+                {(!isDesktopCollapsed || isMobile) && (
+                  <span className="text-sm sm:text-base font-bold tracking-wide">
+                    {state.theme === 'dark' ? 'Tema Claro' : 'Tema Escuro'}
+                  </span>
+                )}
+              </div>
+            </button>
+          </div>
         </nav>
 
         {/* User Info */}
-        <div className={`border-t border-white/30 bg-gradient-to-r from-white/20 to-transparent ${
+        <div className={`border-t ${
+          state.theme === 'dark' ? 'border-gray-700 bg-gradient-to-r from-gray-700/20 to-transparent' : 'border-white/30 bg-gradient-to-r from-white/20 to-transparent'
+        } ${
           isMobile ? 'p-4' : 'p-6'
         }`}>
           <div className={`flex items-center ${isDesktopCollapsed && !isMobile ? 'justify-center' : 'space-x-3'}`}>
@@ -225,12 +275,16 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mob
             </div>
             {(!isDesktopCollapsed || isMobile) && (
               <div className="min-w-0 flex-1 animate-slide-in-from-left">
-                <p className={`font-bold text-gray-900 truncate tracking-wide ${
+                <p className={`font-bold truncate tracking-wide ${
+                  state.theme === 'dark' ? 'text-white' : 'text-gray-900'
+                } ${
                   isMobile ? 'text-xs' : 'text-sm'
                 }`}>
                   {profile?.nome_completo || 'Usuário'}
                 </p>
-                <p className="text-xs text-gray-600 capitalize truncate font-semibold">
+                <p className={`text-xs capitalize truncate font-semibold ${
+                  state.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                }`}>
                   {profile?.papel || 'Usuário'} {isPWA && '• PWA'}
                 </p>
               </div>

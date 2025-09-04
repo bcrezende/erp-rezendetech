@@ -21,6 +21,7 @@ interface AppState {
   saleOrders: SaleOrder[];
   purchaseOrders: PurchaseOrder[];
   whatsappMessages: WhatsAppMessage[];
+  theme: 'light' | 'dark';
   loading: boolean;
   error: string | null;
 }
@@ -35,6 +36,7 @@ type AppAction =
   | { type: 'ADD_SALE_ORDER'; payload: SaleOrder }
   | { type: 'ADD_PURCHASE_ORDER'; payload: PurchaseOrder }
   | { type: 'ADD_WHATSAPP_MESSAGE'; payload: WhatsAppMessage }
+  | { type: 'SET_THEME'; payload: 'light' | 'dark' }
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'INITIALIZE_DATA' };
@@ -49,6 +51,7 @@ const initialState: AppState = {
   saleOrders: [],
   purchaseOrders: [],
   whatsappMessages: [],
+  theme: 'light',
   loading: false,
   error: null
 };
@@ -225,6 +228,8 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, purchaseOrders: [...state.purchaseOrders, action.payload] };
     case 'ADD_WHATSAPP_MESSAGE':
       return { ...state, whatsappMessages: [...state.whatsappMessages, action.payload] };
+    case 'SET_THEME':
+      return { ...state, theme: action.payload };
     case 'SET_LOADING':
       return { ...state, loading: action.payload };
     case 'SET_ERROR':
@@ -247,17 +252,44 @@ function appReducer(state: AppState, action: AppAction): AppState {
 const AppContext = createContext<{
   state: AppState;
   dispatch: React.Dispatch<AppAction>;
+  toggleTheme: () => void;
 } | null>(null);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
   React.useEffect(() => {
+    // Load theme from localStorage
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    const initialTheme = savedTheme || systemTheme;
+    
+    dispatch({ type: 'SET_THEME', payload: initialTheme });
+    
     dispatch({ type: 'INITIALIZE_DATA' });
   }, []);
 
+  React.useEffect(() => {
+    // Apply theme to document
+    const root = document.documentElement;
+    if (state.theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    
+    // Save theme to localStorage
+    localStorage.setItem('theme', state.theme);
+  }, [state.theme]);
+
+  const toggleTheme = () => {
+    dispatch({ 
+      type: 'SET_THEME', 
+      payload: state.theme === 'light' ? 'dark' : 'light' 
+    });
+  };
   return (
-    <AppContext.Provider value={{ state, dispatch }}>
+    <AppContext.Provider value={{ state, dispatch, toggleTheme }}>
       {children}
     </AppContext.Provider>
   );

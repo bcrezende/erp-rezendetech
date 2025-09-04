@@ -2,6 +2,23 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+/* Dark mode variables */
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --border-color: #e5e7eb;
+}
+
+.dark {
+  --bg-primary: #1f2937;
+  --bg-secondary: #111827;
+  --text-primary: #f9fafb;
+  --text-secondary: #d1d5db;
+  --border-color: #374151;
+}
+
 /* Custom animations */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
@@ -59,7 +76,7 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: linear-gradient(to bottom, #f8fafc, #e2e8f0);
+  background: linear-gradient(to bottom, var(--bg-secondary), var(--border-color));
   border-radius: 6px;
   margin: 4px;
 }
@@ -76,11 +93,21 @@
   box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
 }
 
+/* Dark mode scrollbar */
+.dark .custom-scrollbar::-webkit-scrollbar-track {
+  background: linear-gradient(to bottom, #111827, #374151);
+}
+
 /* Glass morphism effects */
 .glass-card {
   backdrop-filter: blur(20px);
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass-card {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .glass-card-dark {
@@ -89,12 +116,46 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Glass effect for sidebar and header */
+.glass-strong {
+  backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.dark .glass-strong {
+  background: rgba(31, 41, 55, 0.85);
+  border: 1px solid rgba(75, 85, 99, 0.3);
+}
+
+.glass {
+  backdrop-filter: blur(15px);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass {
+  background: rgba(31, 41, 55, 0.7);
+  border: 1px solid rgba(75, 85, 99, 0.2);
+}
+
 /* Gradient text */
 .gradient-text {
   background: linear-gradient(135deg, #3b82f6, #8b5cf6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* Dark mode gradient backgrounds */
+.bg-gradient-dashboard {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 25%, #fdf2f8 50%, #f0f9ff 75%, #e0e7ff 100%);
+  background-size: 400% 400%;
+}
+
+.dark .bg-gradient-dashboard {
+  background: linear-gradient(135deg, #111827 0%, #1e293b 25%, #1f2937 50%, #111827 75%, #1e293b 100%);
+  background-size: 400% 400%;
 }
 
 /* Hover effects */
@@ -108,6 +169,10 @@
 .hover-lift:hover {
   transform: translateY(-4px) scale(1.02);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.dark .hover-lift:hover {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
 /* Staggered animations */
@@ -222,6 +287,24 @@
   .safe-right {
     padding-right: env(safe-area-inset-right);
   }
+}
+
+/* Theme transition */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+/* Card styles with dark mode */
+.card-modern {
+  @apply bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700;
+}
+
+.card-premium {
+  @apply bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700;
+}
+
+.interactive-card {
+  @apply hover:bg-gray-50 dark:hover:bg-gray-700;
 }
 
 /* Mobile-first responsive utilities */
