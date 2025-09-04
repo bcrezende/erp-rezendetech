@@ -18,14 +18,6 @@ const AccountsReceivable: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [viewingTransaction, setViewingTransaction] = useState<Transaction | null>(null);
-  const [filters, setFilters] = useState({
-    status: 'all',
-    categoria: 'all',
-    pessoa: 'all',
-    periodo: 'all',
-    startDate: '',
-    endDate: ''
-  });
 
   // Função para obter o primeiro e último dia do mês atual
   const getCurrentMonthRange = () => {
@@ -39,15 +31,17 @@ const AccountsReceivable: React.FC = () => {
     };
   };
 
-  // Inicializar filtros com o mês atual
-  useEffect(() => {
+  const [filters, setFilters] = useState(() => {
     const monthRange = getCurrentMonthRange();
-    setFilters(prev => ({
-      ...prev,
+    return {
+      status: 'all',
+      categoria: 'all',
+      pessoa: 'all',
+      periodo: 'all',
       startDate: monthRange.startDate,
       endDate: monthRange.endDate
-    }));
-  }, []);
+    };
+  });
 
   const [formData, setFormData] = useState<Partial<TransactionInsert>>({
     valor: 0,
