@@ -123,17 +123,15 @@ const CompanySettings: React.FC = () => {
         const { data, error: functionError } = await supabase.functions.invoke('create-and-link-company', {
           body: {
             userId: user.id,
-            companyData: {
-              nome: formData.nome,
-              cnpj: formData.cnpj || null,
-              email: formData.email || null,
-              telefone: formData.telefone || null,
-              endereco: formData.endereco || null,
-              cidade: formData.cidade || null,
-              estado: formData.estado || null,
-              cep: formData.cep || null,
-              plano: formData.plano
-            }
+            nomeEmpresa: formData.nome,
+            cnpj: formData.cnpj || null,
+            email: formData.email || null,
+            telefone: formData.telefone || null,
+            endereco: formData.endereco || null,
+            cidade: formData.cidade || null,
+            estado: formData.estado || null,
+            cep: formData.cep || null,
+            plano: formData.plano
           }
         });
 
