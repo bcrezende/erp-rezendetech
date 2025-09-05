@@ -119,38 +119,74 @@ const CompanySettings: React.FC = () => {
         setSuccess('Dados da empresa atualizados com sucesso!');
         await loadCompanyData(); // Recarregar dados
       } else {
-        // Criar nova empresa usando Edge Function (com privilégios de service role)
-        const { data, error: functionError } = await supabase.functions.invoke('create-and-link-company', {
-          body: {
-            userId: user.id,
-            nomeEmpresa: formData.nome,
-            cnpj: formData.cnpj || null,
-            email: formData.email || null,
-            telefone: formData.telefone || null,
-            endereco: formData.endereco || null,
-            cidade: formData.cidade || null,
-            estado: formData.estado || null,
-            cep: formData.cep || null,
-            plano: formData.plano
+        // Criar nova empresa - Solução alternativa sem Edge Function
+        // Primeiro, vamos tentar criar a empresa diretamente
+        const empresaData: EmpresaInsert = {
+          nome: formData.nome,
+          cnpj: formData.cnpj || null,
+          email: formData.email || null,
+          telefone: formData.telefone || null,
+          endereco: formData.endereco || null,
+          cidade: formData.cidade || null,
+          estado: formData.estado || null,
+          cep: formData.cep || null,
+          plano: formData.plano,
+          ativo: true
+        };
+
+        // Tentar criar empresa usando RPC (função do banco)
+        const { data: empresaResult, error: empresaError } = await supabase
+          .rpc('create_empresa_and_link_profile', {
+            p_user_id: user.id,
+            p_nome: formData.nome,
+            p_cnpj: formData.cnpj || null,
+            p_email: formData.email || null,
+            p_telefone: formData.telefone || null,
+            p_endereco: formData.endereco || null,
+            p_cidade: formData.cidade || null,
+            p_estado: formData.estado || null,
+            p_cep: formData.cep || null,
+            p_plano: formData.plano || 'basico'
+          });
+
+        if (empresaError) {
+          console.error('Error creating company via RPC:', empresaError);
+          
+          // Fallback: tentar criar empresa diretamente (pode falhar por RLS)
+          const { data: empresaFallback, error: empresaFallbackError } = await supabase
+            .from('empresas')
+            .insert(empresaData)
+            .select()
+            .single();
+
+          if (empresaFallbackError) {
+            console.error('Fallback also failed:', empresaFallbackError);
+            throw new Error(`Erro ao criar empresa: ${empresaError.message}`);
           }
-        });
 
-        if (functionError) {
-          console.error('Error creating company via Edge Function:', functionError);
-          throw new Error('Erro ao criar empresa via Edge Function');
-        }
+          // Se conseguiu criar, tentar vincular ao perfil
+          const { error: perfilError } = await supabase
+            .from('perfis')
+            .update({ id_empresa: empresaFallback.id })
+            .eq('id', user.id);
 
-        if (!data || data.error) {
-          console.error('Edge Function returned error:', data?.error);
-          throw new Error(data?.error || 'Erro desconhecido ao criar empresa');
+          if (perfilError) {
+            // Rollback: deletar empresa criada
+            await supabase
+              .from('empresas')
+              .delete()
+              .eq('id', empresaFallback.id);
+            
+            throw new Error(`Erro ao vincular perfil: ${perfilError.message}`);
+          }
         }
 
         setSuccess('Empresa criada e vinculada com sucesso!');
         
-        // Recarregar a página para atualizar o contexto de autenticação
+        // Recarregar a página para atualizar o contexto
         setTimeout(() => {
           window.location.reload();
-        }, 2000);
+        }, 1500);
       }
     } catch (err: any) {
       console.error('Error saving company:', err);
