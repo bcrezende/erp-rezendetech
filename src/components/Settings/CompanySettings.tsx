@@ -119,47 +119,37 @@ const CompanySettings: React.FC = () => {
         setSuccess('Dados da empresa atualizados com sucesso!');
         await loadCompanyData(); // Recarregar dados
       } else {
-        // Criar nova empresa diretamente
-        const { data: novaEmpresa, error: empresaError } = await supabase
-          .from('empresas')
-          .insert({
-            nome: formData.nome,
-            cnpj: formData.cnpj || null,
-            email: formData.email || null,
-            telefone: formData.telefone || null,
-            endereco: formData.endereco || null,
-            cidade: formData.cidade || null,
-            estado: formData.estado || null,
-            cep: formData.cep || null,
-            plano: formData.plano
-          })
-          .select()
-          .single();
+        // Criar nova empresa usando Edge Function (com privilégios de service role)
+        const { data, error: functionError } = await supabase.functions.invoke('create-and-link-company', {
+          body: {
+            userId: user.id,
+            companyData: {
+              nome: formData.nome,
+              cnpj: formData.cnpj || null,
+              email: formData.email || null,
+              telefone: formData.telefone || null,
+              endereco: formData.endereco || null,
+              cidade: formData.cidade || null,
+              estado: formData.estado || null,
+              cep: formData.cep || null,
+              plano: formData.plano
+            }
+          }
+        });
 
-        if (empresaError) {
-          console.error('Error creating company:', empresaError);
-          throw new Error(`Erro ao criar empresa: ${empresaError.message}`);
+        if (functionError) {
+          console.error('Error creating company via Edge Function:', functionError);
+          throw new Error('Erro ao criar empresa via Edge Function');
         }
 
-        // Vincular empresa ao perfil do usuário
-        const { error: perfilError } = await supabase
-          .from('perfis')
-          .update({ id_empresa: novaEmpresa.id })
-          .eq('id', user.id);
-
-        if (perfilError) {
-          console.error('Error linking profile to company:', perfilError);
-          // Rollback: deletar a empresa se falhar ao vincular
-          await supabase
-            .from('empresas')
-            .delete()
-            .eq('id', novaEmpresa.id);
-          throw new Error(`Erro ao vincular perfil à empresa: ${perfilError.message}`);
+        if (!data || data.error) {
+          console.error('Edge Function returned error:', data?.error);
+          throw new Error(data?.error || 'Erro desconhecido ao criar empresa');
         }
 
         setSuccess('Empresa criada e vinculada com sucesso!');
         
-        // Recarregar dados para refletir as mudanças
+        // Recarregar a página para atualizar o contexto de autenticação
         setTimeout(() => {
           window.location.reload();
         }, 2000);
