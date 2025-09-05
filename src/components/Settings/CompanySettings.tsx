@@ -119,34 +119,47 @@ const CompanySettings: React.FC = () => {
         setSuccess('Dados da empresa atualizados com sucesso!');
         await loadCompanyData(); // Recarregar dados
       } else {
-        // Criar nova empresa e vincular ao perfil
-        const { data, error } = await supabase.functions.invoke('create-and-link-company', {
-          body: {
-            userId: user.id,
-            nomeEmpresa: formData.nome,
+        // Criar nova empresa diretamente
+        const { data: novaEmpresa, error: empresaError } = await supabase
+          .from('empresas')
+          .insert({
+            nome: formData.nome,
             cnpj: formData.cnpj || null,
-            telefone: formData.telefone || null,
             email: formData.email || null,
+            telefone: formData.telefone || null,
             endereco: formData.endereco || null,
             cidade: formData.cidade || null,
             estado: formData.estado || null,
             cep: formData.cep || null,
-            plano: formData.plano || 'basico'
-          }
-        });
+            plano: formData.plano
+          })
+          .select()
+          .single();
 
-        if (error) {
-          console.error('Edge Function error:', error);
-          throw new Error('Erro ao criar empresa via Edge Function');
+        if (empresaError) {
+          console.error('Error creating company:', empresaError);
+          throw new Error(`Erro ao criar empresa: ${empresaError.message}`);
         }
 
-        if (!data?.success) {
-          throw new Error(data?.error || 'Erro desconhecido ao criar empresa');
+        // Vincular empresa ao perfil do usuário
+        const { error: perfilError } = await supabase
+          .from('perfis')
+          .update({ id_empresa: novaEmpresa.id })
+          .eq('id', user.id);
+
+        if (perfilError) {
+          console.error('Error linking profile to company:', perfilError);
+          // Rollback: deletar a empresa se falhar ao vincular
+          await supabase
+            .from('empresas')
+            .delete()
+            .eq('id', novaEmpresa.id);
+          throw new Error(`Erro ao vincular perfil à empresa: ${perfilError.message}`);
         }
 
         setSuccess('Empresa criada e vinculada com sucesso!');
         
-        // Recarregar a página para que o AuthProvider detecte a nova empresa
+        // Recarregar dados para refletir as mudanças
         setTimeout(() => {
           window.location.reload();
         }, 2000);
