@@ -294,6 +294,226 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
     return date.toLocaleDateString('pt-BR');
   };
 
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    
+    // Configurar fonte para suportar caracteres especiais
+    doc.setFont('helvetica');
+    
+    // Título do documento
+    doc.setFontSize(20);
+    doc.setTextColor(40, 40, 40);
+    doc.text('Demonstrativo do Resultado do Exercício (DRE)', 20, 25);
+    
+    // Informações da empresa e período
+    doc.setFontSize(12);
+    doc.setTextColor(80, 80, 80);
+    doc.text(`Empresa: ${profile?.empresas?.nome || 'Empresa'}`, 20, 40);
+    doc.text(`Período: ${dreData.period}`, 20, 50);
+    doc.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}`, 20, 60);
+    
+    // Resumo DRE
+    const resumoData = [
+      ['RECEITA BRUTA', formatCurrency(dreData.receitaBruta)],
+      ['(-) CUSTO VARIÁVEL', `-${formatCurrency(dreData.custoVariavel)}`],
+      ['= MARGEM DE CONTRIBUIÇÃO', formatCurrency(dreData.margemContribuicao)],
+      ['(-) CUSTO FIXO', `-${formatCurrency(dreData.custoFixo)}`],
+      ['= RESULTADO DO NEGÓCIO', formatCurrency(dreData.resultadoNegocio)]
+    ];
+    
+    autoTable(doc, {
+      head: [['Descrição', 'Valor']],
+      body: resumoData,
+      startY: 75,
+      theme: 'grid',
+      headStyles: { fillColor: [59, 130, 246], textColor: 255, fontStyle: 'bold' },
+      bodyStyles: { fontSize: 11 },
+      columnStyles: {
+        0: { cellWidth: 120, fontStyle: 'bold' },
+        1: { cellWidth: 60, halign: 'right', fontStyle: 'bold' }
+      },
+      didParseCell: function(data) {
+        if (data.row.index === resumoData.length - 1) {
+          // Última linha (Resultado do Negócio)
+          data.cell.styles.fillColor = dreData.resultadoNegocio >= 0 ? [34, 197, 94] : [239, 68, 68];
+          data.cell.styles.textColor = 255;
+        } else if (data.row.index === 2) {
+          // Margem de Contribuição
+          data.cell.styles.fillColor = [59, 130, 246];
+          data.cell.styles.textColor = 255;
+        }
+      }
+    });
+    
+    let currentY = (doc as any).lastAutoTable.finalY + 20;
+    
+    // Análise Percentual
+    doc.setFontSize(14);
+    doc.setTextColor(40, 40, 40);
+    doc.text('Análise Percentual', 20, currentY);
+    
+    const percentualData = [
+      ['Margem de Contribuição', `${dreData.receitaBruta > 0 ? ((dreData.margemContribuicao / dreData.receitaBruta) * 100).toFixed(1) : '0.0'}%`],
+      ['Margem Líquida', `${dreData.receitaBruta > 0 ? ((dreData.resultadoNegocio / dreData.receitaBruta) * 100).toFixed(1) : '0.0'}%`],
+      ['Custos Variáveis/Receita', `${dreData.receitaBruta > 0 ? ((dreData.custoVariavel / dreData.receitaBruta) * 100).toFixed(1) : '0.0'}%`],
+      ['Custos Fixos/Receita', `${dreData.receitaBruta > 0 ? ((dreData.custoFixo / dreData.receitaBruta) * 100).toFixed(1) : '0.0'}%`]
+    ];
+    
+    autoTable(doc, {
+      head: [['Indicador', 'Percentual']],
+      body: percentualData,
+      startY: currentY + 10,
+      theme: 'striped',
+      headStyles: { fillColor: [139, 92, 246], textColor: 255 },
+      bodyStyles: { fontSize: 10 },
+      columnStyles: {
+        0: { cellWidth: 120 },
+        1: { cellWidth: 60, halign: 'right', fontStyle: 'bold' }
+      }
+    });
+    
+    // Salvar o PDF
+    const fileName = `DRE_${profile?.empresas?.nome?.replace(/[^a-zA-Z0-9]/g, '_') || 'Empresa'}_${dateFilter.startDate}_${dateFilter.endDate}.pdf`;
+    doc.save(fileName);
+  };
+  
+  const exportToExcel = () => {
+    // Criar workbook
+    const wb = XLSX.utils.book_new();
+    
+    // Dados do resumo DRE
+    const resumoData = [
+      ['DEMONSTRATIVO DO RESULTADO DO EXERCÍCIO (DRE)'],
+      [`Empresa: ${profile?.empresas?.nome || 'Empresa'}`],
+      [`Período: ${dreData.period}`],
+      [`Gerado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}`],
+      [''],
+      ['RESUMO DRE', 'VALOR (R$)'],
+      ['RECEITA BRUTA', dreData.receitaBruta],
+      ['(-) CUSTO VARIÁVEL', -dreData.custoVariavel],
+      ['= MARGEM DE CONTRIBUIÇÃO', dreData.margemContribuicao],
+      ['(-) CUSTO FIXO', -dreData.custoFixo],
+      ['= RESULTADO DO NEGÓCIO', dreData.resultadoNegocio],
+      [''],
+      ['ANÁLISE PERCENTUAL', 'PERCENTUAL'],
+      ['Margem de Contribuição', `${dreData.receitaBruta > 0 ? ((dreData.margemContribuicao / dreData.receitaBruta) * 100).toFixed(1) : '0.0'}%`],
+      ['Margem Líquida', `${dreData.receitaBruta > 0 ? ((dreData.resultadoNegocio / dreData.receitaBruta) * 100).toFixed(1) : '0.0'}%`],
+      ['Custos Variáveis/Receita', `${dreData.receitaBruta > 0 ? ((dreData.custoVariavel / dreData.receitaBruta) * 100).toFixed(1) : '0.0'}%`],
+      ['Custos Fixos/Receita', `${dreData.receitaBruta > 0 ? ((dreData.custoFixo / dreData.receitaBruta) * 100).toFixed(1) : '0.0'}%`]
+    ];
+    
+    // Criar planilha do resumo
+    const wsResumo = XLSX.utils.aoa_to_sheet(resumoData);
+    
+    // Aplicar formatação
+    wsResumo['!cols'] = [
+      { width: 30 },
+      { width: 20 }
+    ];
+    
+    XLSX.utils.book_append_sheet(wb, wsResumo, 'Resumo DRE');
+    
+    // Criar planilha detalhada das receitas
+    if (dreData.detalhes.receitas.length > 0) {
+      const receitasData = [
+        ['DETALHAMENTO DAS RECEITAS'],
+        [''],
+        ['Categoria', 'Descrição', 'Data', 'Valor (R$)']
+      ];
+      
+      dreData.detalhes.receitas.forEach(categoria => {
+        categoria.itens.forEach((item, index) => {
+          receitasData.push([
+            index === 0 ? categoria.categoria : '',
+            item.descricao,
+            formatDate(item.data),
+            item.valor
+          ]);
+        });
+        receitasData.push(['', '', 'TOTAL DA CATEGORIA:', categoria.valor]);
+        receitasData.push(['']);
+      });
+      
+      const wsReceitas = XLSX.utils.aoa_to_sheet(receitasData);
+      wsReceitas['!cols'] = [
+        { width: 25 },
+        { width: 40 },
+        { width: 15 },
+        { width: 15 }
+      ];
+      
+      XLSX.utils.book_append_sheet(wb, wsReceitas, 'Receitas');
+    }
+    
+    // Criar planilha detalhada dos custos variáveis
+    if (dreData.detalhes.custosVariaveis.length > 0) {
+      const custosVariaveisData = [
+        ['DETALHAMENTO DOS CUSTOS VARIÁVEIS'],
+        [''],
+        ['Categoria', 'Descrição', 'Data', 'Valor (R$)']
+      ];
+      
+      dreData.detalhes.custosVariaveis.forEach(categoria => {
+        categoria.itens.forEach((item, index) => {
+          custosVariaveisData.push([
+            index === 0 ? categoria.categoria : '',
+            item.descricao,
+            formatDate(item.data),
+            item.valor
+          ]);
+        });
+        custosVariaveisData.push(['', '', 'TOTAL DA CATEGORIA:', categoria.valor]);
+        custosVariaveisData.push(['']);
+      });
+      
+      const wsCustosVariaveis = XLSX.utils.aoa_to_sheet(custosVariaveisData);
+      wsCustosVariaveis['!cols'] = [
+        { width: 25 },
+        { width: 40 },
+        { width: 15 },
+        { width: 15 }
+      ];
+      
+      XLSX.utils.book_append_sheet(wb, wsCustosVariaveis, 'Custos Variáveis');
+    }
+    
+    // Criar planilha detalhada dos custos fixos
+    if (dreData.detalhes.custosFixos.length > 0) {
+      const custosFixosData = [
+        ['DETALHAMENTO DOS CUSTOS FIXOS'],
+        [''],
+        ['Categoria', 'Descrição', 'Data', 'Valor (R$)']
+      ];
+      
+      dreData.detalhes.custosFixos.forEach(categoria => {
+        categoria.itens.forEach((item, index) => {
+          custosFixosData.push([
+            index === 0 ? categoria.categoria : '',
+            item.descricao,
+            formatDate(item.data),
+            item.valor
+          ]);
+        });
+        custosFixosData.push(['', '', 'TOTAL DA CATEGORIA:', categoria.valor]);
+        custosFixosData.push(['']);
+      });
+      
+      const wsCustosFixos = XLSX.utils.aoa_to_sheet(custosFixosData);
+      wsCustosFixos['!cols'] = [
+        { width: 25 },
+        { width: 40 },
+        { width: 15 },
+        { width: 15 }
+      ];
+      
+      XLSX.utils.book_append_sheet(wb, wsCustosFixos, 'Custos Fixos');
+    }
+    
+    // Salvar o arquivo Excel
+    const fileName = `DRE_${profile?.empresas?.nome?.replace(/[^a-zA-Z0-9]/g, '_') || 'Empresa'}_${dateFilter.startDate}_${dateFilter.endDate}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+  };
+
   const renderExpandableSection = (
     id: string,
     title: string,
@@ -386,8 +606,30 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
             Demonstrativo do Resultado do Exercício (DRE)
           </h3>
         </div>
-        <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 text-center sm:text-right relative z-10 glass rounded-lg sm:rounded-xl px-2 sm:px-3 lg:px-4 py-1 sm:py-2 font-semibold animate-slide-in-from-right">
-          Período: {dreData.period}
+        <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-3 relative z-10">
+          {/* Botões de Exportação */}
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={exportToPDF}
+              className="flex items-center space-x-1 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 text-xs sm:text-sm font-semibold"
+              title="Exportar DRE em PDF"
+            >
+              <FileText size={16} />
+              <span className="hidden sm:inline">PDF</span>
+            </button>
+            <button
+              onClick={exportToExcel}
+              className="flex items-center space-x-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 text-xs sm:text-sm font-semibold"
+              title="Exportar DRE em Excel"
+            >
+              <Download size={16} />
+              <span className="hidden sm:inline">Excel</span>
+            </button>
+          </div>
+          
+          <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 text-center sm:text-right glass rounded-lg sm:rounded-xl px-2 sm:px-3 lg:px-4 py-1 sm:py-2 font-semibold animate-slide-in-from-right">
+            Período: {dreData.period}
+          </div>
         </div>
       </div>
 
