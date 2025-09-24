@@ -1,7 +1,7 @@
 {
-  "name": "Sistema ERP Integrado",
-  "short_name": "ERP System",
-  "description": "Sistema ERP completo com agente IA integrado",
+  "name": "RezendeTECH - Soluções em Tecnologia",
+  "short_name": "RezendeTECH",
+  "description": "Sistema ERP completo com IA integrada para gestão empresarial",
   "start_url": "/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "browser"],

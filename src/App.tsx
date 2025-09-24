@@ -48,6 +48,13 @@ const AppContent: React.FC = () => {
   const isResetPasswordPage = currentComponent === 'reset-password';
   const isAuthPage = currentComponent === 'auth';
 
+  // Update document title based on current route
+  React.useEffect(() => {
+    if (currentRoute?.title) {
+      document.title = currentRoute.title;
+    }
+  }, [currentRoute]);
+
   // Calculate initial date filter for the entire current month
   const getInitialMonthDateRange = () => {
     const today = new Date();

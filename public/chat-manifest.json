@@ -1,7 +1,7 @@
 {
-  "name": "Assistente Financeiro IA",
-  "short_name": "Chat IA",
-  "description": "Chat inteligente para gestão financeira empresarial",
+  "name": "RezendeTECH - Chat IA Financeiro",
+  "short_name": "RezendeTECH Chat",
+  "description": "Assistente inteligente para gestão financeira empresarial",
   "start_url": "/chat.html",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "browser"],

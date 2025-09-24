@@ -13,7 +13,7 @@ export const routes: RouteConfig[] = [
   {
     path: '/',
     component: 'dashboard',
-    title: 'Dashboard',
+    title: 'RezendeTECH - Dashboard',
     subtitle: 'Visão geral do seu negócio',
     requiresAuth: true,
     requiresCompany: true
@@ -21,14 +21,14 @@ export const routes: RouteConfig[] = [
   {
     path: '/auth',
     component: 'auth',
-    title: 'Autenticação',
+    title: 'RezendeTECH - Login',
     subtitle: 'Acesse sua conta',
     requiresAuth: false
   },
   {
     path: '/transacoes',
     component: 'transactions',
-    title: 'Transações',
+    title: 'RezendeTECH - Transações',
     subtitle: 'Controle de receitas e despesas',
     requiresAuth: true,
     requiresCompany: true
@@ -36,7 +36,7 @@ export const routes: RouteConfig[] = [
   {
     path: '/contas-a-pagar',
     component: 'accounts-payable',
-    title: 'Contas a Pagar',
+    title: 'RezendeTECH - Contas a Pagar',
     subtitle: 'Gerencie valores a pagar para fornecedores',
     requiresAuth: true,
     requiresCompany: true
@@ -44,7 +44,7 @@ export const routes: RouteConfig[] = [
   {
     path: '/contas-a-receber',
     component: 'accounts-receivable',
-    title: 'Contas a Receber',
+    title: 'RezendeTECH - Contas a Receber',
     subtitle: 'Gerencie valores a receber de clientes',
     requiresAuth: true,
     requiresCompany: true
@@ -52,7 +52,7 @@ export const routes: RouteConfig[] = [
   {
     path: '/indicadores-financeiros',
     component: 'financial-indicators',
-    title: 'Indicadores Financeiros',
+    title: 'RezendeTECH - Indicadores Financeiros',
     subtitle: 'Acompanhe valores vencidos e indicadores críticos',
     requiresAuth: true,
     requiresCompany: true
@@ -60,7 +60,7 @@ export const routes: RouteConfig[] = [
   {
     path: '/pessoas',
     component: 'people',
-    title: 'Gestão de Pessoas',
+    title: 'RezendeTECH - Gestão de Pessoas',
     subtitle: 'Cadastro unificado de clientes, fornecedores e colaboradores',
     requiresAuth: true,
     requiresCompany: true
@@ -68,7 +68,7 @@ export const routes: RouteConfig[] = [
   {
     path: '/produtos',
     component: 'products',
-    title: 'Produtos e Serviços',
+    title: 'RezendeTECH - Produtos e Serviços',
     subtitle: 'Gerencie seu catálogo',
     requiresAuth: true,
     requiresCompany: true
@@ -76,7 +76,7 @@ export const routes: RouteConfig[] = [
   {
     path: '/categorias',
     component: 'categories',
-    title: 'Categorias',
+    title: 'RezendeTECH - Categorias',
     subtitle: 'Gerencie categorias e classificações para DRE',
     requiresAuth: true,
     requiresCompany: true
@@ -84,7 +84,7 @@ export const routes: RouteConfig[] = [
   {
     path: '/vendas',
     component: 'sales',
-    title: 'Vendas',
+    title: 'RezendeTECH - Vendas',
     subtitle: 'Gerencie pedidos e faturamento',
     requiresAuth: true,
     requiresCompany: true
@@ -92,7 +92,7 @@ export const routes: RouteConfig[] = [
   {
     path: '/compras',
     component: 'purchases',
-    title: 'Compras',
+    title: 'RezendeTECH - Compras',
     subtitle: 'Pedidos de compra',
     requiresAuth: true,
     requiresCompany: true
@@ -100,7 +100,7 @@ export const routes: RouteConfig[] = [
   {
     path: '/lembretes',
     component: 'reminders',
-    title: 'Lembretes',
+    title: 'RezendeTECH - Lembretes',
     subtitle: 'Gerencie seus lembretes e notificações',
     requiresAuth: true,
     requiresCompany: true
@@ -108,7 +108,7 @@ export const routes: RouteConfig[] = [
   {
     path: '/relatorios',
     component: 'reports',
-    title: 'Relatórios',
+    title: 'RezendeTECH - Relatórios',
     subtitle: 'Análises e indicadores',
     requiresAuth: true,
     requiresCompany: true
@@ -116,21 +116,21 @@ export const routes: RouteConfig[] = [
   {
     path: '/configuracoes',
     component: 'settings',
-    title: 'Configurações do Usuário',
+    title: 'RezendeTECH - Configurações do Usuário',
     subtitle: 'Configurações da sua conta',
     requiresAuth: true
   },
   {
     path: '/configuracoes-empresa',
     component: 'company-settings',
-    title: 'Configurações da Empresa',
+    title: 'RezendeTECH - Configurações da Empresa',
     subtitle: 'Dados e informações da empresa',
     requiresAuth: true
   },
   {
     path: '/reset-password',
     component: 'reset-password',
-    title: 'Redefinir Senha',
+    title: 'RezendeTECH - Redefinir Senha',
     subtitle: 'Altere sua senha de acesso',
     requiresAuth: false
   }
