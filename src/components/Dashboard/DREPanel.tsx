@@ -179,7 +179,9 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
       
       if (t.id_categoria) {
         const categoria = categories.find(c => c.id === t.id_categoria);
-        return !categoria?.classificacao_dre || categoria.classificacao_dre === 'despesa_operacional';
+        return !categoria?.classificacao_dre || 
+               categoria.classificacao_dre === 'despesa_operacional' ||
+               categoria.classificacao_dre === 'custo_variavel';
       }
       
       return true; // Se não tem categoria, considera operacional (inclui pendentes)
@@ -408,7 +410,7 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
           dreData.despesaOperacional,
           true,
           dreData.detalhes.despesasOperacionais,
-          'Despesas classificadas como operacionais (pagas)'
+          'Despesas operacionais e custos variáveis (pagas + pendentes)'
         )}
 
         {/* MARGEM DE CONTRIBUIÇÃO */}
@@ -435,7 +437,7 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
           dreData.custoFixo,
           true,
           dreData.detalhes.custosFixos,
-          'Despesas classificadas como custo fixo (pagas)'
+          'Despesas classificadas como custo fixo (pagas + pendentes)'
         )}
 
         {/* RESULTADO DO NEGÓCIO */}
