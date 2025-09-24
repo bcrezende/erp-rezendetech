@@ -174,35 +174,34 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
     const receitaBruta = Array.from(receitasPorCategoria.values()).reduce((sum, cat) => sum + cat.valor, 0);
 
     // DESPESAS OPERACIONAIS = Despesas classificadas como operacionais (pagas + pendentes)
-    const despesasOperacionais = filteredTransactions.filter(t => {
+    // CUSTOS VARIÁVEIS = Despesas classificadas como custo variável (pagas + pendentes)
+    const custosVariaveis = filteredTransactions.filter(t => {
       if (t.tipo !== 'despesa') return false;
       
       if (t.id_categoria) {
         const categoria = categories.find(c => c.id === t.id_categoria);
-        return !categoria?.classificacao_dre || 
-               categoria.classificacao_dre === 'despesa_operacional' ||
-               categoria.classificacao_dre === 'custo_variavel';
+        return !categoria?.classificacao_dre || categoria.classificacao_dre === 'custo_variavel';
       }
       
-      return true; // Se não tem categoria, considera operacional (inclui pendentes)
+      return true; // Se não tem categoria, considera custo variável (inclui pendentes)
     });
 
-    // Agrupar despesas operacionais por categoria
-    const despesasOperacionaisPorCategoria = new Map<string, { categoria: string; valor: number; itens: Array<{ descricao: string; valor: number; data: string }> }>();
+    // Agrupar custos variáveis por categoria
+    const custosVariaveisPorCategoria = new Map<string, { categoria: string; valor: number; itens: Array<{ descricao: string; valor: number; data: string }> }>();
     
-    despesasOperacionais.forEach(t => {
-      const categoryName = getCategoryName(t.id_categoria) || 'Despesas Operacionais Gerais';
+    custosVariaveis.forEach(t => {
+      const categoryName = getCategoryName(t.id_categoria) || 'Custos Variáveis Gerais';
       const key = t.id_categoria || 'gerais';
       
-      if (!despesasOperacionaisPorCategoria.has(key)) {
-        despesasOperacionaisPorCategoria.set(key, {
+      if (!custosVariaveisPorCategoria.has(key)) {
+        custosVariaveisPorCategoria.set(key, {
           categoria: categoryName,
           valor: 0,
           itens: []
         });
       }
       
-      const categoria = despesasOperacionaisPorCategoria.get(key)!;
+      const categoria = custosVariaveisPorCategoria.get(key)!;
       categoria.valor += t.valor;
       categoria.itens.push({
         descricao: `${t.descricao}${getPessoaName(t.id_pessoa) ? ` - ${getPessoaName(t.id_pessoa)}` : ''} (${t.status === 'pendente' ? 'Pendente' : 'Pago'})`,
@@ -211,10 +210,10 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
       });
     });
 
-    const despesaOperacional = Array.from(despesasOperacionaisPorCategoria.values()).reduce((sum, cat) => sum + cat.valor, 0);
+    const custoVariavel = Array.from(custosVariaveisPorCategoria.values()).reduce((sum, cat) => sum + cat.valor, 0);
 
-    // MARGEM DE CONTRIBUIÇÃO
-    const margemContribuicao = receitaBruta - despesaOperacional;
+    // MARGEM DE CONTRIBUIÇÃO = Receita Bruta - Custo Variável
+    const margemContribuicao = receitaBruta - custoVariavel;
 
     // CUSTOS FIXOS = Despesas classificadas como custo fixo (pagas + pendentes)
     const custosFixos = filteredTransactions.filter(t => {
@@ -260,7 +259,7 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
     return {
       period: `${formatDateFromString(dateFilter.startDate)} - ${formatDateFromString(dateFilter.endDate)}`,
       receitaBruta,
-      despesaOperacional,
+      custoVariavel,
       margemContribuicao,
       custoFixo,
       resultadoNegocio,
@@ -271,12 +270,12 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
         filteredVendasCount: filteredVendas.length,
         receitaVendasValue: receitaVendas,
         receitasTransacoesCount: receitasTransacoes.length,
-        despesasOperacionaisCount: despesasOperacionais.length,
+        custosVariaveisCount: custosVariaveis.length,
         custosFixosCount: custosFixos.length
       },
       detalhes: {
         receitas: Array.from(receitasPorCategoria.values()),
-        despesasOperacionais: Array.from(despesasOperacionaisPorCategoria.values()),
+        custosVariaveis: Array.from(custosVariaveisPorCategoria.values()),
         custosFixos: Array.from(custosFixosPorCategoria.values())
       }
     };
@@ -405,12 +404,12 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
 
         {/* DESPESA OPERACIONAL */}
         {renderExpandableSection(
-          'despesa-operacional',
-          'DESPESA OPERACIONAL',
-          dreData.despesaOperacional,
+          'custo-variavel',
+          'CUSTO VARIÁVEL',
+          dreData.custoVariavel,
           true,
-          dreData.detalhes.despesasOperacionais,
-          'Despesas operacionais e custos variáveis (pagas + pendentes)'
+          dreData.detalhes.custosVariaveis,
+          'Custos que variam com o volume de vendas (pagas + pendentes)'
         )}
 
         {/* MARGEM DE CONTRIBUIÇÃO */}
@@ -420,7 +419,7 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-2 sm:space-y-0">
             <div className="relative z-10">
               <span className="font-black text-blue-900 dark:text-blue-100 text-base sm:text-xl tracking-wide drop-shadow-sm">MARGEM DE CONTRIBUIÇÃO</span>
-              <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-200 mt-1 sm:mt-2 font-bold tracking-wide drop-shadow-sm">Receita Bruta - Despesa Operacional</p>
+              <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-200 mt-1 sm:mt-2 font-bold tracking-wide drop-shadow-sm">Receita Bruta - Custo Variável</p>
             </div>
             <span className={`font-black text-xl sm:text-3xl ${
               dreData.margemContribuicao >= 0 ? 'text-blue-900 dark:text-blue-100' : 'text-red-600 dark:text-red-400'
@@ -495,9 +494,9 @@ const DREPanel: React.FC<DREPanelProps> = ({ dateFilter }) => {
             </span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-700 dark:text-gray-200 font-bold drop-shadow-sm">Despesas/Receita:</span>
+            <span className="text-gray-700 dark:text-gray-200 font-bold drop-shadow-sm">Custos Variáveis/Receita:</span>
             <span className="font-black text-orange-600 dark:text-orange-400 text-sm sm:text-base drop-shadow-sm">
-              {dreData.receitaBruta > 0 ? ((dreData.despesaOperacional / dreData.receitaBruta) * 100).toFixed(1) : '0.0'}%
+              {dreData.receitaBruta > 0 ? ((dreData.custoVariavel / dreData.receitaBruta) * 100).toFixed(1) : '0.0'}%
             </span>
           </div>
           <div className="flex items-center justify-between">

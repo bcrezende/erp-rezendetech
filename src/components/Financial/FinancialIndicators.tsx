@@ -383,13 +383,14 @@ const FinancialIndicators: React.FC = () => {
                       <th className="text-left p-4 font-medium text-gray-600">Categoria</th>
                       <th className="text-left p-4 font-medium text-gray-600">Vencimento</th>
                       <th className="text-left p-4 font-medium text-gray-600">Dias em Atraso</th>
+                      <th className="text-left p-4 font-medium text-gray-600">Classificação</th>
                       <th className="text-right p-4 font-medium text-gray-600">Valor</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredPayables.length === 0 ? (
                       <tr>
-                        <td colSpan={6} className="text-center py-8 text-gray-500">
+                        <td colSpan={7} className="text-center py-8 text-gray-500">
                           Nenhuma conta a pagar vencida encontrada com os filtros aplicados
                         </td>
                       </tr>
@@ -418,6 +419,17 @@ const FinancialIndicators: React.FC = () => {
                             <td className="p-4">
                               <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">
                                 {item.daysOverdue} dias
+                              </span>
+                            </td>
+                            <td className="p-4">
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                item.transaction.id_categoria && categories.find(c => c.id === item.transaction.id_categoria)?.classificacao_dre === 'custo_fixo' 
+                                  ? 'bg-red-100 text-red-700' 
+                                  : 'bg-orange-100 text-orange-700'
+                              }`}>
+                                {item.transaction.id_categoria && categories.find(c => c.id === item.transaction.id_categoria)?.classificacao_dre === 'custo_fixo' 
+                                  ? 'Fixo' 
+                                  : 'Variável'}
                               </span>
                             </td>
                             <td className="p-4 text-right font-semibold text-red-600">

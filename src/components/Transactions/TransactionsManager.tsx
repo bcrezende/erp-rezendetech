@@ -707,7 +707,7 @@ const TransactionsManager: React.FC = () => {
                         <option key={category.id} value={category.id}>
                           {category.nome}
                           {category.tipo === 'despesa' && category.classificacao_dre && 
-                            ` (${category.classificacao_dre.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())})`
+                            ` (${category.classificacao_dre === 'custo_fixo' ? 'Custo Fixo' : 'Custo Variável'})`
                           }
                         </option>
                       ))}

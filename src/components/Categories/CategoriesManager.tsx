@@ -149,14 +149,14 @@ const CategoriesManager: React.FC = () => {
       { nome: 'Outras Receitas', tipo: 'receita', cor: '#8B5CF6' },
       
       // Categorias de Despesa
-      { nome: 'Material de Escritório', tipo: 'despesa', cor: '#F59E0B', classificacao_dre: 'despesa_operacional' },
+      { nome: 'Material de Escritório', tipo: 'despesa', cor: '#F59E0B', classificacao_dre: 'custo_variavel' },
       { nome: 'Energia Elétrica', tipo: 'despesa', cor: '#EF4444', classificacao_dre: 'custo_fixo' },
       { nome: 'Telefone/Internet', tipo: 'despesa', cor: '#06B6D4', classificacao_dre: 'custo_fixo' },
       { nome: 'Aluguel', tipo: 'despesa', cor: '#84CC16', classificacao_dre: 'custo_fixo' },
       { nome: 'Fornecedores', tipo: 'despesa', cor: '#F97316', classificacao_dre: 'custo_variavel' },
-      { nome: 'Marketing', tipo: 'despesa', cor: '#EC4899', classificacao_dre: 'despesa_operacional' },
-      { nome: 'Combustível', tipo: 'despesa', cor: '#6366F1', classificacao_dre: 'despesa_operacional' },
-      { nome: 'Alimentação', tipo: 'despesa', cor: '#14B8A6', classificacao_dre: 'despesa_operacional' }
+      { nome: 'Marketing', tipo: 'despesa', cor: '#EC4899', classificacao_dre: 'custo_variavel' },
+      { nome: 'Combustível', tipo: 'despesa', cor: '#6366F1', classificacao_dre: 'custo_variavel' },
+      { nome: 'Alimentação', tipo: 'despesa', cor: '#14B8A6', classificacao_dre: 'custo_variavel' }
     ];
 
     try {
@@ -183,8 +183,7 @@ const CategoriesManager: React.FC = () => {
   const getClassificationLabel = (classification: string | null) => {
     const labels = {
       custo_fixo: 'Custo Fixo',
-      custo_variavel: 'Custo Variável',
-      despesa_operacional: 'Despesa Operacional'
+      custo_variavel: 'Custo Variável'
     };
     return classification ? labels[classification as keyof typeof labels] : '-';
   };
@@ -192,8 +191,7 @@ const CategoriesManager: React.FC = () => {
   const getClassificationColor = (classification: string | null) => {
     const colors = {
       custo_fixo: 'bg-red-100 text-red-700',
-      custo_variavel: 'bg-orange-100 text-orange-700',
-      despesa_operacional: 'bg-blue-100 text-blue-700'
+      custo_variavel: 'bg-orange-100 text-orange-700'
     };
     return classification ? colors[classification as keyof typeof colors] : 'bg-gray-100 text-gray-700';
   };
@@ -466,9 +464,8 @@ const CategoriesManager: React.FC = () => {
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="">Selecione uma classificação</option>
-                      <option value="despesa_operacional">Despesa Operacional</option>
-                      <option value="custo_fixo">Custo Fixo</option>
                       <option value="custo_variavel">Custo Variável</option>
+                      <option value="custo_fixo">Custo Fixo</option>
                     </select>
                     <p className="text-xs text-gray-500 mt-1">
                       Esta classificação será usada no cálculo do DRE
@@ -537,9 +534,8 @@ const CategoriesManager: React.FC = () => {
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <h4 className="font-semibold text-blue-900 mb-2">💡 Classificações DRE</h4>
                   <div className="text-sm text-blue-800 space-y-1">
-                    <p><strong>Despesa Operacional:</strong> Gastos diretos da operação (ex: material, energia, telefone)</p>
-                    <p><strong>Custo Fixo:</strong> Gastos que não variam com vendas (ex: aluguel, salários, seguros)</p>
                     <p><strong>Custo Variável:</strong> Gastos que variam com vendas (ex: comissões, fretes, matéria-prima)</p>
+                    <p><strong>Custo Fixo:</strong> Gastos que não variam com vendas (ex: aluguel, salários, seguros)</p>
                   </div>
                 </div>
               )}
