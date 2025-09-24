@@ -1,7 +1,10 @@
 import React, { useMemo, useState } from 'react';
 import { useAuth } from '../Auth/AuthProvider';
-import { ChevronDown, ChevronRight, BarChart3 } from 'lucide-react';
+import { ChevronDown, ChevronRight, BarChart3, FileText, Download } from 'lucide-react';
 import { Database } from '../../types/supabase';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
 
 type Transaction = Database['public']['Tables']['transacoes']['Row'];
 type Category = Database['public']['Tables']['categorias']['Row'];
