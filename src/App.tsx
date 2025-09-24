@@ -204,13 +204,51 @@ const AppContent: React.FC = () => {
         return <PeopleManager />;
       
       case 'products':
-        return <ProductsManager />;
+        return (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div className="text-center py-12">
+              <div className="mb-4">
+                <Package size={48} className="mx-auto text-gray-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                Módulo de Produtos em Desenvolvimento
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Esta funcionalidade será implementada em breve.
+              </p>
+              <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <p className="text-sm text-blue-800 dark:text-blue-200">
+                  💡 Em breve você poderá gerenciar seu catálogo completo de produtos e serviços com controle de estoque.
+                </p>
+              </div>
+            </div>
+          </div>
+        );
       
       case 'categories':
         return <CategoriesManager />;
       
       case 'sales':
-        return <SalesManager />;
+        return (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div className="text-center py-12">
+              <div className="mb-4">
+                <ShoppingCart size={48} className="mx-auto text-gray-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                Módulo de Vendas em Desenvolvimento
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Esta funcionalidade será implementada em breve.
+              </p>
+              <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <p className="text-sm text-blue-800 dark:text-blue-200">
+                  💡 Em breve você poderá gerenciar pedidos de venda, faturamento e controle completo do processo comercial.
+                </p>
+              </div>
+            </div>
+          </div>
+        );
       
       case 'purchases':
         return (
