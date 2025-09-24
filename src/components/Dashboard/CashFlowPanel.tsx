@@ -203,9 +203,9 @@ const CashFlowPanel: React.FC = () => {
       {/* Detalhamento por Data */}
       <div className={`relative z-10 ${
         isMobile ? 'max-h-[500px]' : 'max-h-[700px]'
-      } overflow-hidden`}>
+      } overflow-y-auto custom-scrollbar mobile-scroll`}>
         {/* Tabela Real com Alinhamento Perfeito */}
-        <div className="overflow-y-auto custom-scrollbar mobile-scroll max-h-full">
+        <div>
           <table className="w-full">
             {/* Header da Tabela */}
             <thead className="sticky top-0 z-30 bg-gradient-to-r from-white/95 to-slate-50/95 backdrop-blur-lg shadow-lg">
