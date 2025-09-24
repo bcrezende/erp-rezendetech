@@ -45,19 +45,20 @@ interface MenuItem {
   id: string;
   label: string;
   icon: React.ComponentType<any>;
+  path?: string;
   children?: MenuItem[];
 }
 
 const menuItems: MenuItem[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: Home },
+  { id: 'dashboard', label: 'Dashboard', icon: Home, path: '/' },
   {
     id: 'financeiro',
     label: 'Financeiro',
     icon: DollarSign,
     children: [
-      { id: 'accounts-payable', label: 'Contas a Pagar', icon: CreditCard },
-      { id: 'accounts-receivable', label: 'Contas a Receber', icon: Banknote },
-      { id: 'financial-indicators', label: 'Indicadores', icon: AlertTriangle },
+      { id: 'accounts-payable', label: 'Contas a Pagar', icon: CreditCard, path: '/contas-a-pagar' },
+      { id: 'accounts-receivable', label: 'Contas a Receber', icon: Banknote, path: '/contas-a-receber' },
+      { id: 'financial-indicators', label: 'Indicadores', icon: AlertTriangle, path: '/indicadores-financeiros' },
     ]
   },
   {
@@ -65,22 +66,22 @@ const menuItems: MenuItem[] = [
     label: 'Cadastros',
     icon: Users,
     children: [
-      { id: 'people', label: 'Pessoas', icon: Users },
-      { id: 'products', label: 'Produtos', icon: Package },
-      { id: 'categories', label: 'Categorias', icon: Tag },
+      { id: 'people', label: 'Pessoas', icon: Users, path: '/pessoas' },
+      { id: 'products', label: 'Produtos', icon: Package, path: '/produtos' },
+      { id: 'categories', label: 'Categorias', icon: Tag, path: '/categorias' },
     ]
   },
-  { id: 'sales', label: 'Vendas', icon: ShoppingCart },
-  { id: 'purchases', label: 'Compras', icon: TruckIcon },
-  { id: 'reminders', label: 'Lembretes', icon: Bell },
-  { id: 'reports', label: 'Relatórios', icon: BarChart3 },
+  { id: 'sales', label: 'Vendas', icon: ShoppingCart, path: '/vendas' },
+  { id: 'purchases', label: 'Compras', icon: TruckIcon, path: '/compras' },
+  { id: 'reminders', label: 'Lembretes', icon: Bell, path: '/lembretes' },
+  { id: 'reports', label: 'Relatórios', icon: BarChart3, path: '/relatorios' },
   {
     id: 'configuracoes',
     label: 'Configurações',
     icon: Settings,
     children: [
-      { id: 'settings', label: 'Usuário', icon: User },
-      { id: 'company-settings', label: 'Empresa', icon: Building },
+      { id: 'settings', label: 'Usuário', icon: User, path: '/configuracoes' },
+      { id: 'company-settings', label: 'Empresa', icon: Building, path: '/configuracoes-empresa' },
     ]
   }
 ];

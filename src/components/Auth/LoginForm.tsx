@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from './AuthProvider';
+import { useRouter } from '../../hooks/useRouter';
 import { LogIn, Mail, Lock, AlertCircle, CheckCircle, ArrowLeft } from 'lucide-react';
 
 interface LoginFormProps {}
@@ -7,6 +8,7 @@ interface LoginFormProps {}
 const LoginForm: React.FC<LoginFormProps> = () => {
   const { signIn } = useAuth();
   const { supabase } = useAuth();
+  const { navigate } = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -36,8 +38,8 @@ const LoginForm: React.FC<LoginFormProps> = () => {
           setError('Erro ao fazer login: ' + error.message);
         }
       } else {
-        // Força o recarregamento da página para garantir que o AuthProvider detecte o usuário
-        window.location.reload();
+        // Navigate to dashboard after successful login
+        navigate('/');
       }
     } catch (err) {
       setError('Erro inesperado. Tente novamente.');
@@ -83,6 +85,10 @@ const LoginForm: React.FC<LoginFormProps> = () => {
     setForgotPasswordError('');
     setForgotPasswordSuccess(false);
     setForgotPasswordLoading(false);
+  };
+
+  const goToLogin = () => {
+    navigate('/auth');
   };
 
   // Se está mostrando o formulário de esqueci senha

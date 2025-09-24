@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './components/Auth/AuthProvider';
 import { AppProvider, useAppContext } from './contexts/AppContext';
 import { useDeviceDetection } from './hooks/useDeviceDetection';
+import { useRouter } from './hooks/useRouter';
 import LoginForm from './components/Auth/LoginForm';
 import ResetPasswordForm from './components/Auth/ResetPasswordForm';
 import PeopleManager from './components/People/PeopleManager';
@@ -36,14 +37,16 @@ import {
 } from 'lucide-react';
 
 const AppContent: React.FC = () => {
-  const [currentPage, setCurrentPage] = useState('dashboard');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const { user, profile, loading, signOut, supabase } = useAuth();
   const { state } = useAppContext();
   const { isMobile, isTablet, isDesktop, isPWA, hasTouch, orientation } = useDeviceDetection();
+  const { currentComponent, navigate, navigateByComponent, getCurrentRoute } = useRouter();
 
-  // Check if current URL is reset-password
-  const isResetPasswordPage = window.location.pathname === '/reset-password';
+  // Get current route info
+  const currentRoute = getCurrentRoute();
+  const isResetPasswordPage = currentComponent === 'reset-password';
+  const isAuthPage = currentComponent === 'auth';
 
   // Calculate initial date filter for the entire current month
   const getInitialMonthDateRange = () => {
@@ -60,11 +63,16 @@ const AppContent: React.FC = () => {
 
   const handleSignOut = async () => {
     await signOut();
+    navigate('/auth');
   };
 
-  // If on reset password page, show reset form regardless of auth state
+  // If on reset password page or auth page, show appropriate form regardless of auth state
   if (isResetPasswordPage) {
     return <ResetPasswordForm />;
+  }
+
+  if (isAuthPage) {
+    return <LoginForm />;
   }
 
   // Loading state
@@ -82,30 +90,27 @@ const AppContent: React.FC = () => {
 
   // Not authenticated - show login or signup
   if (!user) {
+    // Redirect to auth page if not already there
+    if (currentComponent !== 'auth') {
+      navigate('/auth');
+      return null;
+    }
     return <LoginForm />;
   }
 
-  // User authenticated with profile - show main app
-  const getPageTitle = (page: string) => {
-    const titles: Record<string, { title: string; subtitle: string }> = {
-      dashboard: { title: 'Dashboard', subtitle: 'Visão geral do seu negócio' },
-      transactions: { title: 'Transações', subtitle: 'Controle de receitas e despesas' },
-      clients: { title: 'Clientes', subtitle: 'Gestão de relacionamento com clientes' },
-      suppliers: { title: 'Fornecedores', subtitle: 'Cadastro de fornecedores' },
-      products: { title: 'Produtos', subtitle: 'Catálogo de produtos e serviços' },
-      sales: { title: 'Vendas', subtitle: 'Pedidos e faturamento' },
-      purchases: { title: 'Compras', subtitle: 'Pedidos de compra' },
-      reminders: { title: 'Lembretes', subtitle: 'Gerencie seus lembretes e notificações' },
-      reports: { title: 'Relatórios', subtitle: 'Análises e indicadores' },
-      'whatsapp-agent': { title: 'Agente WhatsApp', subtitle: 'Integração com inteligência artificial' },
-      settings: { title: 'Configurações do Usuário', subtitle: 'Configurações da sua conta' },
-      'company-settings': { title: 'Configurações da Empresa', subtitle: 'Dados e informações da empresa' }
-    };
-    return titles[page] || { title: 'Sistema ERP', subtitle: 'Gestão empresarial completa' };
-  };
+  // Check if user needs company setup (except for settings pages)
+  const needsCompanySetup = !profile?.id_empresa && 
+    currentRoute?.requiresCompany && 
+    currentComponent !== 'company-settings';
 
+  if (needsCompanySetup) {
+    navigate('/configuracoes-empresa');
+    return null;
+  }
+
+  // User authenticated with profile - show main app
   const renderPageContent = () => {
-    switch (currentPage) {
+    switch (currentComponent) {
       case 'dashboard':
         return (
           <div className="space-y-6 lg:space-y-8">
@@ -203,6 +208,9 @@ const AppContent: React.FC = () => {
         return <CategoriesManager />;
       
       case 'sales':
+        return <SalesManager />;
+      
+      case 'purchases':
         return (
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
             <div className="text-center py-12">
@@ -210,14 +218,36 @@ const AppContent: React.FC = () => {
                 <ShoppingCart size={48} className="mx-auto text-gray-400" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                Módulo de Vendas em Desenvolvimento
+                Módulo de Compras em Desenvolvimento
               </h3>
               <p className="text-gray-600 dark:text-gray-300">
                 Esta funcionalidade será implementada em breve.
               </p>
               <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                 <p className="text-sm text-blue-800 dark:text-blue-200">
-                  💡 Em breve você poderá gerenciar pedidos, faturamento e controle de vendas completo.
+                  💡 Em breve você poderá gerenciar pedidos de compra e controle de fornecedores.
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      
+      case 'reports':
+        return (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div className="text-center py-12">
+              <div className="mb-4">
+                <BarChart3 size={48} className="mx-auto text-gray-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                Módulo de Relatórios em Desenvolvimento
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Esta funcionalidade será implementada em breve.
+              </p>
+              <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <p className="text-sm text-blue-800 dark:text-blue-200">
+                  💡 Em breve você terá acesso a relatórios avançados e análises detalhadas.
                 </p>
               </div>
             </div>
@@ -252,7 +282,7 @@ const AppContent: React.FC = () => {
     }
   };
 
-  const { title, subtitle } = getPageTitle(currentPage);
+  const { title, subtitle } = currentRoute || { title: 'Sistema ERP', subtitle: 'Gestão empresarial completa' };
 
   // Adicionar classes CSS baseadas no dispositivo
   const deviceClasses = [
@@ -271,8 +301,8 @@ const AppContent: React.FC = () => {
         : 'bg-gradient-dashboard animate-gradient-shift'
     } safe-top safe-bottom ${deviceClasses} ${isMobileSidebarOpen ? 'overflow-hidden' : ''}`}>
       <Sidebar 
-        currentPage={currentPage} 
-        onNavigate={setCurrentPage} 
+        currentPage={currentComponent} 
+        onNavigate={navigateByComponent} 
         profile={profile || {}} 
         mobileOpen={isMobileSidebarOpen}
         onClose={() => setIsMobileSidebarOpen(false)}

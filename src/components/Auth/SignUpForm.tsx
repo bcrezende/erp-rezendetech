@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from './AuthProvider';
+import { useRouter } from '../../hooks/useRouter';
 import { supabase } from '../../lib/supabase';
 import { UserPlus, Mail, Lock, User, Building, Phone, AlertCircle, CheckCircle, ArrowLeft } from 'lucide-react';
 
@@ -9,6 +10,7 @@ interface SignUpFormProps {
 
 const SignUpForm: React.FC<SignUpFormProps> = ({ onBackToLogin }) => {
   const { signUp } = useAuth();
+  const { navigate } = useRouter();
   const [formData, setFormData] = useState({
     nomeCompleto: '',
     email: '',

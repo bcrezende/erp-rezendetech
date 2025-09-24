@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from './AuthProvider';
+import { useRouter } from '../../hooks/useRouter';
 import { Lock, AlertCircle, CheckCircle, ArrowLeft, Key } from 'lucide-react';
 
 const ResetPasswordForm: React.FC = () => {
   const { supabase } = useAuth();
+  const { navigate } = useRouter();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -106,7 +108,7 @@ const ResetPasswordForm: React.FC = () => {
         await supabase.auth.signOut();
         // Redirecionar para login após 3 segundos
         setTimeout(() => {
-          window.location.href = '/';
+          navigate('/auth');
         }, 3000);
       }, 2000);
 
@@ -119,7 +121,7 @@ const ResetPasswordForm: React.FC = () => {
   };
 
   const goToLogin = () => {
-    window.location.href = '/';
+    navigate('/auth');
   };
 
   // Loading state while validating session
