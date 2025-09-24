@@ -38,8 +38,10 @@ const LoginForm: React.FC<LoginFormProps> = () => {
           setError('Erro ao fazer login: ' + error.message);
         }
       } else {
-        // Navigate to dashboard after successful login
-        navigate('/');
+        // Aguardar um pouco para o estado de autenticação ser atualizado
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 100);
       }
     } catch (err) {
       setError('Erro inesperado. Tente novamente.');

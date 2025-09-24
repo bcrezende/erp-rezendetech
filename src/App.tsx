@@ -90,11 +90,6 @@ const AppContent: React.FC = () => {
 
   // Not authenticated - show login or signup
   if (!user) {
-    // Redirect to auth page if not already there
-    if (currentComponent !== 'auth') {
-      navigate('/auth');
-      return null;
-    }
     return <LoginForm />;
   }
 
