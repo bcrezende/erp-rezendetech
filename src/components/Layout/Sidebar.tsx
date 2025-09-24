@@ -126,7 +126,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mob
           }}
           className={`w-full flex items-center justify-between px-3 sm:px-4 py-3 sm:py-3 text-left rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl touch-target no-select ${
             isActive 
-              ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-xl animate-glow' 
+              ? 'bg-gray-700 text-white shadow-lg' 
               : 'text-gray-700 dark:text-gray-200 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-gray-900 dark:hover:text-white backdrop-blur-sm'
           } ${level > 0 ? 'ml-2 sm:ml-4 pl-6 sm:pl-8' : ''}`}
         >

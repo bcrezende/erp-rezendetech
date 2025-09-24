@@ -322,20 +322,20 @@ const AppContent: React.FC = () => {
           {/* Header gradient overlay */}
           <div className={`absolute inset-0 ${
             state.theme === 'dark'
-              ? 'bg-gradient-to-r from-blue-600/5 via-purple-600/5 to-pink-600/5'
-              : 'bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 animate-gradient-shift'
+              ? 'bg-gradient-to-r from-gray-700/3 via-gray-600/3 to-gray-700/3'
+              : 'bg-gradient-to-r from-gray-200/5 via-gray-300/5 to-gray-200/5'
           }`} />
           
           {/* Floating particles effect */}
           <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
             <div className={`absolute top-4 left-10 w-2 h-2 rounded-full animate-float ${
-              state.theme === 'dark' ? 'bg-blue-400/20' : 'bg-blue-400/30'
+              state.theme === 'dark' ? 'bg-gray-500/15' : 'bg-gray-400/20'
             }`} style={{ animationDelay: '0s' }}></div>
             <div className={`absolute top-8 right-20 w-1 h-1 rounded-full animate-float ${
-              state.theme === 'dark' ? 'bg-purple-400/25' : 'bg-purple-400/40'
+              state.theme === 'dark' ? 'bg-gray-500/15' : 'bg-gray-400/20'
             }`} style={{ animationDelay: '2s' }}></div>
             <div className={`absolute bottom-6 left-1/3 w-1.5 h-1.5 rounded-full animate-float ${
-              state.theme === 'dark' ? 'bg-pink-400/20' : 'bg-pink-400/30'
+              state.theme === 'dark' ? 'bg-gray-500/15' : 'bg-gray-400/20'
             }`} style={{ animationDelay: '4s' }}></div>
           </div>
           
@@ -355,7 +355,7 @@ const AppContent: React.FC = () => {
               
               <div className="relative z-10">
                 <h2 className={`font-bold bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 bg-clip-text text-transparent tracking-tight animate-slide-in-from-left ${
-                  state.theme === 'dark' ? 'from-white via-blue-200 to-purple-200' : 'from-gray-900 via-blue-900 to-purple-900'
+                  state.theme === 'dark' ? 'from-white to-gray-200' : 'from-gray-900 to-gray-700'
                 } ${
                   isMobile ? 'text-lg' : 'text-3xl'
                 }`}>
@@ -391,7 +391,7 @@ const AppContent: React.FC = () => {
               
               {/* Mobile User Avatar */}
               {isMobile && (
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 rounded-full flex items-center justify-center shadow-xl hover-glow animate-scale-in touch-target">
+                <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center shadow-lg animate-scale-in touch-target">
                   <span className="text-white text-sm font-bold">
                     {profile?.nome_completo?.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'U'}
                   </span>
@@ -400,7 +400,7 @@ const AppContent: React.FC = () => {
               
               <button
                 onClick={handleSignOut}
-                className={`p-3 hover:text-red-600 rounded-xl transition-smooth backdrop-blur-sm hover-glow animate-slide-in-from-right stagger-1 touch-target ${
+                className={`p-3 hover:text-gray-700 rounded-xl transition-smooth backdrop-blur-sm animate-slide-in-from-right stagger-1 touch-target ${
                   state.theme === 'dark' 
                     ? 'text-gray-300 hover:bg-gray-700/60' 
                     : 'text-gray-600 hover:bg-white/60'
