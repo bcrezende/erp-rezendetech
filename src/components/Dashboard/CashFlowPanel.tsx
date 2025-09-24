@@ -236,7 +236,7 @@ const CashFlowPanel: React.FC = () => {
                   </td>
                 </tr>
               ) : (
-                cashFlowData.slice(isMobile ? -7 : -14).map((day) => (
+                cashFlowData.map((day) => (
                   <React.Fragment key={day.date}>
                     <tr>
                       <td colSpan={4} className="p-0">
