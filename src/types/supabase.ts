@@ -502,6 +502,7 @@ export interface Database {
           descricao: string | null;
           data_lembrete: string;
           hora_lembrete: string | null;
+          hora_lembrete: string | null;
           status: string;
           ativo: boolean;
           criado_em: string;
@@ -514,6 +515,7 @@ export interface Database {
           titulo: string;
           descricao?: string | null;
           data_lembrete: string;
+          hora_lembrete?: string | null;
           hora_lembrete?: string | null;
           status?: string;
           ativo?: boolean;
@@ -528,10 +530,49 @@ export interface Database {
           descricao?: string | null;
           data_lembrete?: string;
           hora_lembrete?: string | null;
+          hora_lembrete?: string | null;
           status?: string;
           ativo?: boolean;
           criado_em?: string;
           atualizado_em?: string;
+        };
+      };
+      notificacoes: {
+        Row: {
+          id: string;
+          id_sequencial: number;
+          id_empresa: string;
+          id_usuario: string;
+          mensagem: string;
+          tipo: string;
+          id_lembrete: string | null;
+          lida: boolean;
+          data_envio: string;
+          criado_em: string;
+        };
+        Insert: {
+          id?: string;
+          id_sequencial?: number;
+          id_empresa: string;
+          id_usuario: string;
+          mensagem: string;
+          tipo?: string;
+          id_lembrete?: string | null;
+          lida?: boolean;
+          data_envio?: string;
+          criado_em?: string;
+        };
+        Update: {
+          id?: string;
+          id_sequencial?: number;
+          id_empresa?: string;
+          id_usuario?: string;
+          mensagem?: string;
+          tipo?: string;
+          id_lembrete?: string | null;
+          lida?: boolean;
+          data_envio?: string;
+          criado_em?: string;
         };
       };
     };

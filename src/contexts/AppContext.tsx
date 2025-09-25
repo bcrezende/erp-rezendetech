@@ -228,6 +228,17 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, purchaseOrders: [...state.purchaseOrders, action.payload] };
     case 'ADD_WHATSAPP_MESSAGE':
       return { ...state, whatsappMessages: [...state.whatsappMessages, action.payload] };
+    case 'ADD_NOTIFICATION':
+      return { ...state, notifications: [action.payload, ...state.notifications] };
+    case 'MARK_NOTIFICATION_AS_READ':
+      return { 
+        ...state, 
+        notifications: state.notifications.map(n => 
+          n.id === action.payload ? { ...n, lida: true } : n
+        ) 
+      };
+    case 'SET_NOTIFICATIONS':
+      return { ...state, notifications: action.payload };
     case 'SET_THEME':
       return { ...state, theme: action.payload };
     case 'SET_LOADING':
@@ -253,10 +264,12 @@ const AppContext = createContext<{
   state: AppState;
   dispatch: React.Dispatch<AppAction>;
   toggleTheme: () => void;
+  markNotificationAsRead: (notificationId: string) => Promise<void>;
 } | null>(null);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(appReducer, initialState);
+  const { supabase, profile, user } = useAuth();
 
   React.useEffect(() => {
     // Load theme from localStorage
@@ -269,6 +282,52 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     dispatch({ type: 'INITIALIZE_DATA' });
   }, []);
 
+  // Setup notifications realtime subscription
+  React.useEffect(() => {
+    if (!user?.id || !profile?.id_empresa) return;
+
+    // Load existing notifications
+    const loadNotifications = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('notificacoes')
+          .select('*')
+          .eq('id_usuario', user.id)
+          .eq('id_empresa', profile.id_empresa)
+          .order('data_envio', { ascending: false })
+          .limit(50);
+
+        if (error) throw error;
+        dispatch({ type: 'SET_NOTIFICATIONS', payload: data || [] });
+      } catch (error) {
+        console.error('Error loading notifications:', error);
+      }
+    };
+
+    loadNotifications();
+
+    // Setup realtime subscription
+    const channel = supabase
+      .channel('notifications')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notificacoes',
+          filter: `id_usuario=eq.${user.id}`
+        },
+        (payload) => {
+          console.log('New notification received:', payload);
+          dispatch({ type: 'ADD_NOTIFICATION', payload: payload.new as Notificacao });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, profile?.id_empresa, supabase]);
   React.useEffect(() => {
     // Apply theme to document
     const root = document.documentElement;
@@ -288,8 +347,23 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       payload: state.theme === 'light' ? 'dark' : 'light' 
     });
   };
+
+  const markNotificationAsRead = async (notificationId: string) => {
+    try {
+      const { error } = await supabase
+        .from('notificacoes')
+        .update({ lida: true })
+        .eq('id', notificationId);
+
+      if (error) throw error;
+      dispatch({ type: 'MARK_NOTIFICATION_AS_READ', payload: notificationId });
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+    }
+  };
+
   return (
-    <AppContext.Provider value={{ state, dispatch, toggleTheme }}>
+    <AppContext.Provider value={{ state, dispatch, toggleTheme, markNotificationAsRead }}>
       {children}
     </AppContext.Provider>
   );

@@ -23,6 +23,8 @@ import RemindersManager from './components/Reminders/RemindersManager';
 import PendingAccountsPanel from './components/Dashboard/PendingAccountsPanel';
 import PendingRemindersPanel from './components/Dashboard/PendingRemindersPanel';
 import CompanySettings from './components/Settings/CompanySettings';
+import NotificationToast from './components/Notifications/NotificationToast';
+import NotificationBell from './components/Notifications/NotificationBell';
 import { 
   DollarSign, 
   TrendingUp, 
@@ -494,6 +496,9 @@ const AppContent: React.FC = () => {
                 </div>
               )}
               
+              {/* Notification Bell */}
+              <NotificationBell />
+              
               {/* Mobile User Avatar */}
               {isMobile && (
                 <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center shadow-lg animate-scale-in touch-target">
@@ -527,6 +532,9 @@ const AppContent: React.FC = () => {
           </div>
         </main>
       </div>
+      
+      {/* Global Notification Toasts */}
+      <NotificationToast />
     </div>
   );
 };

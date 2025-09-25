@@ -25,6 +25,7 @@ const RemindersManager: React.FC = () => {
     data_lembrete: new Date().toISOString().split('T')[0],
     hora_lembrete: '',
     hora_lembrete: '',
+    hora_lembrete: '',
     status: 'pendente',
   });
 
@@ -144,6 +145,7 @@ const RemindersManager: React.FC = () => {
       titulo: '',
       descricao: '',
       data_lembrete: new Date().toISOString().split('T')[0],
+      hora_lembrete: '',
       hora_lembrete: '',
       status: 'pendente',
     });
