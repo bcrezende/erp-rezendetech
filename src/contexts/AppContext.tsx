@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
+import { useAuth } from '../components/Auth/AuthProvider';
 import { 
   User, 
   Client, 
