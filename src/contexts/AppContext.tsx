@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
 import { useAuth } from '../components/Auth/AuthProvider';
+import { Database } from '../types/supabase';
 import { 
   User, 
   Client, 
@@ -12,6 +13,8 @@ import {
   WhatsAppMessage 
 } from '../types';
 
+type Notificacao = Database['public']['Tables']['notificacoes']['Row'];
+
 interface AppState {
   user: User | null;
   clients: Client[];
@@ -22,6 +25,7 @@ interface AppState {
   saleOrders: SaleOrder[];
   purchaseOrders: PurchaseOrder[];
   whatsappMessages: WhatsAppMessage[];
+  notifications: Notificacao[];
   theme: 'light' | 'dark';
   loading: boolean;
   error: string | null;
@@ -37,6 +41,9 @@ type AppAction =
   | { type: 'ADD_SALE_ORDER'; payload: SaleOrder }
   | { type: 'ADD_PURCHASE_ORDER'; payload: PurchaseOrder }
   | { type: 'ADD_WHATSAPP_MESSAGE'; payload: WhatsAppMessage }
+  | { type: 'ADD_NOTIFICATION'; payload: Notificacao }
+  | { type: 'MARK_NOTIFICATION_AS_READ'; payload: string }
+  | { type: 'SET_NOTIFICATIONS'; payload: Notificacao[] }
   | { type: 'SET_THEME'; payload: 'light' | 'dark' }
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string | null }
@@ -52,6 +59,7 @@ const initialState: AppState = {
   saleOrders: [],
   purchaseOrders: [],
   whatsappMessages: [],
+  notifications: [],
   theme: 'light',
   loading: false,
   error: null
@@ -229,6 +237,17 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, purchaseOrders: [...state.purchaseOrders, action.payload] };
     case 'ADD_WHATSAPP_MESSAGE':
       return { ...state, whatsappMessages: [...state.whatsappMessages, action.payload] };
+    case 'ADD_NOTIFICATION':
+      return { ...state, notifications: [action.payload, ...state.notifications] };
+    case 'MARK_NOTIFICATION_AS_READ':
+      return { 
+        ...state, 
+        notifications: state.notifications.map(n => 
+          n.id === action.payload ? { ...n, lida: true } : n
+        ) 
+      };
+    case 'SET_NOTIFICATIONS':
+      return { ...state, notifications: action.payload };
     case 'ADD_NOTIFICATION':
       return { ...state, notifications: [action.payload, ...state.notifications] };
     case 'MARK_NOTIFICATION_AS_READ':
