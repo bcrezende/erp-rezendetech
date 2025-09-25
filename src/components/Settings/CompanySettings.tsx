@@ -671,48 +671,73 @@ const CompanySettings: React.FC = () => {
                   <p className="text-green-800 font-medium">✅ Você já tem um plano ativo!</p>
                   <p className="text-sm text-green-700 mt-1">Aproveite as funcionalidades disponíveis</p>
                 </div>
-                    <li>• Transações básicas</li>
+              )}
             </div>
-                    <li>• Cadastros simples</li>
+          )}
 
           {(empresa?.plano === 'enterprise' || empresa?.plano === 'empresarial') && (
             <div className="text-center p-6 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-xl">
               <div className="flex items-center justify-center space-x-2 mb-3">
-                  <h5 className="font-semibold text-blue-900 mb-2">Básico - R$ 29,90/mês</h5>
+                <span className="text-3xl">🎉</span>
                 <h4 className="text-xl font-bold text-purple-900">Plano Empresarial Ativo!</h4>
               </div>
-                    <li>• Até 3 usuários</li>
-                    <li>• Gestão de pessoas</li>
-                    <li>• Contas a pagar/receber</li>
+              <p className="text-purple-700 mb-4">Você tem acesso a todas as funcionalidades premium</p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4 text-sm">
                 <div className="bg-white p-3 rounded-lg border border-purple-200">
                   <span className="font-semibold text-purple-900">📊 Dashboard Completo</span>
                 </div>
-                  <h5 className="font-semibold text-blue-900 mb-2">Empresarial - R$ 99,90/mês</h5>
+                <div className="bg-white p-3 rounded-lg border border-purple-200">
                   <span className="font-semibold text-purple-900">📈 DRE Detalhado</span>
-                    <li>• Tudo do Básico</li>
-                    <li>• Dashboard completo</li>
-                    <li>• DRE detalhado</li>
-                    <li>• Relatórios avançados</li>
+                </div>
+                <div className="bg-white p-3 rounded-lg border border-purple-200">
+                  <span className="font-semibold text-purple-900">📋 Relatórios</span>
+                </div>
                 <div className="bg-white p-3 rounded-lg border border-purple-200">
                   <span className="font-semibold text-purple-900">💡 Indicadores</span>
                 </div>
               </div>
             </div>
           )}
+        </div>
 
-          {/* Informações sobre Teste */}
-          <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <div className="flex items-start space-x-3">
-              <span className="text-2xl">🧪</span>
-              <div>
-                <h4 className="font-semibold text-yellow-900 mb-1">Ambiente de Teste</h4>
-                <div className="text-sm text-yellow-800 space-y-1">
-                  <p>• Este é um ambiente de teste para validação do sistema de pagamentos</p>
-                  <p>• Nenhuma cobrança real será efetuada</p>
-                  <p>• Use dados fictícios para testar o fluxo de assinatura</p>
-                  <p>• O sistema irá simular o processo completo de upgrade</p>
-                </div>
+        {/* Informações sobre os Planos Detalhados */}
+        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <h4 className="font-semibold text-blue-900 mb-3">📋 Comparativo de Planos</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div className="bg-white p-4 rounded-lg border border-blue-200">
+              <h5 className="font-semibold text-blue-900 mb-2">Básico - R$ 29,90/mês</h5>
+              <ul className="text-blue-800 space-y-1 text-xs">
+                <li>• Transações básicas</li>
+                <li>• Cadastros simples</li>
+                <li>• Até 3 usuários</li>
+                <li>• Gestão de pessoas</li>
+                <li>• Contas a pagar/receber</li>
+              </ul>
+            </div>
+            <div className="bg-white p-4 rounded-lg border border-blue-200">
+              <h5 className="font-semibold text-blue-900 mb-2">Empresarial - R$ 99,90/mês</h5>
+              <ul className="text-blue-800 space-y-1 text-xs">
+                <li>• Tudo do Básico</li>
+                <li>• Dashboard completo</li>
+                <li>• DRE detalhado</li>
+                <li>• Relatórios avançados</li>
+                <li>• Indicadores financeiros</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* Informações sobre Teste */}
+        <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="flex items-start space-x-3">
+            <span className="text-2xl">🧪</span>
+            <div>
+              <h4 className="font-semibold text-yellow-900 mb-1">Ambiente de Teste</h4>
+              <div className="text-sm text-yellow-800 space-y-1">
+                <p>• Este é um ambiente de teste para validação do sistema de pagamentos</p>
+                <p>• Nenhuma cobrança real será efetuada</p>
+                <p>• Use dados fictícios para testar o fluxo de assinatura</p>
+                <p>• O sistema irá simular o processo completo de upgrade</p>
               </div>
             </div>
           </div>
