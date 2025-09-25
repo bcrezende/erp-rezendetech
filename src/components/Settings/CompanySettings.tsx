@@ -698,46 +698,46 @@ const CompanySettings: React.FC = () => {
               </div>
             </div>
           )}
-        </div>
 
-        {/* Informações sobre os Planos Detalhados */}
-        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h4 className="font-semibold text-blue-900 mb-3">📋 Comparativo de Planos</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-            <div className="bg-white p-4 rounded-lg border border-blue-200">
-              <h5 className="font-semibold text-blue-900 mb-2">Básico - R$ 29,90/mês</h5>
-              <ul className="text-blue-800 space-y-1 text-xs">
-                <li>• Transações básicas</li>
-                <li>• Cadastros simples</li>
-                <li>• Até 3 usuários</li>
-                <li>• Gestão de pessoas</li>
-                <li>• Contas a pagar/receber</li>
-              </ul>
-            </div>
-            <div className="bg-white p-4 rounded-lg border border-blue-200">
-              <h5 className="font-semibold text-blue-900 mb-2">Empresarial - R$ 99,90/mês</h5>
-              <ul className="text-blue-800 space-y-1 text-xs">
-                <li>• Tudo do Básico</li>
-                <li>• Dashboard completo</li>
-                <li>• DRE detalhado</li>
-                <li>• Relatórios avançados</li>
-                <li>• Indicadores financeiros</li>
-              </ul>
+          {/* Informações sobre os Planos Detalhados */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h4 className="font-semibold text-blue-900 mb-3">📋 Comparativo de Planos</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div className="bg-white p-3 rounded-lg border border-blue-200">
+                <h5 className="font-semibold text-blue-900 mb-2">Básico - R$ 29,90/mês</h5>
+                <ul className="text-blue-800 space-y-1 text-xs">
+                  <li>• Transações básicas</li>
+                  <li>• Cadastros simples</li>
+                  <li>• Até 3 usuários</li>
+                  <li>• Gestão de pessoas</li>
+                  <li>• Contas a pagar/receber</li>
+                </ul>
+              </div>
+              <div className="bg-white p-3 rounded-lg border border-blue-200">
+                <h5 className="font-semibold text-blue-900 mb-2">Empresarial - R$ 99,90/mês</h5>
+                <ul className="text-blue-800 space-y-1 text-xs">
+                  <li>• Tudo do Básico</li>
+                  <li>• Dashboard completo</li>
+                  <li>• DRE detalhado</li>
+                  <li>• Relatórios avançados</li>
+                  <li>• Indicadores financeiros</li>
+                </ul>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Informações sobre Teste */}
-        <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <div className="flex items-start space-x-3">
-            <span className="text-2xl">🧪</span>
-            <div>
-              <h4 className="font-semibold text-yellow-900 mb-1">Ambiente de Teste</h4>
-              <div className="text-sm text-yellow-800 space-y-1">
-                <p>• Este é um ambiente de teste para validação do sistema de pagamentos</p>
-                <p>• Nenhuma cobrança real será efetuada</p>
-                <p>• Use dados fictícios para testar o fluxo de assinatura</p>
-                <p>• O sistema irá simular o processo completo de upgrade</p>
+          {/* Informações sobre Teste */}
+          <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <div className="flex items-start space-x-3">
+              <span className="text-2xl">🧪</span>
+              <div>
+                <h4 className="font-semibold text-yellow-900 mb-1">Ambiente de Teste</h4>
+                <div className="text-sm text-yellow-800 space-y-1">
+                  <p>• Este é um ambiente de teste para validação do sistema de pagamentos</p>
+                  <p>• Nenhuma cobrança real será efetuada</p>
+                  <p>• Use dados fictícios para testar o fluxo de assinatura</p>
+                  <p>• O sistema irá simular o processo completo de upgrade</p>
+                </div>
               </div>
             </div>
           </div>
