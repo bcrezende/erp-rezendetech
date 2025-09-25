@@ -146,7 +146,6 @@ const RemindersManager: React.FC = () => {
       descricao: '',
       data_lembrete: new Date().toISOString().split('T')[0],
       hora_lembrete: '',
-      hora_lembrete: '',
       status: 'pendente',
     });
     setEditingLembrete(null);
