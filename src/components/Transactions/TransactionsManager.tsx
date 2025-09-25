@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../Auth/AuthProvider';
-import { Plus, Search, Edit, Trash2, DollarSign, TrendingUp, TrendingDown, Filter, Calendar, Eye, X } from 'lucide-react';
+import { Plus, Search, CreditCard as Edit, Trash2, DollarSign, TrendingUp, TrendingDown, Filter, Calendar, Eye, X } from 'lucide-react';
 import { Database } from '../../types/supabase';
 
 type Transaction = Database['public']['Tables']['transacoes']['Row'];
