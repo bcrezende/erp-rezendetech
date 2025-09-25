@@ -700,19 +700,19 @@ const CompanySettings: React.FC = () => {
               </div>
             </div>
           )}
-        </div>
 
-        {/* Informações sobre Teste */}
-        <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <div className="flex items-start space-x-3">
-            <span className="text-2xl">🧪</span>
-            <div>
-              <h4 className="font-semibold text-yellow-900 mb-1">Ambiente de Teste</h4>
-              <div className="text-sm text-yellow-800 space-y-1">
-                <p>• Este é um ambiente de teste para validação do sistema de pagamentos</p>
-                <p>• Nenhuma cobrança real será efetuada</p>
-                <p>• Use dados fictícios para testar o fluxo de assinatura</p>
-                <p>• O sistema irá simular o processo completo de upgrade</p>
+          {/* Informações sobre Teste */}
+          <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <div className="flex items-start space-x-3">
+              <span className="text-2xl">🧪</span>
+              <div>
+                <h4 className="font-semibold text-yellow-900 mb-1">Ambiente de Teste</h4>
+                <div className="text-sm text-yellow-800 space-y-1">
+                  <p>• Este é um ambiente de teste para validação do sistema de pagamentos</p>
+                  <p>• Nenhuma cobrança real será efetuada</p>
+                  <p>• Use dados fictícios para testar o fluxo de assinatura</p>
+                  <p>• O sistema irá simular o processo completo de upgrade</p>
+                </div>
               </div>
             </div>
           </div>
