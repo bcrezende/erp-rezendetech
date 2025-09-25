@@ -110,6 +110,73 @@ const AppContent: React.FC = () => {
     return null;
   }
 
+  // Check if user needs enterprise plan for dashboard access
+  const needsEnterprisePlan = profile?.empresas?.plano === 'basico' && 
+    currentRoute?.requiresEnterprisePlan;
+
+  if (needsEnterprisePlan) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+        <div className="max-w-md w-full space-y-6">
+          <div className="text-center">
+            <div className="mx-auto h-16 w-16 bg-gradient-to-br from-orange-500 to-yellow-500 rounded-full flex items-center justify-center mb-6">
+              <AlertCircle className="h-8 w-8 text-white" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              Acesso Restrito
+            </h2>
+            <p className="text-gray-600 mb-6">
+              Esta funcionalidade está disponível apenas no <strong>Plano Empresarial</strong>.
+            </p>
+          </div>
+
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h3 className="font-semibold text-blue-900 mb-2">🚀 Plano Empresarial</h3>
+            <ul className="text-sm text-blue-800 space-y-1">
+              <li>• Dashboard completo com DRE</li>
+              <li>• Indicadores financeiros avançados</li>
+              <li>• Relatórios detalhados</li>
+              <li>• Análise de fluxo de caixa</li>
+              <li>• Previsões de negócio</li>
+            </ul>
+          </div>
+
+          <div className="space-y-3">
+            <a
+              href={`https://sandbox.asaas.com/c/uc30wq3aaewqjxzb?empresa_id=${profile?.id_empresa}&usuario_id=${profile?.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full text-center bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
+              <div className="flex items-center justify-center space-x-2 mb-1">
+                <span className="text-xl">🚀</span>
+                <span>Upgrade para Empresarial</span>
+              </div>
+              <div className="text-sm opacity-90">
+                Acesso completo ao dashboard
+              </div>
+            </a>
+
+            <button
+              onClick={() => navigate('/transacoes')}
+              className="w-full px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              Voltar para Transações
+            </button>
+          </div>
+
+          <div className="text-center pt-4 border-t border-gray-200">
+            <p className="text-xs text-gray-500">
+              Seu plano atual: <strong>Básico</strong>
+            </p>
+            <p className="text-xs text-gray-400 mt-1">
+              Você tem acesso às funcionalidades básicas de transações
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
   // User authenticated with profile - show main app
   const renderPageContent = () => {
     switch (currentComponent) {

@@ -7,6 +7,7 @@ export interface RouteConfig {
   subtitle: string;
   requiresAuth?: boolean;
   requiresCompany?: boolean;
+  requiresEnterprisePlan?: boolean;
 }
 
 export const routes: RouteConfig[] = [
@@ -16,7 +17,8 @@ export const routes: RouteConfig[] = [
     title: 'RezendeTECH - Dashboard',
     subtitle: 'Visão geral do seu negócio',
     requiresAuth: true,
-    requiresCompany: true
+    requiresCompany: true,
+    requiresEnterprisePlan: true
   },
   {
     path: '/auth',
@@ -111,7 +113,8 @@ export const routes: RouteConfig[] = [
     title: 'RezendeTECH - Relatórios',
     subtitle: 'Análises e indicadores',
     requiresAuth: true,
-    requiresCompany: true
+    requiresCompany: true,
+    requiresEnterprisePlan: true
   },
   {
     path: '/configuracoes',

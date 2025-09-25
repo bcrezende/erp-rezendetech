@@ -93,6 +93,11 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mob
   
   const { isMobile, isTablet, isDesktop, isPWA, hasTouch } = deviceInfo || {};
 
+  // Verificar se o item do menu deve ser desabilitado para plano básico
+  const isMenuItemDisabled = (itemId: string) => {
+    const enterpriseOnlyItems = ['dashboard', 'reports'];
+    return profile?.empresas?.plano === 'basico' && enterpriseOnlyItems.includes(itemId);
+  };
   const toggleExpanded = (itemId: string) => {
     setExpandedItems(prev => 
       prev.includes(itemId) 
@@ -102,6 +107,11 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mob
   };
 
   const handleNavigate = (page: string) => {
+    // Verificar se o item está desabilitado
+    if (isMenuItemDisabled(page)) {
+      return;
+    }
+    
     onNavigate(page);
     // Close mobile sidebar after navigation
     if (isMobile) {
@@ -113,6 +123,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mob
     const isActive = currentPage === item.id;
     const isExpanded = expandedItems.includes(item.id);
     const hasChildren = item.children && item.children.length > 0;
+    const isDisabled = isMenuItemDisabled(item.id);
 
     return (
       <div key={item.id}>
@@ -125,15 +136,25 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mob
             }
           }}
           className={`w-full flex items-center justify-between px-3 sm:px-4 py-3 sm:py-3 text-left rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl touch-target no-select ${
+            isDisabled 
+              ? 'opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800' :
             isActive 
               ? 'bg-gray-700 text-white shadow-lg' 
               : 'text-gray-700 dark:text-gray-200 hover:bg-white/60 dark:hover:bg-gray-700/60 hover:text-gray-900 dark:hover:text-white backdrop-blur-sm'
           } ${level > 0 ? 'ml-2 sm:ml-4 pl-6 sm:pl-8' : ''}`}
+          disabled={isDisabled}
         >
           <div className="flex items-center space-x-2 sm:space-x-3">
-            <item.icon size={20} className="drop-shadow-sm" />
+            <item.icon size={20} className={`drop-shadow-sm ${isDisabled ? 'text-gray-400' : ''}`} />
             {(!isDesktopCollapsed || isMobile) && (
-              <span className="text-sm sm:text-base font-bold tracking-wide">{item.label}</span>
+              <span className={`text-sm sm:text-base font-bold tracking-wide ${isDisabled ? 'text-gray-400' : ''}`}>
+                {item.label}
+                {isDisabled && (
+                  <span className="ml-2 px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs">
+                    Empresarial
+                  </span>
+                )}
+              </span>
             )}
           </div>
           {hasChildren && (!isDesktopCollapsed || isMobile) && (

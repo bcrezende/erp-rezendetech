@@ -618,82 +618,84 @@ const CompanySettings: React.FC = () => {
           {empresa?.plano === 'basico' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <a
-                href="https://sandbox.asaas.com/c/9p35djzc5y3w18tk"
+                href={`https://sandbox.asaas.com/c/52etrpbztyd8msz9?empresa_id=${empresa?.id}&usuario_id=${profile?.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full text-center bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+              >
+                <div className="flex items-center justify-center space-x-2 mb-2">
+                  <span className="text-2xl">📊</span>
+                  <span className="text-lg">Plano Básico</span>
+                </div>
+                <div className="text-sm opacity-90">
+                  R$ 29,90/mês • Transações básicas
+                </div>
+              </a>
+
+              <a
+                href={`https://sandbox.asaas.com/c/uc30wq3aaewqjxzb?empresa_id=${empresa?.id}&usuario_id=${profile?.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block w-full text-center bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 <div className="flex items-center justify-center space-x-2 mb-2">
-                  <span className="text-2xl">⭐</span>
-                  <span className="text-lg">Upgrade para Premium</span>
-                </div>
-                <div className="text-sm opacity-90">
-                  R$ 49,90/mês • Transações ilimitadas • Chat IA
-                </div>
-              </a>
-
-              <a
-                href="https://sandbox.asaas.com/c/52etrpbztyd8msz9"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full text-center bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
-              >
-                <div className="flex items-center justify-center space-x-2 mb-2">
                   <span className="text-2xl">🚀</span>
-                  <span className="text-lg">Upgrade para Enterprise</span>
+                  <span className="text-lg">Plano Empresarial</span>
                 </div>
                 <div className="text-sm opacity-90">
-                  R$ 99,90/mês • Usuários ilimitados • WhatsApp
+                  R$ 99,90/mês • Dashboard completo • DRE
                 </div>
               </a>
             </div>
           )}
 
-          {empresa?.plano === 'premium' && (
+          {(empresa?.plano === 'premium' || empresa?.plano === 'basico') && empresa?.plano !== 'enterprise' && (
             <div className="grid grid-cols-1 gap-4">
               <a
-                href="https://sandbox.asaas.com/c/52etrpbztyd8msz9"
+                href={`https://sandbox.asaas.com/c/uc30wq3aaewqjxzb?empresa_id=${empresa?.id}&usuario_id=${profile?.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block w-full text-center bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                className="block w-full text-center bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 <div className="flex items-center justify-center space-x-2 mb-2">
                   <span className="text-2xl">🚀</span>
-                  <span className="text-lg">Upgrade para Enterprise</span>
+                  <span className="text-lg">Upgrade para Empresarial</span>
                 </div>
                 <div className="text-sm opacity-90">
-                  R$ 99,90/mês • Usuários ilimitados • API • WhatsApp
+                  R$ 99,90/mês • Dashboard completo • DRE • Relatórios
                 </div>
               </a>
 
-              <div className="text-center p-4 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-green-800 font-medium">✅ Você já tem o plano Premium ativo!</p>
-                <p className="text-sm text-green-700 mt-1">Aproveite todas as funcionalidades disponíveis</p>
-              </div>
+              {empresa?.plano !== 'basico' && (
+                <div className="text-center p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-green-800 font-medium">✅ Você já tem um plano ativo!</p>
+                  <p className="text-sm text-green-700 mt-1">Aproveite as funcionalidades disponíveis</p>
+                </div>
+                    <li>• Transações básicas</li>
             </div>
-          )}
+                    <li>• Cadastros simples</li>
 
-          {empresa?.plano === 'enterprise' && (
+          {(empresa?.plano === 'enterprise' || empresa?.plano === 'empresarial') && (
             <div className="text-center p-6 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-xl">
               <div className="flex items-center justify-center space-x-2 mb-3">
-                <span className="text-3xl">🎉</span>
-                <h4 className="text-xl font-bold text-purple-900">Plano Enterprise Ativo!</h4>
+                  <h5 className="font-semibold text-blue-900 mb-2">Básico - R$ 29,90/mês</h5>
+                <h4 className="text-xl font-bold text-purple-900">Plano Empresarial Ativo!</h4>
               </div>
-              <p className="text-purple-700 font-medium mb-2">
-                Você tem acesso a todas as funcionalidades premium do sistema
-              </p>
+                    <li>• Até 3 usuários</li>
+                    <li>• Gestão de pessoas</li>
+                    <li>• Contas a pagar/receber</li>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4 text-sm">
                 <div className="bg-white p-3 rounded-lg border border-purple-200">
-                  <span className="font-semibold text-purple-900">✨ Usuários Ilimitados</span>
+                  <span className="font-semibold text-purple-900">📊 Dashboard Completo</span>
                 </div>
+                  <h5 className="font-semibold text-blue-900 mb-2">Empresarial - R$ 99,90/mês</h5>
+                  <span className="font-semibold text-purple-900">📈 DRE Detalhado</span>
+                    <li>• Tudo do Básico</li>
+                    <li>• Dashboard completo</li>
+                    <li>• DRE detalhado</li>
+                    <li>• Relatórios avançados</li>
                 <div className="bg-white p-3 rounded-lg border border-purple-200">
-                  <span className="font-semibold text-purple-900">🤖 Chat IA Avançado</span>
-                </div>
-                <div className="bg-white p-3 rounded-lg border border-purple-200">
-                  <span className="font-semibold text-purple-900">📱 WhatsApp Bot</span>
-                </div>
-                <div className="bg-white p-3 rounded-lg border border-purple-200">
-                  <span className="font-semibold text-purple-900">🔗 API Personalizada</span>
+                  <span className="font-semibold text-purple-900">💡 Indicadores</span>
                 </div>
               </div>
             </div>
