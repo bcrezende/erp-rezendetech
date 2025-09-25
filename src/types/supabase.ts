@@ -502,7 +502,6 @@ export interface Database {
           descricao: string | null;
           data_lembrete: string;
           hora_lembrete: string | null;
-          hora_lembrete: string | null;
           status: string;
           ativo: boolean;
           criado_em: string;
@@ -516,7 +515,6 @@ export interface Database {
           descricao?: string | null;
           data_lembrete: string;
           hora_lembrete?: string | null;
-          hora_lembrete?: string | null;
           status?: string;
           ativo?: boolean;
           criado_em?: string;
@@ -529,7 +527,6 @@ export interface Database {
           titulo?: string;
           descricao?: string | null;
           data_lembrete?: string;
-          hora_lembrete?: string | null;
           hora_lembrete?: string | null;
           status?: string;
           ativo?: boolean;
