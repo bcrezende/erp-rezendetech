@@ -304,6 +304,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // Setup notifications realtime subscription
   React.useEffect(() => {
+    // Temporarily disable notifications until table is created
+    return;
+    
     if (!user?.id || !profile?.id_empresa) return;
 
     // Load existing notifications
