@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../../contexts/AppContext';
-import { Home, DollarSign, Users, Package, Truck as TruckIcon, ShoppingCart, BarChart3, MessageCircle, Settings, Menu, X, ChevronDown, ChevronRight, CreditCard, Banknote, AlertTriangle, Tag, Bot, Bell, User, Building, Moon, Sun } from 'lucide-react';
+import { Home, DollarSign, Users, Package, Truck as TruckIcon, ShoppingCart, BarChart3, MessageCircle, Settings, Menu, X, ChevronDown, ChevronRight, CreditCard, Banknote, AlertTriangle, Tag, Bot, Bell, User, Building, Moon, Sun, Receipt } from 'lucide-react';
 
 interface SidebarProps {
   currentPage: string;
@@ -32,6 +32,7 @@ const menuItems: MenuItem[] = [
     label: 'Financeiro',
     icon: DollarSign,
     children: [
+      { id: 'transactions', label: 'Transações', icon: Receipt, path: '/transacoes' },
       { id: 'accounts-payable', label: 'Contas a Pagar', icon: CreditCard, path: '/contas-a-pagar' },
       { id: 'accounts-receivable', label: 'Contas a Receber', icon: Banknote, path: '/contas-a-receber' },
       { id: 'financial-indicators', label: 'Indicadores', icon: AlertTriangle, path: '/indicadores-financeiros' },
