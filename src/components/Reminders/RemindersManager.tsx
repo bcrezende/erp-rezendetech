@@ -625,9 +625,11 @@ const RemindersManager: React.FC = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-600">Data do Lembrete</label>
-                  <p className="text-lg font-semibold text-gray-900">{formatDate(viewingLembrete.data_lembrete)}</p>
+                  <p className="text-lg font-semibold text-gray-900">{formatDateTime(viewingLembrete.data_lembrete, viewingLembrete.hora_lembrete)}</p>
                   {isToday(viewingLembrete.data_lembrete) && (
-                    <p className="text-sm text-blue-600 font-medium">📅 Hoje</p>
+                    <p className="text-sm text-blue-600 font-medium">
+                      📅 Hoje{viewingLembrete.hora_lembrete ? ` às ${formatTime(viewingLembrete.hora_lembrete)}` : ''}
+                    </p>
                   )}
                   {isOverdue(viewingLembrete.data_lembrete, viewingLembrete.status) && (
                     <p className="text-sm text-red-600 font-medium">⚠️ Vencido há {Math.abs(getDaysUntil(viewingLembrete.data_lembrete))} dias</p>

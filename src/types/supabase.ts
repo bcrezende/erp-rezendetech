@@ -493,6 +493,47 @@ export interface Database {
           atualizado_em?: string;
         };
       };
+      lembretes: {
+        Row: {
+          id: string;
+          id_sequencial: number;
+          id_empresa: string;
+          titulo: string;
+          descricao: string | null;
+          data_lembrete: string;
+          hora_lembrete: string | null;
+          status: string;
+          ativo: boolean;
+          criado_em: string;
+          atualizado_em: string;
+        };
+        Insert: {
+          id?: string;
+          id_sequencial?: number;
+          id_empresa: string;
+          titulo: string;
+          descricao?: string | null;
+          data_lembrete: string;
+          hora_lembrete?: string | null;
+          status?: string;
+          ativo?: boolean;
+          criado_em?: string;
+          atualizado_em?: string;
+        };
+        Update: {
+          id?: string;
+          id_sequencial?: number;
+          id_empresa?: string;
+          titulo?: string;
+          descricao?: string | null;
+          data_lembrete?: string;
+          hora_lembrete?: string | null;
+          status?: string;
+          ativo?: boolean;
+          criado_em?: string;
+          atualizado_em?: string;
+        };
+      };
     };
     vendas: {
       Row: {
@@ -606,47 +647,6 @@ export interface Database {
         percentual_custos_vendas?: number;
         percentual_despesas_operacionais?: number;
         percentual_resultado_financeiro?: number;
-        ativo?: boolean;
-        criado_em?: string;
-        atualizado_em?: string;
-      };
-    };
-    lembretes: {
-      Row: {
-        id: string;
-        id_sequencial: number;
-        id_empresa: string;
-        titulo: string;
-        descricao: string | null;
-        valor: number | null;
-        data_lembrete: string;
-        status: string;
-        ativo: boolean;
-        criado_em: string;
-        atualizado_em: string;
-      };
-      Insert: {
-        id?: string;
-        id_sequencial?: number;
-        id_empresa: string;
-        titulo: string;
-        descricao?: string | null;
-        valor?: number | null;
-        data_lembrete: string;
-        status?: string;
-        ativo?: boolean;
-        criado_em?: string;
-        atualizado_em?: string;
-      };
-      Update: {
-        id?: string;
-        id_sequencial?: number;
-        id_empresa?: string;
-        titulo?: string;
-        descricao?: string | null;
-        valor?: number | null;
-        data_lembrete?: string;
-        status?: string;
         ativo?: boolean;
         criado_em?: string;
         atualizado_em?: string;

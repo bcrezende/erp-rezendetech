@@ -157,8 +157,8 @@ Deno.serve(async (req: Request) => {
         id_usuario: requestData.id_usuario,
         titulo: requestData.titulo,
         descricao: requestData.descricao || null,
-        valor: requestData.valor ? Number(requestData.valor) : null,
         data_lembrete: requestData.data_lembrete,
+        hora_lembrete: requestData.hora_lembrete || null,
         status: requestData.status || 'pendente',
         ativo: true
       })

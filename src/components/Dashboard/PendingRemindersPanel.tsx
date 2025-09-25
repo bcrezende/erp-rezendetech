@@ -310,7 +310,7 @@ const PendingRemindersPanel: React.FC<PendingRemindersPanelProps> = ({ dateFilte
                                   <p className="text-sm text-gray-700 mt-1">{lembrete.descricao}</p>
                                 )}
                                 <p className="text-xs text-gray-600 mt-2 font-medium">
-                                  📅 {formatDate(lembrete.data_lembrete)} • Em {getDaysUntil(lembrete.data_lembrete)} dias • ID: {lembrete.id_sequencial}
+                                  📅 {formatDateTime(lembrete.data_lembrete, lembrete.hora_lembrete)} • Em {getDaysUntil(lembrete.data_lembrete)} dias • ID: {lembrete.id_sequencial}
                                 </p>
                               </div>
                               <button
