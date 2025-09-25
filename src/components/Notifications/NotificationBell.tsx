@@ -5,6 +5,11 @@ import { Bell, X, Clock, CheckCircle, Trash2 } from 'lucide-react';
 const NotificationBell: React.FC = () => {
   const { state, markNotificationAsRead } = useAppContext();
   const [showPanel, setShowPanel] = useState(false);
+  
+  // Early return if notifications are not available
+  if (!state.notifications || state.notifications.length === 0) {
+    return null; // Hide notification bell when no notifications system is available
+  }
 
   const unreadCount = state.notifications.filter(n => !n.lida).length;
 

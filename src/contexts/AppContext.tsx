@@ -304,52 +304,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // Setup notifications realtime subscription
   React.useEffect(() => {
-    
-    
-    if (!user?.id || !profile?.id_empresa) return;
-
-    // Load existing notifications
-    const loadNotifications = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('notificacoes')
-          .select('*')
-          .eq('id_usuario', user.id)
-          .eq('id_empresa', profile.id_empresa)
-          .order('data_envio', { ascending: false })
-          .limit(50);
-
-        if (error) throw error;
-        dispatch({ type: 'SET_NOTIFICATIONS', payload: data || [] });
-      } catch (error) {
-        console.error('Error loading notifications:', error);
-      }
-    };
-
-    loadNotifications();
-
-    // Setup realtime subscription
-    const channel = supabase
-      .channel('notifications')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notificacoes',
-          filter: `id_usuario=eq.${user.id}`
-        },
-        (payload) => {
-          console.log('New notification received:', payload);
-          dispatch({ type: 'ADD_NOTIFICATION', payload: payload.new as Notificacao });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    // Notifications functionality disabled - table 'notificacoes' does not exist
+    // To enable notifications, first create the 'notificacoes' table in Supabase
+    console.log('Notifications functionality is disabled - table notificacoes does not exist');
   }, [user?.id, profile?.id_empresa, supabase]);
+  
   React.useEffect(() => {
     // Apply theme to document
     const root = document.documentElement;

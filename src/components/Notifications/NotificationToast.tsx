@@ -6,6 +6,11 @@ const NotificationToast: React.FC = () => {
   const { state, markNotificationAsRead } = useAppContext();
   const [visibleNotifications, setVisibleNotifications] = useState<string[]>([]);
   const [dismissedNotifications, setDismissedNotifications] = useState<Set<string>>(new Set());
+  
+  // Early return if notifications are not available
+  if (!state.notifications || state.notifications.length === 0) {
+    return null;
+  }
 
   // Show new unread notifications as toasts
   useEffect(() => {
