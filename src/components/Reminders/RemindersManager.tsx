@@ -24,6 +24,7 @@ const RemindersManager: React.FC = () => {
     descricao: '',
     data_lembrete: new Date().toISOString().split('T')[0],
     hora_lembrete: '',
+    hora_lembrete: '',
     status: 'pendente',
   });
 
@@ -113,6 +114,7 @@ const RemindersManager: React.FC = () => {
       titulo: lembrete.titulo,
       descricao: lembrete.descricao,
       data_lembrete: lembrete.data_lembrete,
+      hora_lembrete: lembrete.hora_lembrete || '',
       status: lembrete.status,
     });
     setShowForm(true);
@@ -142,6 +144,7 @@ const RemindersManager: React.FC = () => {
       titulo: '',
       descricao: '',
       data_lembrete: new Date().toISOString().split('T')[0],
+      hora_lembrete: '',
       status: 'pendente',
     });
     setEditingLembrete(null);
@@ -554,6 +557,21 @@ const RemindersManager: React.FC = () => {
                     onChange={(e) => setFormData({ ...formData, data_lembrete: e.target.value })}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Hora do Lembrete (opcional)
+                  </label>
+                  <input
+                    type="time"
+                    value={formData.hora_lembrete || ''}
+                    onChange={(e) => setFormData({ ...formData, hora_lembrete: e.target.value })}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Deixe em branco para lembrete apenas por data
+                  </p>
                 </div>
 
                 <div>
