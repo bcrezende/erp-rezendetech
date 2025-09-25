@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../Auth/AuthProvider';
-import { Plus, Search, Edit, Trash2, Bell, Calendar, DollarSign, CheckCircle, Clock, AlertCircle, Eye, X } from 'lucide-react';
+import { Plus, Search, CreditCard as Edit, Trash2, Bell, Calendar, DollarSign, CheckCircle, Clock, AlertCircle, Eye, X } from 'lucide-react';
 import { Database } from '../../types/supabase';
 
 type Lembrete = Database['public']['Tables']['lembretes']['Row'];
@@ -23,6 +23,7 @@ const RemindersManager: React.FC = () => {
     titulo: '',
     descricao: '',
     data_lembrete: new Date().toISOString().split('T')[0],
+    hora_lembrete: '',
     status: 'pendente',
   });
 
@@ -625,11 +626,9 @@ const RemindersManager: React.FC = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-600">Data do Lembrete</label>
-                  <p className="text-lg font-semibold text-gray-900">{formatDateTime(viewingLembrete.data_lembrete, viewingLembrete.hora_lembrete)}</p>
+                  <p className="text-lg font-semibold text-gray-900">{formatDate(viewingLembrete.data_lembrete)}</p>
                   {isToday(viewingLembrete.data_lembrete) && (
-                    <p className="text-sm text-blue-600 font-medium">
-                      📅 Hoje{viewingLembrete.hora_lembrete ? ` às ${formatTime(viewingLembrete.hora_lembrete)}` : ''}
-                    </p>
+                    <p className="text-sm text-blue-600 font-medium">📅 Hoje</p>
                   )}
                   {isOverdue(viewingLembrete.data_lembrete, viewingLembrete.status) && (
                     <p className="text-sm text-red-600 font-medium">⚠️ Vencido há {Math.abs(getDaysUntil(viewingLembrete.data_lembrete))} dias</p>
