@@ -292,28 +292,6 @@ const TransactionsManager: React.FC = () => {
       </div>
 
       {/* Debug Info */}
-      {true && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <h4 className="font-semibold text-yellow-900 mb-2">🔍 Debug Info</h4>
-          <div className="text-sm text-yellow-800 space-y-1">
-            <p>• Total de transações carregadas: {transactions.length}</p>
-            <p>• Transações após filtros: {filteredTransactions.length}</p>
-            <p>• Empresa ID: {profile?.id_empresa}</p>
-            <p>• Usuário ID: {profile?.id}</p>
-            <p>• Categorias carregadas: {categories.length}</p>
-            <p>• Pessoas carregadas: {pessoas.length}</p>
-            <p>• Filtros ativos: {JSON.stringify(filters)}</p>
-            <p>• Termo de busca: "{searchTerm}"</p>
-            <details className="mt-2">
-              <summary className="cursor-pointer font-medium">Ver dados brutos das transações</summary>
-              <pre className="mt-2 text-xs bg-yellow-100 p-2 rounded overflow-auto max-h-40">
-                {JSON.stringify(transactions.slice(0, 3), null, 2)}
-              </pre>
-            </details>
-          </div>
-        </div>
-      )}
-
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
