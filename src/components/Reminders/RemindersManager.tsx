@@ -16,6 +16,9 @@ const RemindersManager: React.FC = () => {
   const [viewingLembrete, setViewingLembrete] = useState<Lembrete | null>(null);
   const [viewMode, setViewMode] = useState<'cards' | 'calendar'>('cards');
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [showDailyEventsModal, setShowDailyEventsModal] = useState(false);
+  const [selectedDayReminders, setSelectedDayReminders] = useState<Lembrete[]>([]);
+  const [selectedDayDate, setSelectedDayDate] = useState<string | null>(null);
   const [filters, setFilters] = useState({
     status: 'all',
     periodo: 'all'
@@ -254,6 +257,13 @@ const RemindersManager: React.FC = () => {
     return lembretes.filter(lembrete => lembrete.data_lembrete === dateString);
   };
 
+  const handleDayClick = (dateString: string) => {
+    const reminders = getRemindersForDate(dateString);
+    setSelectedDayReminders(reminders);
+    setSelectedDayDate(dateString);
+    setShowDailyEventsModal(true);
+  };
+
   const navigateMonth = (direction: 'prev' | 'next') => {
     setCurrentDate(prev => {
       const newDate = new Date(prev);
@@ -288,7 +298,8 @@ const RemindersManager: React.FC = () => {
       days.push(
         <div
           key={day}
-          className={`h-24 sm:h-32 border border-gray-200 p-1 sm:p-2 overflow-hidden hover:bg-gray-50 transition-colors ${
+          onClick={() => handleDayClick(dateString)}
+          className={`h-24 sm:h-32 border border-gray-200 p-1 sm:p-2 overflow-hidden hover:bg-gray-50 transition-colors cursor-pointer ${
             isCurrentDay ? 'bg-blue-50 border-blue-300' : ''
           }`}
         >
@@ -297,15 +308,19 @@ const RemindersManager: React.FC = () => {
           }`}>
             {day}
             {isCurrentDay && <span className="ml-1 text-xs text-blue-500">hoje</span>}
+            {dayReminders.length > 0 && (
+              <span className="ml-1 text-xs bg-blue-100 text-blue-600 px-1 rounded-full">
+                {dayReminders.length}
+              </span>
+            )}
           </div>
           
           <div className="space-y-1">
             {dayReminders.slice(0, 3).map((lembrete) => {
               const StatusIcon = getStatusIcon(lembrete.status);
               return (
-                <button
+                <div
                   key={lembrete.id}
-                  onClick={() => setViewingLembrete(lembrete)}
                   className={`w-full text-left p-1 rounded text-xs hover:shadow-sm transition-all ${
                     lembrete.status === 'pendente' 
                       ? isOverdue(lembrete.data_lembrete, lembrete.status)
@@ -325,7 +340,7 @@ const RemindersManager: React.FC = () => {
                       {lembrete.hora_lembrete}
                     </div>
                   )}
-                </button>
+                </div>
               );
             })}
             
@@ -919,6 +934,203 @@ const RemindersManager: React.FC = () => {
         </div>
       )}
 
+      {/* Daily Events Modal */}
+      {showDailyEventsModal && selectedDayDate && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    Lembretes para {formatDate(selectedDayDate)}
+                  </h2>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {selectedDayReminders.length} lembrete(s) neste dia
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowDailyEventsModal(false)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6">
+              {selectedDayReminders.length === 0 ? (
+                <div className="text-center py-8">
+                  <Bell className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                  <p className="text-gray-500 font-medium">Nenhum lembrete para este dia</p>
+                  <button
+                    onClick={() => {
+                      setFormData({
+                        ...formData,
+                        data_lembrete: selectedDayDate
+                      });
+                      setShowDailyEventsModal(false);
+                      setShowForm(true);
+                    }}
+                    className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Criar Lembrete para Este Dia
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {selectedDayReminders
+                    .sort((a, b) => {
+                      // Ordenar por hora se disponível, senão por título
+                      if (a.hora_lembrete && b.hora_lembrete) {
+                        return a.hora_lembrete.localeCompare(b.hora_lembrete);
+                      }
+                      if (a.hora_lembrete && !b.hora_lembrete) return -1;
+                      if (!a.hora_lembrete && b.hora_lembrete) return 1;
+                      return a.titulo.localeCompare(b.titulo);
+                    })
+                    .map((lembrete) => {
+                      const StatusIcon = getStatusIcon(lembrete.status);
+                      const isReminderOverdue = isOverdue(lembrete.data_lembrete, lembrete.status);
+                      
+                      return (
+                        <div 
+                          key={lembrete.id} 
+                          className={`border-2 rounded-xl p-4 transition-all duration-200 ${
+                            isReminderOverdue ? 'border-red-200 bg-red-50' :
+                            lembrete.status === 'concluido' ? 'border-green-200 bg-green-50' :
+                            'border-gray-200 bg-white hover:bg-gray-50'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center space-x-2 mb-2">
+                                <StatusIcon size={18} className={
+                                  lembrete.status === 'pendente' ? 'text-yellow-600' :
+                                  lembrete.status === 'concluido' ? 'text-green-600' :
+                                  'text-gray-600'
+                                } />
+                                <h4 className="text-lg font-semibold text-gray-900 truncate">
+                                  {lembrete.titulo}
+                                </h4>
+                                <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(lembrete.status)}`}>
+                                  {getStatusLabel(lembrete.status)}
+                                </span>
+                              </div>
+                              
+                              {lembrete.descricao && (
+                                <p className="text-sm text-gray-600 mb-2">
+                                  {lembrete.descricao}
+                                </p>
+                              )}
+                              
+                              <div className="flex items-center space-x-4 text-sm text-gray-500">
+                                <span>ID: {lembrete.id_sequencial}</span>
+                                {lembrete.hora_lembrete && (
+                                  <div className="flex items-center space-x-1">
+                                    <Clock size={14} />
+                                    <span>{lembrete.hora_lembrete}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            
+                            <div className="flex space-x-1 ml-3">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setViewingLembrete(lembrete);
+                                }}
+                                className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                title="Ver detalhes"
+                              >
+                                <Eye size={16} />
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEdit(lembrete);
+                                  setShowDailyEventsModal(false);
+                                }}
+                                className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                title="Editar"
+                              >
+                                <Edit size={16} />
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDelete(lembrete.id);
+                                  setShowDailyEventsModal(false);
+                                }}
+                                className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                title="Excluir"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
+                          </div>
+                          
+                          {/* Quick Actions para lembretes pendentes */}
+                          {lembrete.status === 'pendente' && (
+                            <div className="mt-3 pt-3 border-t border-gray-200">
+                              <div className="flex space-x-2">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleStatusChange(lembrete.id, 'concluido');
+                                    // Atualizar a lista local para refletir a mudança imediatamente
+                                    setSelectedDayReminders(prev => 
+                                      prev.map(r => r.id === lembrete.id ? { ...r, status: 'concluido' } : r)
+                                    );
+                                  }}
+                                  className="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                                >
+                                  ✓ Concluir
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleStatusChange(lembrete.id, 'cancelado');
+                                    // Atualizar a lista local para refletir a mudança imediatamente
+                                    setSelectedDayReminders(prev => 
+                                      prev.map(r => r.id === lembrete.id ? { ...r, status: 'cancelado' } : r)
+                                    );
+                                  }}
+                                  className="px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
+                                >
+                                  ✕ Cancelar
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  
+                  {/* Botão para criar novo lembrete neste dia */}
+                  <div className="mt-6 pt-4 border-t border-gray-200">
+                    <button
+                      onClick={() => {
+                        setFormData({
+                          ...formData,
+                          data_lembrete: selectedDayDate
+                        });
+                        setShowDailyEventsModal(false);
+                        setShowForm(true);
+                      }}
+                      className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                    >
+                      <Plus size={20} />
+                      <span>Criar Novo Lembrete para {formatDate(selectedDayDate)}</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Info Panel */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
         <div className="flex items-start space-x-3">
@@ -927,9 +1139,10 @@ const RemindersManager: React.FC = () => {
             <h3 className="font-semibold text-blue-900 mb-2">💡 Sobre as Visualizações</h3>
             <div className="text-sm text-blue-800 space-y-1">
               <p>• <strong>Cards:</strong> Visualização em lista com filtros avançados e busca</p>
-              <p>• <strong>Calendário:</strong> Visualização mensal com eventos organizados por data</p>
+              <p>• <strong>Calendário:</strong> Visualização mensal - clique em qualquer dia para ver todos os eventos</p>
               <p>• Clique em qualquer lembrete para ver detalhes completos</p>
               <p>• Use as ações rápidas para marcar como concluído ou cancelar</p>
+              <p>• No calendário, o número ao lado do dia indica quantos lembretes existem</p>
             </div>
           </div>
         </div>
