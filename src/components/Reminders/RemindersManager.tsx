@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../Auth/AuthProvider';
-import { Plus, Search, Edit, Trash2, Bell, Calendar, DollarSign, CheckCircle, Clock, AlertCircle, Eye, X, Grid3X3, CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Search, CreditCard as Edit, Trash2, Bell, Calendar, DollarSign, CheckCircle, Clock, AlertCircle, Eye, X, Grid3x3 as Grid3X3, CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Database } from '../../types/supabase';
 
 type Lembrete = Database['public']['Tables']['lembretes']['Row'];
