@@ -30,6 +30,11 @@ const RemindersManager: React.FC = () => {
     data_lembrete: new Date().toISOString().split('T')[0],
     hora_lembrete: '',
     status: 'pendente',
+    e_recorrente: false,
+    frequencia_recorrencia: '',
+    data_fim_recorrencia: '',
+    dias_semana: '',
+    dia_mes: null,
   });
 
   useEffect(() => {
@@ -120,6 +125,11 @@ const RemindersManager: React.FC = () => {
       data_lembrete: lembrete.data_lembrete,
       hora_lembrete: lembrete.hora_lembrete || '',
       status: lembrete.status,
+      e_recorrente: lembrete.e_recorrente || false,
+      frequencia_recorrencia: lembrete.frequencia_recorrencia || '',
+      data_fim_recorrencia: lembrete.data_fim_recorrencia || '',
+      dias_semana: lembrete.dias_semana || '',
+      dia_mes: lembrete.dia_mes || null,
     });
     setShowForm(true);
   };
@@ -149,6 +159,11 @@ const RemindersManager: React.FC = () => {
       data_lembrete: new Date().toISOString().split('T')[0],
       hora_lembrete: '',
       status: 'pendente',
+      e_recorrente: false,
+      frequencia_recorrencia: '',
+      data_fim_recorrencia: '',
+      dias_semana: '',
+      dia_mes: null,
     });
     setEditingLembrete(null);
     setShowForm(false);
@@ -321,7 +336,7 @@ const RemindersManager: React.FC = () => {
               return (
                 <div
                   key={lembrete.id}
-                  className={`w-full text-left p-1 rounded text-xs hover:shadow-sm transition-all ${
+                  className={`w-full text-left p-1 rounded text-xs hover:shadow-sm transition-all relative ${
                     lembrete.status === 'pendente' 
                       ? isOverdue(lembrete.data_lembrete, lembrete.status)
                         ? 'bg-red-100 text-red-700 hover:bg-red-200'
@@ -333,6 +348,9 @@ const RemindersManager: React.FC = () => {
                 >
                   <div className="flex items-center space-x-1">
                     <StatusIcon size={10} />
+                    {lembrete.e_recorrente && (
+                      <span className="text-xs">🔄</span>
+                    )}
                     <span className="truncate">{lembrete.titulo}</span>
                   </div>
                   {lembrete.hora_lembrete && (
@@ -450,6 +468,9 @@ const RemindersManager: React.FC = () => {
                       lembrete.status === 'concluido' ? 'text-green-600' :
                       'text-gray-600'
                     } />
+                    {lembrete.e_recorrente && (
+                      <span className="text-lg" title="Lembrete recorrente">🔄</span>
+                    )}
                     <h3 className="text-lg font-semibold text-gray-900 truncate">
                       {lembrete.titulo}
                     </h3>
@@ -486,6 +507,22 @@ const RemindersManager: React.FC = () => {
                 <p className="text-sm text-gray-600 mb-3 line-clamp-2">
                   {lembrete.descricao}
                 </p>
+              )}
+
+              {/* Informações de Recorrência */}
+              {lembrete.e_recorrente && (
+                <div className="text-xs text-gray-500 mb-2">
+                  🔄 Recorrente: {
+                    lembrete.frequencia_recorrencia === 'diaria' ? 'Diariamente' :
+                    lembrete.frequencia_recorrencia === 'semanal' ? 'Semanalmente' :
+                    lembrete.frequencia_recorrencia === 'mensal' ? 'Mensalmente' :
+                    lembrete.frequencia_recorrencia === 'anual' ? 'Anualmente' :
+                    'Personalizada'
+                  }
+                  {lembrete.data_fim_recorrencia && (
+                    <span> até {formatDate(lembrete.data_fim_recorrencia)}</span>
+                  )}
+                </div>
               )}
 
               {/* Data e Hora */}
@@ -810,7 +847,145 @@ const RemindersManager: React.FC = () => {
                     <option value="cancelado">Cancelado</option>
                   </select>
                 </div>
+
+                <div>
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={formData.e_recorrente || false}
+                      onChange={(e) => setFormData({ ...formData, e_recorrente: e.target.checked })}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm font-medium text-gray-700">
+                      Lembrete recorrente
+                    </span>
+                  </label>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Marque para criar um lembrete que se repete automaticamente
+                  </p>
+                </div>
+
+                {/* Campos de Recorrência */}
+                {formData.e_recorrente && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Frequência *
+                      </label>
+                      <select
+                        required={formData.e_recorrente}
+                        value={formData.frequencia_recorrencia || ''}
+                        onChange={(e) => setFormData({ ...formData, frequencia_recorrencia: e.target.value })}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      >
+                        <option value="">Selecione a frequência</option>
+                        <option value="diaria">Diariamente</option>
+                        <option value="semanal">Semanalmente</option>
+                        <option value="mensal">Mensalmente</option>
+                        <option value="anual">Anualmente</option>
+                      </select>
+                    </div>
+
+                    {/* Dias da semana para recorrência semanal */}
+                    {formData.frequencia_recorrencia === 'semanal' && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Dias da Semana
+                        </label>
+                        <div className="grid grid-cols-7 gap-2">
+                          {[
+                            { value: '0', label: 'Dom' },
+                            { value: '1', label: 'Seg' },
+                            { value: '2', label: 'Ter' },
+                            { value: '3', label: 'Qua' },
+                            { value: '4', label: 'Qui' },
+                            { value: '5', label: 'Sex' },
+                            { value: '6', label: 'Sáb' }
+                          ].map(day => {
+                            const selectedDays = (formData.dias_semana || '').split(',').filter(d => d);
+                            const isSelected = selectedDays.includes(day.value);
+                            
+                            return (
+                              <label key={day.value} className="flex flex-col items-center">
+                                <input
+                                  type="checkbox"
+                                  checked={isSelected}
+                                  onChange={(e) => {
+                                    const currentDays = (formData.dias_semana || '').split(',').filter(d => d);
+                                    let newDays;
+                                    if (e.target.checked) {
+                                      newDays = [...currentDays, day.value];
+                                    } else {
+                                      newDays = currentDays.filter(d => d !== day.value);
+                                    }
+                                    setFormData({ ...formData, dias_semana: newDays.join(',') });
+                                  }}
+                                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                />
+                                <span className="text-xs text-gray-600 mt-1">{day.label}</span>
+                              </label>
+                            );
+                          })}
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2">
+                          Selecione os dias da semana em que o lembrete deve se repetir
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Dia do mês para recorrência mensal */}
+                    {formData.frequencia_recorrencia === 'mensal' && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Dia do Mês
+                        </label>
+                        <input
+                          type="number"
+                          min="1"
+                          max="31"
+                          value={formData.dia_mes || ''}
+                          onChange={(e) => setFormData({ ...formData, dia_mes: Number(e.target.value) || null })}
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Ex: 15 (dia 15 de cada mês)"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Deixe em branco para usar o dia da data inicial ({new Date(formData.data_lembrete || '').getDate()})
+                        </p>
+                      </div>
+                    )}
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Data Final da Recorrência (opcional)
+                      </label>
+                      <input
+                        type="date"
+                        value={formData.data_fim_recorrencia || ''}
+                        onChange={(e) => setFormData({ ...formData, data_fim_recorrencia: e.target.value })}
+                        min={formData.data_lembrete}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Deixe em branco para recorrência indefinida
+                      </p>
+                    </div>
+                  </>
+                )}
               </div>
+
+              {/* Explicação sobre Recorrência */}
+              {formData.e_recorrente && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h4 className="font-semibold text-blue-900 mb-2">🔄 Como Funcionam os Lembretes Recorrentes</h4>
+                  <div className="text-sm text-blue-800 space-y-1">
+                    <p>• <strong>Diária:</strong> Lembrete se repete todos os dias</p>
+                    <p>• <strong>Semanal:</strong> Escolha os dias da semana específicos</p>
+                    <p>• <strong>Mensal:</strong> Se repete no mesmo dia de cada mês</p>
+                    <p>• <strong>Anual:</strong> Se repete na mesma data todo ano</p>
+                    <p>• <strong>Data Final:</strong> Define quando a recorrência deve parar</p>
+                  </div>
+                </div>
+              )}
 
               <div className="flex justify-end space-x-3 pt-4">
                 <button
@@ -860,6 +1035,7 @@ const RemindersManager: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-600">Status</label>
                   <div className="flex items-center space-x-2">
                     <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(viewingLembrete.status)}`}>
+                      {viewingLembrete.e_recorrente && <span className="mr-1">🔄</span>}
                       {getStatusLabel(viewingLembrete.status)}
                     </span>
                   </div>
@@ -886,6 +1062,62 @@ const RemindersManager: React.FC = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-2">Descrição</label>
                   <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{viewingLembrete.descricao}</p>
+                </div>
+              )}
+
+              {/* Informações de Recorrência */}
+              {viewingLembrete.e_recorrente && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h4 className="font-semibold text-blue-900 mb-2">🔄 Configurações de Recorrência</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <label className="block text-xs font-medium text-blue-700">Frequência</label>
+                      <p className="text-blue-900 font-medium">
+                        {viewingLembrete.frequencia_recorrencia === 'diaria' ? 'Diariamente' :
+                         viewingLembrete.frequencia_recorrencia === 'semanal' ? 'Semanalmente' :
+                         viewingLembrete.frequencia_recorrencia === 'mensal' ? 'Mensalmente' :
+                         viewingLembrete.frequencia_recorrencia === 'anual' ? 'Anualmente' :
+                         'Não definida'}
+                      </p>
+                    </div>
+                    
+                    {viewingLembrete.frequencia_recorrencia === 'semanal' && viewingLembrete.dias_semana && (
+                      <div>
+                        <label className="block text-xs font-medium text-blue-700">Dias da Semana</label>
+                        <p className="text-blue-900 font-medium">
+                          {viewingLembrete.dias_semana.split(',').map(day => {
+                            const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+                            return dayNames[parseInt(day)] || day;
+                          }).join(', ')}
+                        </p>
+                      </div>
+                    )}
+                    
+                    {viewingLembrete.frequencia_recorrencia === 'mensal' && (
+                      <div>
+                        <label className="block text-xs font-medium text-blue-700">Dia do Mês</label>
+                        <p className="text-blue-900 font-medium">
+                          Dia {viewingLembrete.dia_mes || new Date(viewingLembrete.data_lembrete).getDate()}
+                        </p>
+                      </div>
+                    )}
+                    
+                    {viewingLembrete.data_fim_recorrencia && (
+                      <div>
+                        <label className="block text-xs font-medium text-blue-700">Termina em</label>
+                        <p className="text-blue-900 font-medium">
+                          {formatDate(viewingLembrete.data_fim_recorrencia)}
+                        </p>
+                      </div>
+                    )}
+                    
+                    {!viewingLembrete.data_fim_recorrencia && (
+                      <div>
+                        <label className="block text-xs font-medium text-blue-700">Duração</label>
+                        <p className="text-blue-900 font-medium">Indefinida</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 
@@ -1012,6 +1244,9 @@ const RemindersManager: React.FC = () => {
                                 <h4 className="text-lg font-semibold text-gray-900 truncate">
                                   {lembrete.titulo}
                                 </h4>
+                                {lembrete.e_recorrente && (
+                                  <span className="text-lg ml-1" title="Lembrete recorrente">🔄</span>
+                                )}
                                 <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(lembrete.status)}`}>
                                   {getStatusLabel(lembrete.status)}
                                 </span>
@@ -1020,6 +1255,21 @@ const RemindersManager: React.FC = () => {
                               {lembrete.descricao && (
                                 <p className="text-sm text-gray-600 mb-2">
                                   {lembrete.descricao}
+                                </p>
+                              )}
+                              
+                              {lembrete.e_recorrente && (
+                                <p className="text-xs text-blue-600 mb-2 font-medium">
+                                  🔄 Recorrente: {
+                                    lembrete.frequencia_recorrencia === 'diaria' ? 'Diariamente' :
+                                    lembrete.frequencia_recorrencia === 'semanal' ? 'Semanalmente' :
+                                    lembrete.frequencia_recorrencia === 'mensal' ? 'Mensalmente' :
+                                    lembrete.frequencia_recorrencia === 'anual' ? 'Anualmente' :
+                                    'Personalizada'
+                                  }
+                                  {lembrete.data_fim_recorrencia && (
+                                    <span> até {formatDate(lembrete.data_fim_recorrencia)}</span>
+                                  )}
                                 </p>
                               )}
                               
@@ -1136,10 +1386,12 @@ const RemindersManager: React.FC = () => {
         <div className="flex items-start space-x-3">
           <Bell className="h-6 w-6 text-blue-600 mt-1" />
           <div>
-            <h3 className="font-semibold text-blue-900 mb-2">💡 Sobre as Visualizações</h3>
+            <h3 className="font-semibold text-blue-900 mb-2">💡 Sobre os Lembretes</h3>
             <div className="text-sm text-blue-800 space-y-1">
               <p>• <strong>Cards:</strong> Visualização em lista com filtros avançados e busca</p>
               <p>• <strong>Calendário:</strong> Visualização mensal - clique em qualquer dia para ver todos os eventos</p>
+              <p>• <strong>Lembretes Recorrentes:</strong> Use o ícone 🔄 para identificar tarefas que se repetem</p>
+              <p>• <strong>Tarefas Diárias:</strong> Marque como recorrente e escolha "Diariamente" para tarefas do dia a dia</p>
               <p>• Clique em qualquer lembrete para ver detalhes completos</p>
               <p>• Use as ações rápidas para marcar como concluído ou cancelar</p>
               <p>• No calendário, o número ao lado do dia indica quantos lembretes existem</p>
