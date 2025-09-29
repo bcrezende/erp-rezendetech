@@ -70,6 +70,65 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mob
   
   const { isMobile, isTablet, isDesktop, isPWA, hasTouch } = deviceInfo || {};
 
+  // Filter menu items based on user plan
+  const getFilteredMenuItems = (items: MenuItem[], userPlan: string = 'basico'): MenuItem[] => {
+    // Define allowed items for each plan
+    const planPermissions = {
+      basico: [
+        'dashboard', // Will be hidden by route logic, but keep in structure
+        'financeiro', 'transactions', 'accounts-payable', 'accounts-receivable', 'financial-indicators',
+        'cadastros', 'people', 'categories',
+        'reminders',
+        'reports', // Will be hidden by route logic, but keep in structure
+        'configuracoes', 'settings', 'company-settings'
+      ],
+      premium: [
+        'dashboard', 'financeiro', 'transactions', 'accounts-payable', 'accounts-receivable', 'financial-indicators',
+        'cadastros', 'people', 'products', 'categories',
+        'sales', 'purchases', 'reminders', 'reports',
+        'configuracoes', 'settings', 'company-settings'
+      ],
+      enterprise: [
+        'dashboard', 'financeiro', 'transactions', 'accounts-payable', 'accounts-receivable', 'financial-indicators',
+        'cadastros', 'people', 'products', 'categories',
+        'sales', 'purchases', 'reminders', 'reports',
+        'configuracoes', 'settings', 'company-settings'
+      ]
+    };
+
+    const allowedItems = planPermissions[userPlan as keyof typeof planPermissions] || planPermissions.basico;
+
+    return items.map(item => {
+      // Check if this item is allowed
+      const isItemAllowed = allowedItems.includes(item.id);
+      
+      if (!isItemAllowed) {
+        return null;
+      }
+
+      // If item has children, filter them recursively
+      if (item.children) {
+        const filteredChildren = getFilteredMenuItems(item.children, userPlan).filter(Boolean);
+        
+        // Only show parent if it has visible children
+        if (filteredChildren.length === 0) {
+          return null;
+        }
+
+        return {
+          ...item,
+          children: filteredChildren as MenuItem[]
+        };
+      }
+
+      return item;
+    }).filter(Boolean) as MenuItem[];
+  };
+
+  // Get user plan from profile
+  const userPlan = profile?.empresas?.plano || 'basico';
+  const filteredMenuItems = getFilteredMenuItems(menuItems, userPlan);
+
   const toggleExpanded = (itemId: string) => {
     setExpandedItems(prev => 
       prev.includes(itemId) 
@@ -211,7 +270,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mob
         <nav className={`flex-1 space-y-3 overflow-y-auto custom-scrollbar mobile-scroll ${
           isMobile ? 'p-3' : 'p-4'
         }`}>
-          {menuItems.map(item => renderMenuItem(item))}
+          {filteredMenuItems.map(item => renderMenuItem(item))}
           
           {/* Theme Toggle Button */}
           <div className="pt-4 border-t border-white/30 dark:border-gray-700">
