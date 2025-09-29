@@ -506,6 +506,11 @@ export interface Database {
           ativo: boolean;
           criado_em: string;
           atualizado_em: string;
+          e_recorrente: boolean;
+          frequencia_recorrencia: string | null;
+          data_fim_recorrencia: string | null;
+          dias_semana: string | null;
+          dia_mes: number | null;
         };
         Insert: {
           id?: string;
@@ -519,6 +524,11 @@ export interface Database {
           ativo?: boolean;
           criado_em?: string;
           atualizado_em?: string;
+          e_recorrente?: boolean;
+          frequencia_recorrencia?: string | null;
+          data_fim_recorrencia?: string | null;
+          dias_semana?: string | null;
+          dia_mes?: number | null;
         };
         Update: {
           id?: string;
@@ -532,6 +542,11 @@ export interface Database {
           ativo?: boolean;
           criado_em?: string;
           atualizado_em?: string;
+          e_recorrente?: boolean;
+          frequencia_recorrencia?: string | null;
+          data_fim_recorrencia?: string | null;
+          dias_semana?: string | null;
+          dia_mes?: number | null;
         };
       };
       notificacoes: {
