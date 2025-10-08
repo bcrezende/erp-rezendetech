@@ -10,6 +10,7 @@ type Pessoa = Database['public']['Tables']['pessoas']['Row'];
 
 type SortColumn = 'id_sequencial' | 'descricao' | 'cliente' | 'categoria' | 'data_transacao' | 'data_vencimento' | 'valor' | 'status';
 type SortDirection = 'asc' | 'desc';
+type DeleteScope = 'single' | 'future' | 'all';
 
 const AccountsReceivable: React.FC = () => {
   const { supabase, profile } = useAuth();
@@ -23,6 +24,9 @@ const AccountsReceivable: React.FC = () => {
   const [viewingTransaction, setViewingTransaction] = useState<Transaction | null>(null);
   const [sortColumn, setSortColumn] = useState<SortColumn>('data_vencimento');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteScope, setDeleteScope] = useState<DeleteScope>('single');
+  const [transactionToDelete, setTransactionToDelete] = useState<Transaction | null>(null);
 
   // Função para obter o primeiro e último dia do mês atual
   const getCurrentMonthRange = () => {
@@ -188,20 +192,74 @@ const AccountsReceivable: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Tem certeza que deseja excluir esta conta a receber? Esta ação não pode ser desfeita.')) return;
+    const transaction = transactions.find(t => t.id === id);
+
+    if (!transaction) return;
+
+    const isInstallment = transaction.e_recorrente &&
+                         transaction.tipo_recorrencia === 'parcelada' &&
+                         transaction.id_grupo_parcelas;
+
+    if (isInstallment) {
+      setTransactionToDelete(transaction);
+      setDeleteScope('single');
+      setShowDeleteModal(true);
+    } else {
+      if (!confirm('Tem certeza que deseja excluir esta conta a receber? Esta ação não pode ser desfeita.')) return;
+
+      try {
+        const { error } = await supabase
+          .from('transacoes')
+          .delete()
+          .eq('id', id);
+
+        if (error) throw error;
+        await loadData();
+        alert('Conta a receber excluída com sucesso!');
+      } catch (error) {
+        console.error('Error deleting account receivable:', error);
+        alert('Erro ao excluir conta a receber. Tente novamente.');
+      }
+    }
+  };
+
+  const handleDeleteInstallmentsByScope = async () => {
+    if (!transactionToDelete) return;
 
     try {
-      const { error } = await supabase
-        .from('transacoes')
-        .delete()
-        .eq('id', id);
+      if (deleteScope === 'single') {
+        const { error } = await supabase
+          .from('transacoes')
+          .delete()
+          .eq('id', transactionToDelete.id);
 
-      if (error) throw error;
+        if (error) throw error;
+        alert('Parcela excluída com sucesso!');
+      } else if (deleteScope === 'future') {
+        const { error } = await supabase
+          .from('transacoes')
+          .delete()
+          .eq('id_grupo_parcelas', transactionToDelete.id_grupo_parcelas)
+          .gte('parcela_atual', transactionToDelete.parcela_atual || 0);
+
+        if (error) throw error;
+        alert('Parcelas futuras excluídas com sucesso!');
+      } else if (deleteScope === 'all') {
+        const { error } = await supabase
+          .from('transacoes')
+          .delete()
+          .eq('id_grupo_parcelas', transactionToDelete.id_grupo_parcelas);
+
+        if (error) throw error;
+        alert('Todas as parcelas excluídas com sucesso!');
+      }
+
       await loadData();
-      alert('Conta a receber excluída com sucesso!');
+      setShowDeleteModal(false);
+      setTransactionToDelete(null);
     } catch (error) {
-      console.error('Error deleting account receivable:', error);
-      alert('Erro ao excluir conta a receber. Tente novamente.');
+      console.error('Error deleting installments:', error);
+      alert('Erro ao excluir parcela(s). Tente novamente.');
     }
   };
 
@@ -963,6 +1021,136 @@ const AccountsReceivable: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Installment Modal */}
+      {showDeleteModal && transactionToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900 flex items-center space-x-2">
+                    <AlertCircle size={24} className="text-red-600" />
+                    <span>Excluir Parcela do Parcelamento</span>
+                  </h2>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Parcela {transactionToDelete.parcela_atual}/{transactionToDelete.numero_parcelas}
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setTransactionToDelete(null);
+                  }}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4">
+                <h3 className="font-semibold text-red-900 mb-3 flex items-center space-x-2">
+                  <Trash2 size={18} />
+                  <span>Escopo da Exclusão</span>
+                </h3>
+                <p className="text-sm text-red-800 mb-4">
+                  Escolha quais parcelas você deseja excluir. Esta ação não pode ser desfeita!
+                </p>
+                <div className="space-y-2">
+                  <label className="flex items-start space-x-3 p-3 bg-white rounded-lg border-2 border-transparent hover:border-red-300 cursor-pointer transition-all">
+                    <input
+                      type="radio"
+                      name="deleteScope"
+                      value="single"
+                      checked={deleteScope === 'single'}
+                      onChange={(e) => setDeleteScope(e.target.value as DeleteScope)}
+                      className="mt-1 text-red-600 focus:ring-red-500"
+                    />
+                    <div className="flex-1">
+                      <div className="font-medium text-gray-900">Apenas esta parcela</div>
+                      <div className="text-sm text-gray-600">
+                        Exclui somente a parcela {transactionToDelete.parcela_atual}
+                      </div>
+                    </div>
+                  </label>
+
+                  <label className="flex items-start space-x-3 p-3 bg-white rounded-lg border-2 border-transparent hover:border-red-300 cursor-pointer transition-all">
+                    <input
+                      type="radio"
+                      name="deleteScope"
+                      value="future"
+                      checked={deleteScope === 'future'}
+                      onChange={(e) => setDeleteScope(e.target.value as DeleteScope)}
+                      className="mt-1 text-red-600 focus:ring-red-500"
+                    />
+                    <div className="flex-1">
+                      <div className="font-medium text-gray-900">Esta e todas as futuras</div>
+                      <div className="text-sm text-gray-600">
+                        Exclui {(transactionToDelete.numero_parcelas || 0) - (transactionToDelete.parcela_atual || 0) + 1} parcelas
+                        (da {transactionToDelete.parcela_atual} até a {transactionToDelete.numero_parcelas})
+                      </div>
+                    </div>
+                  </label>
+
+                  <label className="flex items-start space-x-3 p-3 bg-white rounded-lg border-2 border-transparent hover:border-red-300 cursor-pointer transition-all">
+                    <input
+                      type="radio"
+                      name="deleteScope"
+                      value="all"
+                      checked={deleteScope === 'all'}
+                      onChange={(e) => setDeleteScope(e.target.value as DeleteScope)}
+                      className="mt-1 text-red-600 focus:ring-red-500"
+                    />
+                    <div className="flex-1">
+                      <div className="font-medium text-gray-900">Todas as parcelas</div>
+                      <div className="text-sm text-gray-600">
+                        Exclui todas as {transactionToDelete.numero_parcelas} parcelas do parcelamento
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div className="flex items-start space-x-3">
+                  <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5" />
+                  <div>
+                    <h4 className="font-semibold text-yellow-900 mb-1">Atenção!</h4>
+                    <p className="text-sm text-yellow-800">
+                      Esta ação é permanente e não pode ser desfeita. Certifique-se de que deseja excluir {
+                        deleteScope === 'single' ? 'esta parcela' :
+                        deleteScope === 'future' ? 'estas parcelas e todas as futuras' :
+                        'todas as parcelas deste parcelamento'
+                      }.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-3 pt-4">
+                <button
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setTransactionToDelete(null);
+                  }}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleDeleteInstallmentsByScope}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium flex items-center space-x-2"
+                >
+                  <Trash2 size={16} />
+                  <span>Confirmar Exclusão</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
