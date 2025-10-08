@@ -206,12 +206,10 @@ const UserSettings: React.FC = () => {
               <div>
                 <label className="block text-xs font-medium text-gray-600">Plano</label>
                 <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                  profile.empresas.plano === 'enterprise' ? 'bg-purple-100 text-purple-700' :
-                  profile.empresas.plano === 'premium' ? 'bg-blue-100 text-blue-700' :
+                  profile.empresas.plano === 'enterprise' || profile.empresas.plano === 'empresarial' ? 'bg-purple-100 text-purple-700' :
                   'bg-gray-100 text-gray-700'
                 }`}>
-                  {profile.empresas.plano === 'enterprise' ? 'Enterprise' :
-                   profile.empresas.plano === 'premium' ? 'Premium' :
+                  {profile.empresas.plano === 'enterprise' || profile.empresas.plano === 'empresarial' ? 'Empresarial' :
                    'Básico'}
                 </span>
               </div>

@@ -22,8 +22,7 @@ const CompanySettings: React.FC = () => {
     endereco: '',
     cidade: '',
     estado: '',
-    cep: '',
-    plano: 'basico'
+    cep: ''
   });
 
   useEffect(() => {
@@ -43,8 +42,7 @@ const CompanySettings: React.FC = () => {
           endereco: '',
           cidade: '',
           estado: '',
-          cep: '',
-          plano: 'basico'
+          cep: ''
         });
         setLoading(false);
         return;
@@ -73,8 +71,7 @@ const CompanySettings: React.FC = () => {
         endereco: data.endereco || '',
         cidade: data.cidade || '',
         estado: data.estado || '',
-        cep: data.cep || '',
-        plano: data.plano || 'basico'
+        cep: data.cep || ''
       });
     } catch (err) {
       console.error('Error in loadCompanyData:', err);
@@ -105,8 +102,7 @@ const CompanySettings: React.FC = () => {
           endereco: formData.endereco || null,
           cidade: formData.cidade || null,
           estado: formData.estado || null,
-          cep: formData.cep || null,
-          plano: formData.plano
+          cep: formData.cep || null
         };
 
         const { error } = await supabase
@@ -130,7 +126,6 @@ const CompanySettings: React.FC = () => {
           cidade: formData.cidade || null,
           estado: formData.estado || null,
           cep: formData.cep || null,
-          plano: formData.plano,
           ativo: true
         };
 
@@ -145,8 +140,7 @@ const CompanySettings: React.FC = () => {
             p_endereco: formData.endereco || null,
             p_cidade: formData.cidade || null,
             p_estado: formData.estado || null,
-            p_cep: formData.cep || null,
-            p_plano: formData.plano || 'basico'
+            p_cep: formData.cep || null
           });
 
         if (empresaError) {
@@ -305,25 +299,20 @@ const CompanySettings: React.FC = () => {
             </div>
 
             <div>
-              <label htmlFor="plano" className="block text-sm font-medium text-gray-700 mb-2">
-                Plano
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Plano Atual
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <CreditCard className="h-5 w-5 text-gray-400" />
                 </div>
-                <select
-                  id="plano"
-                  name="plano"
-                  value={formData.plano}
-                  onChange={(e) => setFormData({ ...formData, plano: e.target.value })}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="basico">Básico - Gratuito</option>
-                  <option value="premium">Premium - R$ 49,90/mês</option>
-                  <option value="enterprise">Enterprise - R$ 99,90/mês</option>
-                </select>
+                <div className="w-full pl-10 pr-3 py-2 border border-gray-200 bg-gray-50 rounded-lg text-gray-700 font-medium">
+                  {empresa?.plano === 'enterprise' || empresa?.plano === 'empresarial' ? 'Empresarial - R$ 199,90/mês' : 'Básico - R$ 29,90/mês'}
+                </div>
               </div>
+              <p className="text-xs text-gray-500 mt-1">
+                O plano só pode ser alterado através do gateway de pagamento
+              </p>
             </div>
 
             <div>
@@ -462,34 +451,27 @@ const CompanySettings: React.FC = () => {
           {/* Informações sobre os Planos */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <h4 className="font-semibold text-blue-900 mb-3">💼 Informações dos Planos</h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div className="bg-white p-3 rounded-lg border border-blue-200">
-                <h5 className="font-semibold text-blue-900 mb-2">Básico - Gratuito</h5>
+                <h5 className="font-semibold text-blue-900 mb-2">Básico - R$ 29,90/mês</h5>
                 <ul className="text-blue-800 space-y-1 text-xs">
-                  <li>• Até 100 transações/mês</li>
-                  <li>• 1 usuário</li>
-                  <li>• Relatórios básicos</li>
+                  <li>• Transações básicas</li>
+                  <li>• Gestão de pessoas</li>
+                  <li>• Contas a pagar/receber</li>
+                  <li>• Lembretes e notificações</li>
                   <li>• Suporte por email</li>
                 </ul>
               </div>
               <div className="bg-white p-3 rounded-lg border border-blue-200">
-                <h5 className="font-semibold text-blue-900 mb-2">Premium - R$ 49,90/mês</h5>
+                <h5 className="font-semibold text-blue-900 mb-2">Empresarial - R$ 199,90/mês</h5>
                 <ul className="text-blue-800 space-y-1 text-xs">
-                  <li>• Transações ilimitadas</li>
-                  <li>• Até 5 usuários</li>
+                  <li>• Tudo do Básico</li>
+                  <li>• Dashboard completo</li>
+                  <li>• DRE detalhado</li>
                   <li>• Relatórios avançados</li>
-                  <li>• Chat IA integrado</li>
+                  <li>• Indicadores financeiros</li>
+                  <li>• Previsões com IA</li>
                   <li>• Suporte prioritário</li>
-                </ul>
-              </div>
-              <div className="bg-white p-3 rounded-lg border border-blue-200">
-                <h5 className="font-semibold text-blue-900 mb-2">Enterprise - R$ 99,90/mês</h5>
-                <ul className="text-blue-800 space-y-1 text-xs">
-                  <li>• Tudo do Premium</li>
-                  <li>• Usuários ilimitados</li>
-                  <li>• API personalizada</li>
-                  <li>• Integração WhatsApp</li>
-                  <li>• Suporte 24/7</li>
                 </ul>
               </div>
             </div>
@@ -504,7 +486,7 @@ const CompanySettings: React.FC = () => {
                 <ul className="space-y-1 text-xs">
                   <li>• Apenas o nome da empresa é obrigatório</li>
                   <li>• Você pode atualizar essas informações a qualquer momento</li>
-                  <li>• O plano pode ser alterado conforme sua necessidade</li>
+                  <li>• O plano é gerenciado através do sistema de pagamento</li>
                   <li>• Todos os dados são protegidos e seguros</li>
                   {!empresa && (
                     <li>• Após cadastrar a empresa, você terá acesso completo ao sistema</li>
@@ -595,20 +577,15 @@ const CompanySettings: React.FC = () => {
             <div>
               <h4 className="font-semibold text-purple-900 mb-1">Plano Atual</h4>
               <p className="text-purple-700 capitalize font-medium">
-                {empresa?.plano || 'Básico'} 
-                {empresa?.plano === 'basico' && ' - Gratuito'}
-                {empresa?.plano === 'premium' && ' - R$ 49,90/mês'}
-                {empresa?.plano === 'enterprise' && ' - R$ 99,90/mês'}
+                {(empresa?.plano === 'enterprise' || empresa?.plano === 'empresarial') ? 'Empresarial' : 'Básico'}
+                {(empresa?.plano === 'enterprise' || empresa?.plano === 'empresarial') ? ' - R$ 199,90/mês' : ' - R$ 29,90/mês'}
               </p>
             </div>
             <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-              empresa?.plano === 'enterprise' ? 'bg-purple-100 text-purple-700' :
-              empresa?.plano === 'premium' ? 'bg-blue-100 text-blue-700' :
+              empresa?.plano === 'enterprise' || empresa?.plano === 'empresarial' ? 'bg-purple-100 text-purple-700' :
               'bg-gray-100 text-gray-700'
             }`}>
-              {empresa?.plano === 'enterprise' ? '🚀 Enterprise' :
-               empresa?.plano === 'premium' ? '⭐ Premium' :
-               '🆓 Básico'}
+              {(empresa?.plano === 'enterprise' || empresa?.plano === 'empresarial') ? '🚀 Empresarial' : '📊 Básico'}
             </div>
           </div>
         </div>
@@ -628,7 +605,7 @@ const CompanySettings: React.FC = () => {
                   <span className="text-lg">Plano Básico</span>
                 </div>
                 <div className="text-sm opacity-90">
-                  R$ 29,90/mês • Transações básicas
+                  R$ 29,90/mês • Gestão básica
                 </div>
               </a>
 
@@ -643,13 +620,13 @@ const CompanySettings: React.FC = () => {
                   <span className="text-lg">Plano Empresarial</span>
                 </div>
                 <div className="text-sm opacity-90">
-                  R$ 99,90/mês • Dashboard completo • DRE
+                  R$ 199,90/mês • Dashboard • DRE • Relatórios
                 </div>
               </a>
             </div>
           )}
 
-          {(empresa?.plano === 'premium' || empresa?.plano === 'basico') && empresa?.plano !== 'enterprise' && (
+          {empresa?.plano === 'basico' && (
             <div className="grid grid-cols-1 gap-4">
               <a
                 href={`https://sandbox.asaas.com/c/uc30wq3aaewqjxzb?empresa_id=${empresa?.id}&usuario_id=${profile?.id}`}
@@ -662,16 +639,10 @@ const CompanySettings: React.FC = () => {
                   <span className="text-lg">Upgrade para Empresarial</span>
                 </div>
                 <div className="text-sm opacity-90">
-                  R$ 99,90/mês • Dashboard completo • DRE • Relatórios
+                  R$ 199,90/mês • Dashboard • DRE • Relatórios • IA
                 </div>
               </a>
 
-              {empresa?.plano !== 'basico' && (
-                <div className="text-center p-4 bg-green-50 border border-green-200 rounded-lg">
-                  <p className="text-green-800 font-medium">✅ Você já tem um plano ativo!</p>
-                  <p className="text-sm text-green-700 mt-1">Aproveite as funcionalidades disponíveis</p>
-                </div>
-              )}
             </div>
           )}
 
@@ -707,20 +678,21 @@ const CompanySettings: React.FC = () => {
                 <h5 className="font-semibold text-blue-900 mb-2">Básico - R$ 29,90/mês</h5>
                 <ul className="text-blue-800 space-y-1 text-xs">
                   <li>• Transações básicas</li>
-                  <li>• Cadastros simples</li>
-                  <li>• Até 3 usuários</li>
                   <li>• Gestão de pessoas</li>
                   <li>• Contas a pagar/receber</li>
+                  <li>• Lembretes</li>
+                  <li>• Categorias</li>
                 </ul>
               </div>
               <div className="bg-white p-3 rounded-lg border border-blue-200">
-                <h5 className="font-semibold text-blue-900 mb-2">Empresarial - R$ 99,90/mês</h5>
+                <h5 className="font-semibold text-blue-900 mb-2">Empresarial - R$ 199,90/mês</h5>
                 <ul className="text-blue-800 space-y-1 text-xs">
                   <li>• Tudo do Básico</li>
                   <li>• Dashboard completo</li>
                   <li>• DRE detalhado</li>
                   <li>• Relatórios avançados</li>
                   <li>• Indicadores financeiros</li>
+                  <li>• Previsões com IA</li>
                 </ul>
               </div>
             </div>

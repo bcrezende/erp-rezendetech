@@ -113,9 +113,8 @@ Deno.serve(async (req: Request) => {
     let planoDB = 'basico';
     if (webhookData.plano === 'empresarial' || webhookData.plano === 'enterprise') {
       planoDB = 'enterprise';
-    } else if (webhookData.plano === 'premium') {
-      planoDB = 'premium';
     }
+    // Only 'basico' and 'enterprise' plans are supported
 
     // 1. PRIMEIRO: Atualizar plano no perfil do admin da empresa
     // O trigger sync_plan_from_perfil_to_empresa vai propagar para a empresa automaticamente

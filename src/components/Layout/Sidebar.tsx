@@ -82,13 +82,13 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mob
         'reports', // Will be hidden by route logic, but keep in structure
         'configuracoes', 'settings', 'company-settings'
       ],
-      premium: [
+      enterprise: [
         'dashboard', 'financeiro', 'transactions', 'accounts-payable', 'accounts-receivable', 'financial-indicators',
         'cadastros', 'people', 'products', 'categories',
         'sales', 'purchases', 'reminders', 'reports',
         'configuracoes', 'settings', 'company-settings'
       ],
-      enterprise: [
+      empresarial: [
         'dashboard', 'financeiro', 'transactions', 'accounts-payable', 'accounts-receivable', 'financial-indicators',
         'cadastros', 'people', 'products', 'categories',
         'sales', 'purchases', 'reminders', 'reports',
