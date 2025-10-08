@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../Auth/AuthProvider';
-import { Plus, Search, Edit, Trash2, Calendar, DollarSign, Clock, AlertCircle, Eye, X, Filter } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Calendar, DollarSign, Clock, AlertCircle, Eye, X, Filter, ChevronUp, ChevronDown } from 'lucide-react';
 import { Database } from '../../types/supabase';
 
 type Transaction = Database['public']['Tables']['transacoes']['Row'];
 type TransactionInsert = Database['public']['Tables']['transacoes']['Insert'];
 type Category = Database['public']['Tables']['categorias']['Row'];
 type Pessoa = Database['public']['Tables']['pessoas']['Row'];
+
+type SortColumn = 'id_sequencial' | 'descricao' | 'cliente' | 'categoria' | 'data_transacao' | 'data_vencimento' | 'valor' | 'status';
+type SortDirection = 'asc' | 'desc';
 
 const AccountsReceivable: React.FC = () => {
   const { supabase, profile } = useAuth();
@@ -18,6 +21,8 @@ const AccountsReceivable: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [viewingTransaction, setViewingTransaction] = useState<Transaction | null>(null);
+  const [sortColumn, setSortColumn] = useState<SortColumn>('data_vencimento');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
   // Função para obter o primeiro e último dia do mês atual
   const getCurrentMonthRange = () => {
@@ -276,6 +281,15 @@ const AccountsReceivable: React.FC = () => {
     return diffDays;
   };
 
+  const handleSort = (column: SortColumn) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
+
   const filteredTransactions = transactions.filter(transaction => {
     const matchesSearch = transaction.descricao.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          getCategoryName(transaction.id_categoria).toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -298,6 +312,56 @@ const AccountsReceivable: React.FC = () => {
     }
 
     return matchesSearch && matchesStatus && matchesCategory && matchesPessoa && matchesPeriod;
+  });
+
+  const sortedTransactions = [...filteredTransactions].sort((a, b) => {
+    let compareA: any;
+    let compareB: any;
+
+    switch (sortColumn) {
+      case 'id_sequencial':
+        compareA = a.id_sequencial || 0;
+        compareB = b.id_sequencial || 0;
+        break;
+      case 'descricao':
+        compareA = a.descricao.toLowerCase();
+        compareB = b.descricao.toLowerCase();
+        break;
+      case 'cliente':
+        compareA = getPessoaName(a.id_pessoa).toLowerCase();
+        compareB = getPessoaName(b.id_pessoa).toLowerCase();
+        break;
+      case 'categoria':
+        compareA = getCategoryName(a.id_categoria).toLowerCase();
+        compareB = getCategoryName(b.id_categoria).toLowerCase();
+        break;
+      case 'data_transacao':
+        compareA = a.data_transacao;
+        compareB = b.data_transacao;
+        break;
+      case 'data_vencimento':
+        compareA = a.data_vencimento || a.data_transacao;
+        compareB = b.data_vencimento || b.data_transacao;
+        break;
+      case 'valor':
+        compareA = a.valor;
+        compareB = b.valor;
+        break;
+      case 'status':
+        compareA = a.status;
+        compareB = b.status;
+        break;
+      default:
+        return 0;
+    }
+
+    if (compareA < compareB) {
+      return sortDirection === 'asc' ? -1 : 1;
+    }
+    if (compareA > compareB) {
+      return sortDirection === 'asc' ? 1 : -1;
+    }
+    return 0;
   });
 
   const totals = filteredTransactions.reduce((acc, transaction) => {
@@ -541,19 +605,99 @@ const AccountsReceivable: React.FC = () => {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="text-left p-4 font-medium text-gray-600">#</th>
-                <th className="text-left p-4 font-medium text-gray-600">Descrição</th>
-                <th className="text-left p-4 font-medium text-gray-600">Cliente</th>
-                <th className="text-left p-4 font-medium text-gray-600">Categoria</th>
-                <th className="text-left p-4 font-medium text-gray-600">Data Transação</th>
-                <th className="text-left p-4 font-medium text-gray-600">Vencimento</th>
-                <th className="text-right p-4 font-medium text-gray-600">Valor</th>
-                <th className="text-center p-4 font-medium text-gray-600">Status</th>
+                <th
+                  className="text-left p-4 font-medium text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none"
+                  onClick={() => handleSort('id_sequencial')}
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>#</span>
+                    {sortColumn === 'id_sequencial' && (
+                      sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />
+                    )}
+                  </div>
+                </th>
+                <th
+                  className="text-left p-4 font-medium text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none"
+                  onClick={() => handleSort('descricao')}
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>Descrição</span>
+                    {sortColumn === 'descricao' && (
+                      sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />
+                    )}
+                  </div>
+                </th>
+                <th
+                  className="text-left p-4 font-medium text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none"
+                  onClick={() => handleSort('cliente')}
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>Cliente</span>
+                    {sortColumn === 'cliente' && (
+                      sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />
+                    )}
+                  </div>
+                </th>
+                <th
+                  className="text-left p-4 font-medium text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none"
+                  onClick={() => handleSort('categoria')}
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>Categoria</span>
+                    {sortColumn === 'categoria' && (
+                      sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />
+                    )}
+                  </div>
+                </th>
+                <th
+                  className="text-left p-4 font-medium text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none"
+                  onClick={() => handleSort('data_transacao')}
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>Data Transação</span>
+                    {sortColumn === 'data_transacao' && (
+                      sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />
+                    )}
+                  </div>
+                </th>
+                <th
+                  className="text-left p-4 font-medium text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none"
+                  onClick={() => handleSort('data_vencimento')}
+                >
+                  <div className="flex items-center space-x-1">
+                    <span>Vencimento</span>
+                    {sortColumn === 'data_vencimento' && (
+                      sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />
+                    )}
+                  </div>
+                </th>
+                <th
+                  className="text-right p-4 font-medium text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none"
+                  onClick={() => handleSort('valor')}
+                >
+                  <div className="flex items-center justify-end space-x-1">
+                    <span>Valor</span>
+                    {sortColumn === 'valor' && (
+                      sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />
+                    )}
+                  </div>
+                </th>
+                <th
+                  className="text-center p-4 font-medium text-gray-600 cursor-pointer hover:bg-gray-100 transition-colors select-none"
+                  onClick={() => handleSort('status')}
+                >
+                  <div className="flex items-center justify-center space-x-1">
+                    <span>Status</span>
+                    {sortColumn === 'status' && (
+                      sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />
+                    )}
+                  </div>
+                </th>
                 <th className="text-center p-4 font-medium text-gray-600">Ações</th>
               </tr>
             </thead>
             <tbody>
-              {filteredTransactions.length === 0 ? (
+              {sortedTransactions.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="text-center py-12 text-gray-500">
                     <DollarSign className="mx-auto h-12 w-12 text-gray-400 mb-4" />
@@ -569,7 +713,7 @@ const AccountsReceivable: React.FC = () => {
                   </td>
                 </tr>
               ) : (
-                filteredTransactions.map((transaction) => {
+                sortedTransactions.map((transaction) => {
                   const daysUntilDue = getDaysUntilDue(transaction.data_vencimento || transaction.data_transacao);
                   const isTransactionOverdue = isOverdue(transaction.data_vencimento || transaction.data_transacao, transaction.status);
                   
