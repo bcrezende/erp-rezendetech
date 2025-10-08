@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../Auth/AuthProvider';
-import { Plus, Search, Edit, Trash2, Calendar, DollarSign, Clock, AlertCircle, Eye, X, Repeat, Calculator, ChevronUp, ChevronDown } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Calendar, DollarSign, Clock, AlertCircle, Eye, X, Repeat, Calculator, ChevronUp, ChevronDown, Link2, Users } from 'lucide-react';
 import { Database } from '../../types/supabase';
+import { generateInstallmentDates, formatDateToISO } from '../../utils/dateUtils';
 
 type Transaction = Database['public']['Tables']['transacoes']['Row'];
 type TransactionInsert = Database['public']['Tables']['transacoes']['Insert'];
@@ -10,6 +11,7 @@ type Pessoa = Database['public']['Tables']['pessoas']['Row'];
 
 type SortColumn = 'id_sequencial' | 'descricao' | 'fornecedor' | 'categoria' | 'data_transacao' | 'data_vencimento' | 'valor' | 'status';
 type SortDirection = 'asc' | 'desc';
+type EditScope = 'single' | 'future' | 'all';
 
 const AccountsPayable: React.FC = () => {
   const { supabase, profile } = useAuth();
@@ -23,6 +25,10 @@ const AccountsPayable: React.FC = () => {
   const [viewingTransaction, setViewingTransaction] = useState<Transaction | null>(null);
   const [sortColumn, setSortColumn] = useState<SortColumn>('data_vencimento');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [editScope, setEditScope] = useState<EditScope>('single');
+  const [isEditingInstallment, setIsEditingInstallment] = useState(false);
+  const [viewingAllInstallments, setViewingAllInstallments] = useState(false);
+  const [allInstallments, setAllInstallments] = useState<Transaction[]>([]);
 
   // Função para obter o primeiro e último dia do mês atual
   const getCurrentMonthRange = () => {
@@ -71,29 +77,25 @@ const AccountsPayable: React.FC = () => {
     }
   }, [profile, filters.startDate, filters.endDate]);
 
-  // Simulação dinâmica que reage a mudanças no formData
   const simulacaoParcelas = useMemo(() => {
     if (!formData.e_recorrente || !formData.numero_parcelas || !formData.valor || !formData.data_inicio_recorrencia) {
       return [];
     }
 
-    const parcelas = [];
     const valorParcela = Number(formData.valor) / Number(formData.numero_parcelas);
-    const dataInicio = new Date(formData.data_inicio_recorrencia);
+    const installmentDates = generateInstallmentDates(
+      formData.data_inicio_recorrencia,
+      Number(formData.numero_parcelas)
+    );
 
-    for (let i = 0; i < Number(formData.numero_parcelas); i++) {
-      const dataParcela = new Date(dataInicio);
-      dataParcela.setMonth(dataParcela.getMonth() + i);
-      
-      parcelas.push({
-        numero: i + 1,
-        valor: valorParcela,
-        data: dataParcela.toISOString().split('T')[0],
-        descricao: `${formData.descricao} - Parcela ${i + 1}/${formData.numero_parcelas}`
-      });
-    }
-
-    return parcelas;
+    return installmentDates.map((dateInfo) => ({
+      numero: dateInfo.installmentNumber,
+      valor: valorParcela,
+      data: dateInfo.date,
+      descricao: `${formData.descricao} - Parcela ${dateInfo.installmentNumber}/${formData.numero_parcelas}`,
+      wasAdjusted: dateInfo.wasAdjusted,
+      originalDay: dateInfo.originalDay
+    }));
   }, [formData.e_recorrente, formData.numero_parcelas, formData.valor, formData.data_inicio_recorrencia, formData.descricao]);
 
   const loadData = async () => {
@@ -150,11 +152,11 @@ const AccountsPayable: React.FC = () => {
     if (!profile?.id_empresa) return;
 
     try {
-      if (formData.e_recorrente && formData.tipo_recorrencia === 'parcelada') {
-        // Criar transações parceladas
+      if (isEditingInstallment && editingTransaction) {
+        await updateInstallmentsByScope();
+      } else if (formData.e_recorrente && formData.tipo_recorrencia === 'parcelada') {
         await createParceledTransactions();
       } else {
-        // Criar transação única
         const transactionData = {
           ...formData,
           id_empresa: profile.id_empresa,
@@ -196,19 +198,22 @@ const AccountsPayable: React.FC = () => {
     }
 
     const valorParcela = Number(formData.valor) / Number(formData.numero_parcelas);
+    const installmentDates = generateInstallmentDates(
+      formData.data_inicio_recorrencia,
+      Number(formData.numero_parcelas)
+    );
+
+    const groupId = crypto.randomUUID();
     const transacoes = [];
 
-    for (let i = 0; i < Number(formData.numero_parcelas); i++) {
-      const dataParcela = new Date(formData.data_inicio_recorrencia);
-      dataParcela.setMonth(dataParcela.getMonth() + i);
-
+    for (const dateInfo of installmentDates) {
       const transactionData = {
         id_empresa: profile.id_empresa,
         valor: valorParcela,
         tipo: 'despesa' as const,
-        descricao: `${formData.descricao} - Parcela ${i + 1}/${formData.numero_parcelas}`,
-        data_transacao: dataParcela.toISOString().split('T')[0],
-        data_vencimento: dataParcela.toISOString().split('T')[0],
+        descricao: `${formData.descricao} - Parcela ${dateInfo.installmentNumber}/${formData.numero_parcelas}`,
+        data_transacao: dateInfo.date,
+        data_vencimento: dateInfo.date,
         id_categoria: formData.id_categoria || null,
         id_pessoa: formData.id_pessoa || null,
         status: 'pendente' as const,
@@ -217,10 +222,11 @@ const AccountsPayable: React.FC = () => {
         e_recorrente: true,
         tipo_recorrencia: 'parcelada' as const,
         numero_parcelas: Number(formData.numero_parcelas),
-        parcela_atual: i + 1,
+        parcela_atual: dateInfo.installmentNumber,
         data_inicio_recorrencia: formData.data_inicio_recorrencia,
         valor_parcela: valorParcela,
-        ativa_recorrencia: true
+        ativa_recorrencia: true,
+        id_grupo_parcelas: groupId
       };
 
       transacoes.push(transactionData);
@@ -232,6 +238,68 @@ const AccountsPayable: React.FC = () => {
 
     if (error) throw error;
     alert(`${formData.numero_parcelas} parcelas criadas com sucesso!`);
+  };
+
+  const updateInstallmentsByScope = async () => {
+    if (!editingTransaction || !profile?.id_empresa) return;
+
+    const transactionData = {
+      valor: Number(formData.valor),
+      descricao: formData.descricao,
+      id_categoria: formData.id_categoria || null,
+      id_pessoa: formData.id_pessoa || null,
+      status: formData.status,
+      observacoes: formData.observacoes,
+    };
+
+    try {
+      if (editScope === 'single') {
+        const { error } = await supabase
+          .from('transacoes')
+          .update(transactionData)
+          .eq('id', editingTransaction.id);
+
+        if (error) throw error;
+        alert('Parcela atualizada com sucesso!');
+      } else if (editScope === 'future') {
+        const { error } = await supabase
+          .from('transacoes')
+          .update(transactionData)
+          .eq('id_grupo_parcelas', editingTransaction.id_grupo_parcelas)
+          .gte('parcela_atual', editingTransaction.parcela_atual || 0);
+
+        if (error) throw error;
+        alert('Parcelas futuras atualizadas com sucesso!');
+      } else if (editScope === 'all') {
+        const { error } = await supabase
+          .from('transacoes')
+          .update(transactionData)
+          .eq('id_grupo_parcelas', editingTransaction.id_grupo_parcelas);
+
+        if (error) throw error;
+        alert('Todas as parcelas atualizadas com sucesso!');
+      }
+    } catch (error) {
+      console.error('Error updating installments:', error);
+      throw error;
+    }
+  };
+
+  const loadAllInstallments = async (groupId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('transacoes')
+        .select('*')
+        .eq('id_grupo_parcelas', groupId)
+        .order('parcela_atual', { ascending: true });
+
+      if (error) throw error;
+      setAllInstallments(data || []);
+      setViewingAllInstallments(true);
+    } catch (error) {
+      console.error('Error loading installments:', error);
+      alert('Erro ao carregar parcelas.');
+    }
   };
 
   const handleStatusChange = async (transactionId: string, newStatus: string) => {
@@ -251,6 +319,14 @@ const AccountsPayable: React.FC = () => {
 
   const handleEdit = (transaction: Transaction) => {
     setEditingTransaction(transaction);
+
+    const isInstallment = transaction.e_recorrente &&
+                         transaction.tipo_recorrencia === 'parcelada' &&
+                         transaction.id_grupo_parcelas;
+
+    setIsEditingInstallment(isInstallment);
+    setEditScope('single');
+
     setFormData({
       valor: transaction.valor,
       tipo: 'despesa',
@@ -262,10 +338,10 @@ const AccountsPayable: React.FC = () => {
       status: transaction.status,
       origem: transaction.origem,
       observacoes: transaction.observacoes,
-      e_recorrente: transaction.e_recorrente,
-      tipo_recorrencia: transaction.tipo_recorrencia,
-      numero_parcelas: transaction.numero_parcelas,
-      data_inicio_recorrencia: transaction.data_inicio_recorrencia,
+      e_recorrente: isInstallment ? false : transaction.e_recorrente,
+      tipo_recorrencia: null,
+      numero_parcelas: null,
+      data_inicio_recorrencia: null,
     });
     setShowForm(true);
   };
@@ -307,6 +383,8 @@ const AccountsPayable: React.FC = () => {
     });
     setEditingTransaction(null);
     setShowForm(false);
+    setIsEditingInstallment(false);
+    setEditScope('single');
   };
 
   const formatCurrency = (value: number) => {
@@ -814,6 +892,15 @@ const AccountsPayable: React.FC = () => {
                           {transaction.e_recorrente && (
                             <Repeat size={14} className="text-blue-600" title="Transação recorrente" />
                           )}
+                          {transaction.id_grupo_parcelas && (
+                            <button
+                              onClick={() => loadAllInstallments(transaction.id_grupo_parcelas!)}
+                              className="p-1 hover:bg-blue-50 rounded transition-colors"
+                              title="Ver todas as parcelas"
+                            >
+                              <Link2 size={14} className="text-blue-600" />
+                            </button>
+                          )}
                         </div>
                       </td>
                       <td className="p-4">
@@ -918,12 +1005,98 @@ const AccountsPayable: React.FC = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">
-                {editingTransaction ? 'Editar Conta a Pagar' : 'Nova Conta a Pagar'}
-              </h2>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    {editingTransaction ? 'Editar Conta a Pagar' : 'Nova Conta a Pagar'}
+                  </h2>
+                  {isEditingInstallment && editingTransaction && (
+                    <p className="text-sm text-blue-600 mt-1 flex items-center space-x-2">
+                      <Link2 size={14} />
+                      <span>
+                        Parcela {editingTransaction.parcela_atual}/{editingTransaction.numero_parcelas}
+                      </span>
+                    </p>
+                  )}
+                </div>
+                {isEditingInstallment && editingTransaction?.id_grupo_parcelas && (
+                  <button
+                    type="button"
+                    onClick={() => loadAllInstallments(editingTransaction.id_grupo_parcelas!)}
+                    className="flex items-center space-x-2 px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  >
+                    <Users size={16} />
+                    <span>Ver Todas as Parcelas</span>
+                  </button>
+                )}
+              </div>
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
+              {isEditingInstallment && (
+                <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
+                  <h3 className="font-semibold text-blue-900 mb-3 flex items-center space-x-2">
+                    <Link2 size={18} />
+                    <span>Escopo da Edição</span>
+                  </h3>
+                  <p className="text-sm text-blue-800 mb-4">
+                    Escolha quais parcelas você deseja atualizar:
+                  </p>
+                  <div className="space-y-2">
+                    <label className="flex items-start space-x-3 p-3 bg-white rounded-lg border-2 border-transparent hover:border-blue-300 cursor-pointer transition-all">
+                      <input
+                        type="radio"
+                        name="editScope"
+                        value="single"
+                        checked={editScope === 'single'}
+                        onChange={(e) => setEditScope(e.target.value as EditScope)}
+                        className="mt-1 text-blue-600 focus:ring-blue-500"
+                      />
+                      <div className="flex-1">
+                        <div className="font-medium text-gray-900">Apenas esta parcela</div>
+                        <div className="text-sm text-gray-600">
+                          Atualiza somente a parcela {editingTransaction?.parcela_atual}
+                        </div>
+                      </div>
+                    </label>
+
+                    <label className="flex items-start space-x-3 p-3 bg-white rounded-lg border-2 border-transparent hover:border-blue-300 cursor-pointer transition-all">
+                      <input
+                        type="radio"
+                        name="editScope"
+                        value="future"
+                        checked={editScope === 'future'}
+                        onChange={(e) => setEditScope(e.target.value as EditScope)}
+                        className="mt-1 text-blue-600 focus:ring-blue-500"
+                      />
+                      <div className="flex-1">
+                        <div className="font-medium text-gray-900">Esta e todas as futuras</div>
+                        <div className="text-sm text-gray-600">
+                          Atualiza {(editingTransaction?.numero_parcelas || 0) - (editingTransaction?.parcela_atual || 0) + 1} parcelas
+                          (da {editingTransaction?.parcela_atual} até a {editingTransaction?.numero_parcelas})
+                        </div>
+                      </div>
+                    </label>
+
+                    <label className="flex items-start space-x-3 p-3 bg-white rounded-lg border-2 border-transparent hover:border-blue-300 cursor-pointer transition-all">
+                      <input
+                        type="radio"
+                        name="editScope"
+                        value="all"
+                        checked={editScope === 'all'}
+                        onChange={(e) => setEditScope(e.target.value as EditScope)}
+                        className="mt-1 text-blue-600 focus:ring-blue-500"
+                      />
+                      <div className="flex-1">
+                        <div className="font-medium text-gray-900">Todas as parcelas</div>
+                        <div className="text-sm text-gray-600">
+                          Atualiza todas as {editingTransaction?.numero_parcelas} parcelas do parcelamento
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              )}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1035,29 +1208,30 @@ const AccountsPayable: React.FC = () => {
                   </select>
                 </div>
 
-                {/* Despesa Recorrente */}
-                <div className="md:col-span-2">
-                  <label className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      checked={formData.e_recorrente || false}
-                      onChange={(e) => {
-                        const isRecorrente = e.target.checked;
-                        setFormData({ 
-                          ...formData, 
-                          e_recorrente: isRecorrente,
-                          tipo_recorrencia: isRecorrente ? 'parcelada' : null,
-                          numero_parcelas: isRecorrente ? 2 : null,
-                          data_inicio_recorrencia: isRecorrente ? formData.data_vencimento : null
-                        });
-                      }}
-                      className="rounded border-gray-300 text-red-600 focus:ring-red-500"
-                    />
-                    <span className="text-sm font-medium text-gray-700">
-                      Despesa Recorrente (Parcelada)
-                    </span>
-                  </label>
-                </div>
+                {!isEditingInstallment && (
+                  <div className="md:col-span-2">
+                    <label className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={formData.e_recorrente || false}
+                        onChange={(e) => {
+                          const isRecorrente = e.target.checked;
+                          setFormData({
+                            ...formData,
+                            e_recorrente: isRecorrente,
+                            tipo_recorrencia: isRecorrente ? 'parcelada' : null,
+                            numero_parcelas: isRecorrente ? 2 : null,
+                            data_inicio_recorrencia: isRecorrente ? formData.data_vencimento : null
+                          });
+                        }}
+                        className="rounded border-gray-300 text-red-600 focus:ring-red-500"
+                      />
+                      <span className="text-sm font-medium text-gray-700">
+                        Despesa Recorrente (Parcelada)
+                      </span>
+                    </label>
+                  </div>
+                )}
 
                 {formData.e_recorrente && (
                   <>
@@ -1148,12 +1322,19 @@ const AccountsPayable: React.FC = () => {
                       </thead>
                       <tbody>
                         {simulacaoParcelas.map((parcela, index) => (
-                          <tr key={index} className="border-b border-blue-100">
+                          <tr key={index} className={`border-b border-blue-100 ${parcela.wasAdjusted ? 'bg-yellow-50' : ''}`}>
                             <td className="p-2 text-blue-800">
                               {parcela.numero}ª parcela
                             </td>
                             <td className="p-2 text-blue-800">
-                              {formatDate(parcela.data)}
+                              <div className="flex items-center space-x-2">
+                                <span>{formatDate(parcela.data)}</span>
+                                {parcela.wasAdjusted && (
+                                  <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full" title={`Ajustado do dia ${parcela.originalDay}`}>
+                                    ajustado
+                                  </span>
+                                )}
+                              </div>
                             </td>
                             <td className="p-2 text-right font-semibold text-blue-800">
                               {formatCurrency(parcela.valor)}
@@ -1329,6 +1510,159 @@ const AccountsPayable: React.FC = () => {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* All Installments Modal */}
+      {viewingAllInstallments && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900 flex items-center space-x-2">
+                    <Link2 size={24} className="text-blue-600" />
+                    <span>Todas as Parcelas do Parcelamento</span>
+                  </h2>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {allInstallments.length} parcelas encontradas
+                  </p>
+                </div>
+                <button
+                  onClick={() => setViewingAllInstallments(false)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="text-left p-4 font-medium text-gray-600">Parcela</th>
+                      <th className="text-left p-4 font-medium text-gray-600">Descrição</th>
+                      <th className="text-left p-4 font-medium text-gray-600">Vencimento</th>
+                      <th className="text-right p-4 font-medium text-gray-600">Valor</th>
+                      <th className="text-center p-4 font-medium text-gray-600">Status</th>
+                      <th className="text-center p-4 font-medium text-gray-600">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {allInstallments.map((installment) => {
+                      const isTransactionOverdue = isOverdue(installment.data_vencimento || installment.data_transacao, installment.status);
+
+                      return (
+                        <tr key={installment.id} className={`border-b border-gray-100 hover:bg-gray-50 ${
+                          isTransactionOverdue ? 'bg-red-50' : ''
+                        }`}>
+                          <td className="p-4 font-medium text-gray-900">
+                            <div className="flex items-center space-x-2">
+                              <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
+                                {installment.parcela_atual}/{installment.numero_parcelas}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="p-4">
+                            <p className="font-medium text-gray-900">{installment.descricao}</p>
+                          </td>
+                          <td className="p-4">
+                            <p className={`font-medium ${
+                              isTransactionOverdue ? 'text-red-600' : 'text-gray-900'
+                            }`}>
+                              {formatDate(installment.data_vencimento || installment.data_transacao)}
+                            </p>
+                            {installment.status === 'pendente' && (
+                              <p className={`text-xs ${
+                                isTransactionOverdue ? 'text-red-600' : 'text-gray-500'
+                              }`}>
+                                {isTransactionOverdue
+                                  ? `${Math.abs(getDaysUntilDue(installment.data_vencimento || installment.data_transacao))} dias em atraso`
+                                  : `${getDaysUntilDue(installment.data_vencimento || installment.data_transacao)} dias`
+                                }
+                              </p>
+                            )}
+                          </td>
+                          <td className="p-4 text-right font-semibold text-red-600">
+                            {formatCurrency(installment.valor)}
+                          </td>
+                          <td className="p-4 text-center">
+                            <select
+                              value={installment.status}
+                              onChange={(e) => handleStatusChange(installment.id, e.target.value)}
+                              className={`px-2 py-1 rounded-full text-sm font-medium border-0 ${getStatusColor(installment.status)}`}
+                            >
+                              <option value="pendente">Pendente</option>
+                              <option value="pago">Pago</option>
+                              <option value="vencido">Vencido</option>
+                              <option value="cancelado">Cancelado</option>
+                            </select>
+                          </td>
+                          <td className="p-4 text-center">
+                            <div className="flex items-center justify-center space-x-2">
+                              <button
+                                onClick={() => {
+                                  setViewingTransaction(installment);
+                                  setViewingAllInstallments(false);
+                                }}
+                                className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              >
+                                <Eye size={16} />
+                              </button>
+                              <button
+                                onClick={() => {
+                                  handleEdit(installment);
+                                  setViewingAllInstallments(false);
+                                }}
+                                className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                              >
+                                <Edit size={16} />
+                              </button>
+                              <button
+                                onClick={() => {
+                                  handleDelete(installment.id);
+                                  setViewingAllInstallments(false);
+                                }}
+                                className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-start space-x-3">
+                  <Link2 className="h-5 w-5 text-blue-600 mt-0.5" />
+                  <div>
+                    <h4 className="font-semibold text-blue-900 mb-1">Sobre este Parcelamento</h4>
+                    <div className="text-sm text-blue-800 space-y-1">
+                      <p>• Total de parcelas: {allInstallments.length}</p>
+                      <p>• Valor total: {formatCurrency(allInstallments.reduce((sum, i) => sum + i.valor, 0))}</p>
+                      <p>• Parcelas pagas: {allInstallments.filter(i => i.status === 'pago').length}</p>
+                      <p>• Parcelas pendentes: {allInstallments.filter(i => i.status === 'pendente').length}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 flex justify-end">
+                <button
+                  onClick={() => setViewingAllInstallments(false)}
+                  className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                >
+                  Fechar
+                </button>
+              </div>
             </div>
           </div>
         </div>

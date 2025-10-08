@@ -354,6 +354,7 @@ export interface Database {
           valor_parcela: number | null;
           id_transacao_pai: string | null;
           ativa_recorrencia: boolean;
+          id_grupo_parcelas: string | null;
         };
         Insert: {
           id?: string;
@@ -381,6 +382,7 @@ export interface Database {
           valor_parcela?: number | null;
           id_transacao_pai?: string | null;
           ativa_recorrencia?: boolean;
+          id_grupo_parcelas?: string | null;
         };
         Update: {
           id?: string;
@@ -408,6 +410,7 @@ export interface Database {
           valor_parcela?: number | null;
           id_transacao_pai?: string | null;
           ativa_recorrencia?: boolean;
+          id_grupo_parcelas?: string | null;
         };
       };
       vendas: {
