@@ -148,7 +148,13 @@ export const routes: RouteConfig[] = [
 
 export const useRouter = () => {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
-  const [currentComponent, setCurrentComponent] = useState('dashboard');
+
+  const getInitialComponent = () => {
+    const route = routes.find(r => r.path === window.location.pathname);
+    return route ? route.component : 'dashboard';
+  };
+
+  const [currentComponent, setCurrentComponent] = useState(getInitialComponent());
 
   useEffect(() => {
     const handlePopState = () => {
@@ -164,8 +170,8 @@ export const useRouter = () => {
     if (route) {
       setCurrentComponent(route.component);
     } else {
-      // Default to dashboard for unknown routes
-      setCurrentComponent('dashboard');
+      const defaultRoute = routes.find(r => r.path === '/');
+      setCurrentComponent(defaultRoute ? defaultRoute.component : 'dashboard');
     }
   }, [currentPath]);
 

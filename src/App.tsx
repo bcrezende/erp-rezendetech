@@ -80,17 +80,17 @@ const AppContent: React.FC = () => {
     navigate('/auth');
   };
 
-  // If on reset password page, auth page, or pricing page, show appropriate form regardless of auth state
+  // Priority 1: Public pages that don't require auth (show these first)
+  if (isPricingPage) {
+    return <PricingPlans />;
+  }
+
   if (isResetPasswordPage) {
     return <ResetPasswordForm />;
   }
 
   if (isAuthPage) {
     return <LoginForm />;
-  }
-
-  if (isPricingPage) {
-    return <PricingPlans />;
   }
 
   // Loading state
