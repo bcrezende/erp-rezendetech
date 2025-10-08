@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../Auth/AuthProvider';
 import { useAppContext } from '../../contexts/AppContext';
-import { User, Mail, Phone, MapPin, Save, AlertCircle, CheckCircle, Moon, Sun, Palette } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Save, AlertCircle, CheckCircle, Moon, Sun, Palette, Package } from 'lucide-react';
 import { Database } from '../../types/supabase';
+import SystemVersionInfo from './SystemVersionInfo';
 
 type Profile = Database['public']['Tables']['perfis']['Row'];
 type ProfileUpdate = Database['public']['Tables']['perfis']['Update'];
@@ -499,6 +500,21 @@ const UserSettings: React.FC = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* System Version Information */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div className="flex items-center space-x-3 mb-6">
+          <Package className="h-6 w-6 text-blue-600" />
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Versão do Sistema</h3>
+            <p className="text-gray-600 dark:text-gray-300 text-sm">
+              Informações sobre atualizações e histórico de versões
+            </p>
+          </div>
+        </div>
+
+        <SystemVersionInfo />
       </div>
     </div>
   );

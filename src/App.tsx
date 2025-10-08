@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './components/Auth/AuthProvider';
 import { AppProvider, useAppContext } from './contexts/AppContext';
 import { useDeviceDetection } from './hooks/useDeviceDetection';
 import { useRouter } from './hooks/useRouter';
+import { useVersionCheck } from './hooks/useVersionCheck';
 import LoginForm from './components/Auth/LoginForm';
 import ResetPasswordForm from './components/Auth/ResetPasswordForm';
 import PeopleManager from './components/People/PeopleManager';
@@ -25,11 +26,12 @@ import PendingRemindersPanel from './components/Dashboard/PendingRemindersPanel'
 import CompanySettings from './components/Settings/CompanySettings';
 import NotificationToast from './components/Notifications/NotificationToast';
 import NotificationBell from './components/Notifications/NotificationBell';
-import { 
-  DollarSign, 
-  TrendingUp, 
-  Users, 
-  Package, 
+import UpdateNotificationModal from './components/Notifications/UpdateNotificationModal';
+import {
+  DollarSign,
+  TrendingUp,
+  Users,
+  Package,
   BarChart3,
   LogOut,
   AlertCircle,
@@ -44,6 +46,7 @@ const AppContent: React.FC = () => {
   const { state } = useAppContext();
   const { isMobile, isTablet, isDesktop, isPWA, hasTouch, orientation } = useDeviceDetection();
   const { currentComponent, navigate, navigateByComponent, getCurrentRoute } = useRouter();
+  const { pendingVersion, markAsViewed } = useVersionCheck(user?.id || null);
 
   // Get current route info
   const currentRoute = getCurrentRoute();
@@ -532,9 +535,18 @@ const AppContent: React.FC = () => {
           </div>
         </main>
       </div>
-      
+
       {/* Global Notification Toasts */}
       <NotificationToast />
+
+      {/* Version Update Notification Modal */}
+      {pendingVersion && (
+        <UpdateNotificationModal
+          version={pendingVersion}
+          onClose={() => markAsViewed(pendingVersion.id)}
+          onDismiss={() => markAsViewed(pendingVersion.id)}
+        />
+      )}
     </div>
   );
 };
