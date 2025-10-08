@@ -126,7 +126,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mob
   };
 
   // Get user plan from profile
-  const userPlan = profile?.empresas?.plano || 'basico';
+  const userPlan = profile?.plano || 'basico';
   const filteredMenuItems = getFilteredMenuItems(menuItems, userPlan);
 
   const toggleExpanded = (itemId: string) => {

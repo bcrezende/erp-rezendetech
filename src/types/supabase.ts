@@ -61,6 +61,9 @@ export interface Database {
           id_empresa: string;
           papel: string;
           telefone: string | null;
+          plano: string;
+          assinatura_ativa: boolean;
+          data_assinatura: string;
           ativo: boolean;
           criado_em: string;
           atualizado_em: string;
@@ -71,6 +74,9 @@ export interface Database {
           id_empresa: string;
           papel?: string;
           telefone?: string | null;
+          plano?: string;
+          assinatura_ativa?: boolean;
+          data_assinatura?: string;
           ativo?: boolean;
           criado_em?: string;
           atualizado_em?: string;
@@ -81,6 +87,9 @@ export interface Database {
           id_empresa?: string;
           papel?: string;
           telefone?: string | null;
+          plano?: string;
+          assinatura_ativa?: boolean;
+          data_assinatura?: string;
           ativo?: boolean;
           criado_em?: string;
           atualizado_em?: string;

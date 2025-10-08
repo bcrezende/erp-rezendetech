@@ -128,7 +128,7 @@ const AppContent: React.FC = () => {
   }
 
   // Check if user needs enterprise plan for dashboard access
-  const needsEnterprisePlan = profile?.empresas?.plano === 'basico' && 
+  const needsEnterprisePlan = profile?.plano === 'basico' &&
     currentRoute?.requiresEnterprisePlan;
 
   if (needsEnterprisePlan) {

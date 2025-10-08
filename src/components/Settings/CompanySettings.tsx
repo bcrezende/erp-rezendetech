@@ -307,7 +307,7 @@ const CompanySettings: React.FC = () => {
                   <CreditCard className="h-5 w-5 text-gray-400" />
                 </div>
                 <div className="w-full pl-10 pr-3 py-2 border border-gray-200 bg-gray-50 rounded-lg text-gray-700 font-medium">
-                  {empresa?.plano === 'enterprise' || empresa?.plano === 'empresarial' ? 'Empresarial - R$ 199,90/mês' : 'Básico - R$ 29,90/mês'}
+                  {profile?.plano === 'enterprise' || profile?.plano === 'empresarial' ? 'Empresarial - R$ 199,90/mês' : 'Básico - R$ 29,90/mês'}
                 </div>
               </div>
               <p className="text-xs text-gray-500 mt-1">
@@ -577,22 +577,22 @@ const CompanySettings: React.FC = () => {
             <div>
               <h4 className="font-semibold text-purple-900 mb-1">Plano Atual</h4>
               <p className="text-purple-700 capitalize font-medium">
-                {(empresa?.plano === 'enterprise' || empresa?.plano === 'empresarial') ? 'Empresarial' : 'Básico'}
-                {(empresa?.plano === 'enterprise' || empresa?.plano === 'empresarial') ? ' - R$ 199,90/mês' : ' - R$ 29,90/mês'}
+                {(profile?.plano === 'enterprise' || profile?.plano === 'empresarial') ? 'Empresarial' : 'Básico'}
+                {(profile?.plano === 'enterprise' || profile?.plano === 'empresarial') ? ' - R$ 199,90/mês' : ' - R$ 29,90/mês'}
               </p>
             </div>
             <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-              empresa?.plano === 'enterprise' || empresa?.plano === 'empresarial' ? 'bg-purple-100 text-purple-700' :
+              profile?.plano === 'enterprise' || profile?.plano === 'empresarial' ? 'bg-purple-100 text-purple-700' :
               'bg-gray-100 text-gray-700'
             }`}>
-              {(empresa?.plano === 'enterprise' || empresa?.plano === 'empresarial') ? '🚀 Empresarial' : '📊 Básico'}
+              {(profile?.plano === 'enterprise' || profile?.plano === 'empresarial') ? '🚀 Empresarial' : '📊 Básico'}
             </div>
           </div>
         </div>
 
         {/* Botões de Assinatura */}
         <div className="space-y-4">
-          {empresa?.plano === 'basico' && (
+          {profile?.plano === 'basico' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <a
                 href={`https://sandbox.asaas.com/c/52etrpbztyd8msz9?empresa_id=${empresa?.id}&usuario_id=${profile?.id}`}
@@ -626,7 +626,7 @@ const CompanySettings: React.FC = () => {
             </div>
           )}
 
-          {empresa?.plano === 'basico' && (
+          {profile?.plano === 'basico' && (
             <div className="grid grid-cols-1 gap-4">
               <a
                 href={`https://sandbox.asaas.com/c/uc30wq3aaewqjxzb?empresa_id=${empresa?.id}&usuario_id=${profile?.id}`}
@@ -646,7 +646,7 @@ const CompanySettings: React.FC = () => {
             </div>
           )}
 
-          {(empresa?.plano === 'enterprise' || empresa?.plano === 'empresarial') && (
+          {(profile?.plano === 'enterprise' || profile?.plano === 'empresarial') && (
             <div className="text-center p-6 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-xl">
               <div className="flex items-center justify-center space-x-2 mb-3">
                 <span className="text-3xl">🎉</span>

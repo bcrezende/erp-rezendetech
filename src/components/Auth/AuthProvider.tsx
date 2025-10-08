@@ -115,7 +115,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             email,
             telefone,
             endereco,
-            plano,
             assinatura_id
           )
         `)
