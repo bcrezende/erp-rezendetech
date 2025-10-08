@@ -246,6 +246,8 @@ const AccountsPayable: React.FC = () => {
     const transactionData = {
       valor: Number(formData.valor),
       descricao: formData.descricao,
+      data_transacao: formData.data_transacao,
+      data_vencimento: formData.data_vencimento,
       id_categoria: formData.id_categoria || null,
       id_pessoa: formData.id_pessoa || null,
       status: formData.status,
