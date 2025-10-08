@@ -27,6 +27,7 @@ import CompanySettings from './components/Settings/CompanySettings';
 import NotificationToast from './components/Notifications/NotificationToast';
 import NotificationBell from './components/Notifications/NotificationBell';
 import UpdateNotificationModal from './components/Notifications/UpdateNotificationModal';
+import PricingPlans from './components/Pricing/PricingPlans';
 import {
   DollarSign,
   TrendingUp,
@@ -52,6 +53,7 @@ const AppContent: React.FC = () => {
   const currentRoute = getCurrentRoute();
   const isResetPasswordPage = currentComponent === 'reset-password';
   const isAuthPage = currentComponent === 'auth';
+  const isPricingPage = currentComponent === 'pricing-plans';
 
   // Update document title based on current route
   React.useEffect(() => {
@@ -78,13 +80,17 @@ const AppContent: React.FC = () => {
     navigate('/auth');
   };
 
-  // If on reset password page or auth page, show appropriate form regardless of auth state
+  // If on reset password page, auth page, or pricing page, show appropriate form regardless of auth state
   if (isResetPasswordPage) {
     return <ResetPasswordForm />;
   }
 
   if (isAuthPage) {
     return <LoginForm />;
+  }
+
+  if (isPricingPage) {
+    return <PricingPlans />;
   }
 
   // Loading state

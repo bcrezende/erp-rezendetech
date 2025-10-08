@@ -136,6 +136,13 @@ export const routes: RouteConfig[] = [
     title: 'RezendeTECH - Redefinir Senha',
     subtitle: 'Altere sua senha de acesso',
     requiresAuth: false
+  },
+  {
+    path: '/planos',
+    component: 'pricing-plans',
+    title: 'RezendeTECH - Planos e Preços',
+    subtitle: 'Escolha o plano ideal para sua empresa',
+    requiresAuth: false
   }
 ];
 
