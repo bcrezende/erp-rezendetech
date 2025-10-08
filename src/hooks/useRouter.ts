@@ -148,6 +148,7 @@ export const routes: RouteConfig[] = [
 
 export const useRouter = () => {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
+  const [forceUpdate, setForceUpdate] = useState(0);
 
   const getInitialComponent = () => {
     const route = routes.find(r => r.path === window.location.pathname);
@@ -159,6 +160,7 @@ export const useRouter = () => {
   useEffect(() => {
     const handlePopState = () => {
       setCurrentPath(window.location.pathname);
+      setForceUpdate(prev => prev + 1);
     };
 
     window.addEventListener('popstate', handlePopState);
@@ -169,11 +171,12 @@ export const useRouter = () => {
     const route = routes.find(r => r.path === currentPath);
     if (route) {
       setCurrentComponent(route.component);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       const defaultRoute = routes.find(r => r.path === '/');
       setCurrentComponent(defaultRoute ? defaultRoute.component : 'dashboard');
     }
-  }, [currentPath]);
+  }, [currentPath, forceUpdate]);
 
   const navigate = (path: string) => {
     const route = routes.find(r => r.path === path);
@@ -181,6 +184,8 @@ export const useRouter = () => {
       window.history.pushState({}, '', path);
       setCurrentPath(path);
       setCurrentComponent(route.component);
+      setForceUpdate(prev => prev + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 

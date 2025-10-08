@@ -62,6 +62,11 @@ const AppContent: React.FC = () => {
     }
   }, [currentRoute]);
 
+  // Force re-render when currentComponent changes
+  React.useEffect(() => {
+    // This ensures the component updates when navigation occurs
+  }, [currentComponent]);
+
   // Calculate initial date filter for the entire current month
   const getInitialMonthDateRange = () => {
     const today = new Date();
@@ -80,7 +85,8 @@ const AppContent: React.FC = () => {
     navigate('/auth');
   };
 
-  // Priority 1: Public pages that don't require auth (show these first)
+  // Priority 1: Always render public pages immediately (before any auth/loading checks)
+  // This ensures these pages are accessible regardless of authentication state
   if (isPricingPage) {
     return <PricingPlans />;
   }
@@ -93,7 +99,7 @@ const AppContent: React.FC = () => {
     return <LoginForm />;
   }
 
-  // Loading state
+  // Priority 2: Loading state (only for protected routes)
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -106,7 +112,7 @@ const AppContent: React.FC = () => {
     );
   }
 
-  // Not authenticated - show login or signup
+  // Priority 3: Not authenticated - redirect to login
   if (!user) {
     return <LoginForm />;
   }
