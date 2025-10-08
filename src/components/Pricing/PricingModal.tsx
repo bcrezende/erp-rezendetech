@@ -37,9 +37,9 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, userId, co
 
   if (!isOpen) return null;
 
-  const basicPaymentUrl = 'https://w.app/rezendetech';
+  const basicPaymentUrl = 'https://api.whatsapp.com/send?phone=5519993990280&text=Ol%C3%A1%2C+quero+fazer+o+upgrade+para+o+plano+Enterprise%21';
 
-  const enterprisePaymentUrl = 'https://w.app/rezendetech';
+  const enterprisePaymentUrl = 'https://api.whatsapp.com/send?phone=5519993990280&text=Ol%C3%A1%2C+quero+fazer+o+upgrade+para+o+plano+Enterprise%21';
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">

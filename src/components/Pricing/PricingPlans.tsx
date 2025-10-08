@@ -19,9 +19,9 @@ const PricingPlans: React.FC = () => {
   const { user, profile } = useAuth();
   const { navigate } = useRouter();
 
-  const basicPaymentUrl = 'https://w.app/rezendetech';
+  const basicPaymentUrl = 'https://api.whatsapp.com/send?phone=5519993990280&text=Ol%C3%A1%2C+quero+fazer+o+upgrade+para+o+plano+Enterprise%21';
 
-  const enterprisePaymentUrl = 'https://w.app/rezendetech';
+  const enterprisePaymentUrl = 'https://api.whatsapp.com/send?phone=5519993990280&text=Ol%C3%A1%2C+quero+fazer+o+upgrade+para+o+plano+Enterprise%21';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
