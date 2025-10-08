@@ -22,8 +22,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onBackToLogin }) => {
     endereco: '',
     cidade: '',
     estado: '',
-    cep: '',
-    plano: 'basico'
+    cep: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -103,7 +102,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onBackToLogin }) => {
           cidade: userData.cidade || null,
           estado: userData.estado || null,
           cep: userData.cep || null,
-          plano: userData.plano || 'basico'
+          plano: 'basico'
         }
       });
 
@@ -432,22 +431,6 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onBackToLogin }) => {
               </div>
             </div>
 
-            <div>
-              <label htmlFor="plano" className="block text-sm font-medium text-gray-700">
-                Plano
-              </label>
-              <select
-                id="plano"
-                name="plano"
-                value={formData.plano}
-                onChange={(e) => setFormData({ ...formData, plano: e.target.value })}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-              >
-                <option value="basico">Básico - Gratuito</option>
-                <option value="premium">Premium - R$ 49,90/mês</option>
-                <option value="enterprise">Enterprise - R$ 99,90/mês</option>
-              </select>
-            </div>
           </div>
 
           <div className="space-y-3">

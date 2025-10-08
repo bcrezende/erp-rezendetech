@@ -37,8 +37,11 @@ Deno.serve(async (req: Request) => {
     );
 
     const requestData: CreateCompanyProfileRequest = await req.json();
-    
+
     console.log('🔄 Creating company and profile for user:', requestData.userId);
+
+    // Get user's plan from their metadata or use default
+    const planToUse = requestData.plano || 'basico';
 
     // 1. Create company first
     const { data: empresa, error: empresaError } = await supabaseAdmin
@@ -49,7 +52,7 @@ Deno.serve(async (req: Request) => {
         email: requestData.email,
         telefone: requestData.telefone || null,
         endereco: requestData.endereco || null,
-        plano: requestData.plano || 'basico',
+        plano: planToUse,
         ativo: true
       })
       .select()
@@ -62,7 +65,7 @@ Deno.serve(async (req: Request) => {
 
     console.log('✅ Company created:', empresa.id);
 
-    // 2. Create user profile
+    // 2. Create user profile with plan (this will sync to empresa via trigger)
     const { data: perfil, error: perfilError } = await supabaseAdmin
       .from('perfis')
       .insert({
@@ -71,6 +74,9 @@ Deno.serve(async (req: Request) => {
         id_empresa: empresa.id,
         papel: 'admin',
         telefone: requestData.telefone || null,
+        plano: planToUse,
+        assinatura_ativa: true,
+        data_assinatura: new Date().toISOString(),
         ativo: true
       })
       .select()

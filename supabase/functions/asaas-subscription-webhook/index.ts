@@ -117,42 +117,59 @@ Deno.serve(async (req: Request) => {
       planoDB = 'premium';
     }
 
-    // Atualizar plano da empresa
-    const { error: updateError } = await supabaseAdmin
-      .from('empresas')
+    // 1. PRIMEIRO: Atualizar plano no perfil do admin da empresa
+    // O trigger sync_plan_from_perfil_to_empresa vai propagar para a empresa automaticamente
+    const { data: adminPerfil, error: perfilError } = await supabaseAdmin
+      .from('perfis')
       .update({
         plano: planoDB,
+        assinatura_ativa: webhookData.status === 'ACTIVE' || webhookData.status === 'ativo',
+        data_assinatura: webhookData.data_pagamento || new Date().toISOString()
+      })
+      .eq('id_empresa', webhookData.id_empresa)
+      .eq('papel', 'admin')
+      .select()
+      .maybeSingle();
+
+    if (perfilError) {
+      console.error('❌ Error updating admin profile plan:', perfilError);
+      throw new Error(`Erro ao atualizar plano do perfil: ${perfilError.message}`);
+    }
+
+    if (!adminPerfil) {
+      console.warn('⚠️ No admin profile found for empresa:', webhookData.id_empresa);
+      // Fallback: atualizar diretamente na empresa se não houver admin
+      const { error: empresaError } = await supabaseAdmin
+        .from('empresas')
+        .update({
+          plano: planoDB,
+          assinatura_id: webhookData.assinatura_id
+        })
+        .eq('id', webhookData.id_empresa);
+
+      if (empresaError) {
+        throw new Error(`Erro ao atualizar plano da empresa: ${empresaError.message}`);
+      }
+    }
+
+    console.log('✅ Plan updated successfully:', {
+      empresa: empresa.nome,
+      planoAnterior: empresa.plano,
+      planoNovo: planoDB,
+      assinaturaId: webhookData.assinatura_id,
+      status: webhookData.status
+    });
+
+    // 2. Atualizar assinatura_id na empresa
+    const { error: updateEmpresaError } = await supabaseAdmin
+      .from('empresas')
+      .update({
         assinatura_id: webhookData.assinatura_id
       })
       .eq('id', webhookData.id_empresa);
 
-    if (updateError) {
-      console.error('❌ Error updating company plan:', updateError);
-      throw new Error(`Erro ao atualizar plano da empresa: ${updateError.message}`);
-    }
-
-    console.log('✅ Company plan updated successfully:', {
-      empresa: empresa.nome,
-      planoAnterior: empresa.plano,
-      planoNovo: planoDB,
-      assinaturaId: webhookData.assinatura_id
-    });
-
-    // Se há um usuário específico, atualizar também o perfil
-    if (webhookData.id_usuario) {
-      const { error: perfilError } = await supabaseAdmin
-        .from('perfis')
-        .update({
-          assinatura_id: webhookData.assinatura_id
-        })
-        .eq('id', webhookData.id_usuario);
-
-      if (perfilError) {
-        console.warn('⚠️ Warning updating user profile:', perfilError);
-        // Não falhar se não conseguir atualizar o perfil do usuário
-      } else {
-        console.log('✅ User profile updated with subscription ID');
-      }
+    if (updateEmpresaError) {
+      console.warn('⚠️ Warning updating empresa assinatura_id:', updateEmpresaError);
     }
 
     // Registrar transação de pagamento se fornecida
