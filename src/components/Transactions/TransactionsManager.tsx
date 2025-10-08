@@ -102,6 +102,8 @@ const TransactionsManager: React.FC = () => {
     if (!profile?.id_empresa) return;
 
     try {
+      console.log('💾 Submitting transaction with formData:', formData);
+
       const transactionData = {
         ...formData,
         id_empresa: profile.id_empresa,
@@ -110,18 +112,33 @@ const TransactionsManager: React.FC = () => {
         id_pessoa: formData.id_pessoa || null,
       };
 
+      console.log('📤 Transaction data to be saved:', {
+        ...transactionData,
+        editingId: editingTransaction?.id
+      });
+
       if (editingTransaction) {
-        const { error } = await supabase
+        console.log('🔄 Updating transaction ID:', editingTransaction.id);
+
+        const { data, error } = await supabase
           .from('transacoes')
           .update(transactionData)
-          .eq('id', editingTransaction.id);
+          .eq('id', editingTransaction.id)
+          .select();
+
+        console.log('✅ Update response:', { data, error });
 
         if (error) throw error;
         alert('Transação atualizada com sucesso!');
       } else {
-        const { error } = await supabase
+        console.log('➕ Creating new transaction');
+
+        const { data, error } = await supabase
           .from('transacoes')
-          .insert(transactionData);
+          .insert(transactionData)
+          .select();
+
+        console.log('✅ Insert response:', { data, error });
 
         if (error) throw error;
         alert('Transação criada com sucesso!');
@@ -130,12 +147,19 @@ const TransactionsManager: React.FC = () => {
       await loadData();
       resetForm();
     } catch (error) {
-      console.error('Error saving transaction:', error);
+      console.error('❌ Error saving transaction:', error);
       alert('Erro ao salvar transação. Tente novamente.');
     }
   };
 
   const handleEdit = (transaction: Transaction) => {
+    console.log('🔍 Editing transaction:', {
+      id: transaction.id,
+      data_transacao: transaction.data_transacao,
+      data_vencimento: transaction.data_vencimento,
+      fullTransaction: transaction
+    });
+
     setEditingTransaction(transaction);
     setFormData({
       valor: transaction.valor,
@@ -149,6 +173,12 @@ const TransactionsManager: React.FC = () => {
       origem: transaction.origem,
       observacoes: transaction.observacoes,
     });
+
+    console.log('📝 FormData set to:', {
+      data_transacao: transaction.data_transacao,
+      data_vencimento: transaction.data_vencimento || transaction.data_transacao
+    });
+
     setShowForm(true);
   };
 
@@ -625,7 +655,10 @@ const TransactionsManager: React.FC = () => {
                     type="date"
                     required
                     value={formData.data_transacao || ''}
-                    onChange={(e) => setFormData({ ...formData, data_transacao: e.target.value })}
+                    onChange={(e) => {
+                      console.log('📅 Data Transação changed:', e.target.value);
+                      setFormData({ ...formData, data_transacao: e.target.value });
+                    }}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
@@ -637,7 +670,10 @@ const TransactionsManager: React.FC = () => {
                   <input
                     type="date"
                     value={formData.data_vencimento || ''}
-                    onChange={(e) => setFormData({ ...formData, data_vencimento: e.target.value })}
+                    onChange={(e) => {
+                      console.log('📅 Data Vencimento changed:', e.target.value);
+                      setFormData({ ...formData, data_vencimento: e.target.value });
+                    }}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>

@@ -344,6 +344,7 @@ export interface Database {
           observacoes: string | null;
           data_vencimento: string | null;
           id_pessoa: string | null;
+          nome_razao_social: string | null;
           criado_em: string;
           atualizado_em: string;
           e_recorrente: boolean;
@@ -372,6 +373,7 @@ export interface Database {
           observacoes?: string | null;
           data_vencimento?: string | null;
           id_pessoa?: string | null;
+          nome_razao_social?: string | null;
           criado_em?: string;
           atualizado_em?: string;
           e_recorrente?: boolean;
@@ -400,6 +402,7 @@ export interface Database {
           observacoes?: string | null;
           data_vencimento?: string | null;
           id_pessoa?: string | null;
+          nome_razao_social?: string | null;
           criado_em?: string;
           atualizado_em?: string;
           e_recorrente?: boolean;
