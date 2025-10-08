@@ -37,13 +37,9 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose, userId, co
 
   if (!isOpen) return null;
 
-  const basicPaymentUrl = userId && companyId
-    ? `https://sandbox.asaas.com/c/52etrpbztyd8msz9?empresa_id=${companyId}&usuario_id=${userId}`
-    : 'https://sandbox.asaas.com/c/52etrpbztyd8msz9';
+  const basicPaymentUrl = 'https://w.app/rezendetech';
 
-  const enterprisePaymentUrl = userId && companyId
-    ? `https://sandbox.asaas.com/c/uc30wq3aaewqjxzb?empresa_id=${companyId}&usuario_id=${userId}`
-    : 'https://sandbox.asaas.com/c/uc30wq3aaewqjxzb';
+  const enterprisePaymentUrl = 'https://w.app/rezendetech';
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">

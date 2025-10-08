@@ -19,13 +19,9 @@ const PricingPlans: React.FC = () => {
   const { user, profile } = useAuth();
   const { navigate } = useRouter();
 
-  const basicPaymentUrl = user && profile?.id_empresa
-    ? `https://sandbox.asaas.com/c/52etrpbztyd8msz9?empresa_id=${profile.id_empresa}&usuario_id=${profile.id}`
-    : 'https://sandbox.asaas.com/c/52etrpbztyd8msz9';
+  const basicPaymentUrl = 'https://w.app/rezendetech';
 
-  const enterprisePaymentUrl = user && profile?.id_empresa
-    ? `https://sandbox.asaas.com/c/uc30wq3aaewqjxzb?empresa_id=${profile.id_empresa}&usuario_id=${profile.id}`
-    : 'https://sandbox.asaas.com/c/uc30wq3aaewqjxzb';
+  const enterprisePaymentUrl = 'https://w.app/rezendetech';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8">

@@ -595,7 +595,7 @@ const CompanySettings: React.FC = () => {
           {profile?.plano === 'basico' && (
             <div className="grid grid-cols-1 gap-4">
               <a
-                href={`https://sandbox.asaas.com/c/uc30wq3aaewqjxzb?empresa_id=${empresa?.id}&usuario_id=${profile?.id}`}
+                href="https://w.app/rezendetech"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block w-full text-center bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
