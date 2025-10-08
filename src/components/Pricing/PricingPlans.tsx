@@ -104,16 +104,6 @@ const PricingPlans: React.FC = () => {
                   <Check className="h-5 w-5 text-green-600" />
                 </div>
                 <div>
-                  <p className="text-gray-700 font-medium">Até 3 usuários</p>
-                  <p className="text-sm text-gray-500">Colaboradores com acesso ao sistema</p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-3">
-                <div className="flex-shrink-0 mt-1">
-                  <Check className="h-5 w-5 text-green-600" />
-                </div>
-                <div>
                   <p className="text-gray-700 font-medium">Lembretes e notificações</p>
                   <p className="text-sm text-gray-500">Nunca perca prazos importantes</p>
                 </div>
@@ -180,7 +170,7 @@ const PricingPlans: React.FC = () => {
 
             <div className="mb-8">
               <div className="flex items-baseline">
-                <span className="text-5xl font-bold text-white">R$ 99,90</span>
+                <span className="text-5xl font-bold text-white">R$ 199,90</span>
                 <span className="text-xl text-blue-100 ml-2">/mês</span>
               </div>
               <p className="text-sm text-blue-100 mt-2">Acesso total ao sistema</p>
