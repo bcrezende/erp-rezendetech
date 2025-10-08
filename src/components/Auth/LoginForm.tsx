@@ -304,6 +304,7 @@ const LoginForm: React.FC<LoginFormProps> = () => {
 
           <div className="text-center">
             <button
+              type="button"
               onClick={() => navigate('/planos')}
               className="w-full text-white bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-sm font-medium py-3 px-4 border border-transparent rounded-lg transition-all duration-200 shadow-lg"
             >
