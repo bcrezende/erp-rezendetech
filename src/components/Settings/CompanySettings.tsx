@@ -593,40 +593,6 @@ const CompanySettings: React.FC = () => {
         {/* Botões de Assinatura */}
         <div className="space-y-4">
           {profile?.plano === 'basico' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <a
-                href={`https://sandbox.asaas.com/c/52etrpbztyd8msz9?empresa_id=${empresa?.id}&usuario_id=${profile?.id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full text-center bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
-              >
-                <div className="flex items-center justify-center space-x-2 mb-2">
-                  <span className="text-2xl">📊</span>
-                  <span className="text-lg">Plano Básico</span>
-                </div>
-                <div className="text-sm opacity-90">
-                  R$ 29,90/mês • Gestão básica
-                </div>
-              </a>
-
-              <a
-                href={`https://sandbox.asaas.com/c/uc30wq3aaewqjxzb?empresa_id=${empresa?.id}&usuario_id=${profile?.id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full text-center bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
-              >
-                <div className="flex items-center justify-center space-x-2 mb-2">
-                  <span className="text-2xl">🚀</span>
-                  <span className="text-lg">Plano Empresarial</span>
-                </div>
-                <div className="text-sm opacity-90">
-                  R$ 199,90/mês • Dashboard • DRE • Relatórios
-                </div>
-              </a>
-            </div>
-          )}
-
-          {profile?.plano === 'basico' && (
             <div className="grid grid-cols-1 gap-4">
               <a
                 href={`https://sandbox.asaas.com/c/uc30wq3aaewqjxzb?empresa_id=${empresa?.id}&usuario_id=${profile?.id}`}
@@ -642,7 +608,6 @@ const CompanySettings: React.FC = () => {
                   R$ 199,90/mês • Dashboard • DRE • Relatórios • IA
                 </div>
               </a>
-
             </div>
           )}
 
