@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from './AuthProvider';
 import { useRouter } from '../../hooks/useRouter';
 import { LogIn, Mail, Lock, AlertCircle, CheckCircle, ArrowLeft } from 'lucide-react';
+import PricingModal from '../Pricing/PricingModal';
 
 interface LoginFormProps {}
 
@@ -18,6 +19,7 @@ const LoginForm: React.FC<LoginFormProps> = () => {
   const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
   const [forgotPasswordSuccess, setForgotPasswordSuccess] = useState(false);
   const [forgotPasswordError, setForgotPasswordError] = useState('');
+  const [showPricingModal, setShowPricingModal] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -316,12 +318,17 @@ const LoginForm: React.FC<LoginFormProps> = () => {
         <div className="text-center">
           <button
             type="button"
-            onClick={() => navigate('/planos')}
+            onClick={() => setShowPricingModal(true)}
             className="w-full text-white bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-sm font-medium py-3 px-4 border border-transparent rounded-lg transition-all duration-200 shadow-lg"
           >
             🚀 Adquira Já - Criar Conta Premium
           </button>
         </div>
+
+        <PricingModal
+          isOpen={showPricingModal}
+          onClose={() => setShowPricingModal(false)}
+        />
       </div>
     </div>
   );
