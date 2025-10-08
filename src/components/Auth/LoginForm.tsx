@@ -302,16 +302,6 @@ const LoginForm: React.FC<LoginFormProps> = () => {
             </button>
           </div>
 
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={() => navigate('/planos')}
-              className="w-full text-white bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-sm font-medium py-3 px-4 border border-transparent rounded-lg transition-all duration-200 shadow-lg"
-            >
-              🚀 Adquira Já - Criar Conta Premium
-            </button>
-          </div>
-
           {/* Footer */}
           <div className="text-center pt-6 border-t border-gray-200">
             <p className="text-xs text-gray-500">
@@ -322,6 +312,16 @@ const LoginForm: React.FC<LoginFormProps> = () => {
             </p>
           </div>
         </form>
+
+        <div className="text-center">
+          <button
+            type="button"
+            onClick={() => navigate('/planos')}
+            className="w-full text-white bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-sm font-medium py-3 px-4 border border-transparent rounded-lg transition-all duration-200 shadow-lg"
+          >
+            🚀 Adquira Já - Criar Conta Premium
+          </button>
+        </div>
       </div>
     </div>
   );
