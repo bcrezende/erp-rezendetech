@@ -21,7 +21,7 @@ const PricingPlans: React.FC = () => {
 
   const basicPaymentUrl = 'https://api.whatsapp.com/send?phone=5519993990280&text=Ol%C3%A1%2C+quero+fazer+o+upgrade+para+o+plano+Enterprise%21';
 
-  const enterprisePaymentUrl = 'https://api.whatsapp.com/send?phone=5519993990280&text=Ol%C3%A1%2C+quero+fazer+o+upgrade+para+o+plano+Enterprise%21';
+  const enterprisePaymentUrl = 'https://buy.stripe.com/test_fZuaEW69B3981eK9uA5kk01';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
