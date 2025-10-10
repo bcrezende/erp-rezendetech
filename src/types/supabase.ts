@@ -64,6 +64,11 @@ export interface Database {
           plano: string;
           assinatura_ativa: boolean;
           data_assinatura: string;
+          status_assinatura: string | null;
+          proxima_data_pagamento: string | null;
+          ultima_verificacao_assinatura: string | null;
+          data_vencimento_assinatura: string | null;
+          assinatura_id: string | null;
           ativo: boolean;
           criado_em: string;
           atualizado_em: string;
@@ -77,6 +82,11 @@ export interface Database {
           plano?: string;
           assinatura_ativa?: boolean;
           data_assinatura?: string;
+          status_assinatura?: string | null;
+          proxima_data_pagamento?: string | null;
+          ultima_verificacao_assinatura?: string | null;
+          data_vencimento_assinatura?: string | null;
+          assinatura_id?: string | null;
           ativo?: boolean;
           criado_em?: string;
           atualizado_em?: string;
@@ -90,6 +100,11 @@ export interface Database {
           plano?: string;
           assinatura_ativa?: boolean;
           data_assinatura?: string;
+          status_assinatura?: string | null;
+          proxima_data_pagamento?: string | null;
+          ultima_verificacao_assinatura?: string | null;
+          data_vencimento_assinatura?: string | null;
+          assinatura_id?: string | null;
           ativo?: boolean;
           criado_em?: string;
           atualizado_em?: string;

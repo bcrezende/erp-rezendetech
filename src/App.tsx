@@ -6,6 +6,7 @@ import { useRouter } from './hooks/useRouter';
 import { useVersionCheck } from './hooks/useVersionCheck';
 import LoginForm from './components/Auth/LoginForm';
 import ResetPasswordForm from './components/Auth/ResetPasswordForm';
+import SubscriptionExpired from './components/Auth/SubscriptionExpired';
 import PeopleManager from './components/People/PeopleManager';
 import ProductsManager from './components/Products/ProductsManager';
 import TransactionsManager from './components/Transactions/TransactionsManager';
@@ -27,6 +28,7 @@ import CompanySettings from './components/Settings/CompanySettings';
 import NotificationToast from './components/Notifications/NotificationToast';
 import NotificationBell from './components/Notifications/NotificationBell';
 import UpdateNotificationModal from './components/Notifications/UpdateNotificationModal';
+import SubscriptionAlert from './components/Notifications/SubscriptionAlert';
 import PricingPlans from './components/Pricing/PricingPlans';
 import {
   DollarSign,
@@ -117,9 +119,20 @@ const AppContent: React.FC = () => {
     return <LoginForm />;
   }
 
+  // Priority 4: Check if subscription is expired/inactive
+  const hasInactiveSubscription = profile &&
+    profile.assinatura_ativa === false &&
+    profile.status_assinatura &&
+    profile.status_assinatura !== 'active' &&
+    profile.status_assinatura !== 'trialing';
+
+  if (hasInactiveSubscription) {
+    return <SubscriptionExpired profile={profile} />;
+  }
+
   // Check if user needs company setup (except for settings pages)
-  const needsCompanySetup = !profile?.id_empresa && 
-    currentRoute?.requiresCompany && 
+  const needsCompanySetup = !profile?.id_empresa &&
+    currentRoute?.requiresCompany &&
     currentComponent !== 'company-settings';
 
   if (needsCompanySetup) {
@@ -543,6 +556,7 @@ const AppContent: React.FC = () => {
           isMobile ? 'p-3' : 'p-6 lg:p-8'
         }`}>
           <div className="min-h-full">
+            <SubscriptionAlert profile={profile} />
             {renderPageContent()}
           </div>
         </main>
