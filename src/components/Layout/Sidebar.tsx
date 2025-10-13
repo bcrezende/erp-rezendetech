@@ -219,13 +219,13 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate, profile, mob
             {(!isDesktopCollapsed || isMobile) && (
               <div className="animate-slide-in-from-left">
                 <h1 className={`font-black bg-gradient-to-r ${
-                  state.theme === 'dark' 
-                    ? 'from-white via-blue-200 to-purple-200' 
+                  state.theme === 'dark'
+                    ? 'from-white via-blue-200 to-purple-200'
                     : 'from-gray-900 via-blue-900 to-purple-900'
                 } bg-clip-text text-transparent tracking-tight ${
                   isMobile ? 'text-lg' : 'text-xl'
                 }`}>
-                  {isPWA ? 'ERP Mobile' : 'Sistema ERP'}
+                  RezendeTECH
                 </h1>
                 <p className={`font-bold tracking-wide ${
                   state.theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
