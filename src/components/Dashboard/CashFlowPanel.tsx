@@ -132,7 +132,7 @@ const CashFlowPanel: React.FC = () => {
     return {
       income: realizedTotals.income + pendingTotals.income,
       expenses: realizedTotals.expenses + pendingTotals.expenses,
-      balance: cashFlowData.length > 0 ? cashFlowData[cashFlowData.length - 1].balance : 0,
+      balance: realizedTotals.income - realizedTotals.expenses,
       realized: realizedTotals,
       pending: pendingTotals
     };
