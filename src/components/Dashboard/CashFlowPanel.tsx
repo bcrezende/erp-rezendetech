@@ -33,7 +33,7 @@ const CashFlowPanel: React.FC = () => {
           .from('transacoes')
           .select('*')
           .eq('id_empresa', profile.id_empresa)
-          .in('status', ['concluida', 'pago', 'recebido', 'concluída'])
+          .in('status', ['concluida', 'pago', 'recebido', 'concluída', 'pendente'])
           .order('data_transacao', { ascending: true }),
         supabase
           .from('categorias')
@@ -114,6 +114,15 @@ const CashFlowPanel: React.FC = () => {
 
   const totals = useMemo(() => {
     const realizedTotals = transactions
+      .filter(t => ['concluida', 'pago', 'recebido', 'concluída'].includes(t.status))
+      .reduce((acc, t) => {
+        if (t.tipo === 'receita') acc.income += t.valor;
+        else acc.expenses += t.valor;
+        return acc;
+      }, { income: 0, expenses: 0 });
+
+    const pendingTotals = transactions
+      .filter(t => t.status === 'pendente')
       .reduce((acc, t) => {
         if (t.tipo === 'receita') acc.income += t.valor;
         else acc.expenses += t.valor;
@@ -121,9 +130,11 @@ const CashFlowPanel: React.FC = () => {
       }, { income: 0, expenses: 0 });
 
     return {
-      income: realizedTotals.income,
-      expenses: realizedTotals.expenses,
-      balance: cashFlowData.length > 0 ? cashFlowData[cashFlowData.length - 1].balance : 0
+      income: realizedTotals.income + pendingTotals.income,
+      expenses: realizedTotals.expenses + pendingTotals.expenses,
+      balance: cashFlowData.length > 0 ? cashFlowData[cashFlowData.length - 1].balance : 0,
+      realized: realizedTotals,
+      pending: pendingTotals
     };
   }, [cashFlowData, transactions]);
 
@@ -147,7 +158,17 @@ const CashFlowPanel: React.FC = () => {
         </div>
         <div className="flex flex-col sm:flex-row items-center gap-2 relative z-10">
           <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 text-center sm:text-right glass rounded-xl px-3 sm:px-4 py-2 font-semibold animate-slide-in-from-right">
-            Recebidos e Pagos
+            <span className="hidden sm:inline">Todas as </span>Movimentações
+          </div>
+          <div className="flex items-center gap-2 text-xs">
+            <div className="flex items-center gap-1 bg-white/80 px-2 py-1 rounded-lg border border-white/60">
+              <div className="w-3 h-3 bg-white border border-gray-300 rounded"></div>
+              <span className="text-gray-700 font-medium">Realizado</span>
+            </div>
+            <div className="flex items-center gap-1 bg-yellow-50/80 px-2 py-1 rounded-lg border border-yellow-300/60">
+              <div className="w-3 h-3 bg-yellow-50 border border-yellow-300 rounded"></div>
+              <span className="text-yellow-700 font-medium">Pendente</span>
+            </div>
           </div>
         </div>
       </div>
@@ -155,32 +176,38 @@ const CashFlowPanel: React.FC = () => {
       {/* Resumo Geral */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 mb-6 sm:mb-8 relative z-10">
         <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 sm:p-6 rounded-xl sm:rounded-2xl border-2 border-green-300 shadow-xl hover:shadow-2xl transition-all duration-500 hover-lift interactive-card animate-scale-in touch-target">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-2">
             <div className="min-w-0 flex-1">
               <p className="text-xs sm:text-base font-black text-green-800 tracking-wider uppercase truncate">Total Entradas</p>
               <p className="text-lg sm:text-3xl font-black text-green-900 drop-shadow-lg tracking-tight break-all">
                 {formatCurrency(totals.income)}
               </p>
-              <p className="text-xs text-green-700 font-semibold mt-1">Valores recebidos</p>
             </div>
             <div className="p-2 sm:p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl sm:rounded-2xl shadow-xl hover-glow flex-shrink-0">
               <TrendingUp className="text-white drop-shadow-lg" size={20} />
             </div>
           </div>
+          <div className="flex justify-between text-xs border-t border-green-200 pt-2">
+            <span className="text-green-700">Realizado: {formatCurrency(totals.realized.income)}</span>
+            <span className="text-yellow-700">Pendente: {formatCurrency(totals.pending.income)}</span>
+          </div>
         </div>
 
         <div className="bg-gradient-to-br from-red-50 to-pink-50 p-4 sm:p-6 rounded-xl sm:rounded-2xl border-2 border-red-300 shadow-xl hover:shadow-2xl transition-all duration-500 hover-lift interactive-card animate-scale-in stagger-1 touch-target">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-2">
             <div className="min-w-0 flex-1">
               <p className="text-xs sm:text-base font-black text-red-800 tracking-wider uppercase truncate">Total Saídas</p>
               <p className="text-lg sm:text-3xl font-black text-red-900 drop-shadow-lg tracking-tight break-all">
                 {formatCurrency(totals.expenses)}
               </p>
-              <p className="text-xs text-red-700 font-semibold mt-1">Valores pagos</p>
             </div>
             <div className="p-2 sm:p-3 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl sm:rounded-2xl shadow-xl hover-glow flex-shrink-0">
               <TrendingDown className="text-white drop-shadow-lg" size={20} />
             </div>
+          </div>
+          <div className="flex justify-between text-xs border-t border-red-200 pt-2">
+            <span className="text-red-700">Realizado: {formatCurrency(totals.realized.expenses)}</span>
+            <span className="text-yellow-700">Pendente: {formatCurrency(totals.pending.expenses)}</span>
           </div>
         </div>
 
@@ -201,9 +228,6 @@ const CashFlowPanel: React.FC = () => {
               } break-all`}>
                 {formatCurrency(totals.balance)}
               </p>
-              <p className={`text-xs font-semibold mt-1 ${
-                totals.balance >= 0 ? 'text-blue-700' : 'text-orange-700'
-              }`}>Caixa atual</p>
             </div>
             <div className={`p-2 sm:p-3 rounded-xl sm:rounded-2xl shadow-xl hover-glow flex-shrink-0 ${
               totals.balance >= 0 ? 'bg-gradient-to-br from-blue-500 to-indigo-600' : 'bg-gradient-to-br from-orange-500 to-yellow-600'
@@ -308,11 +332,17 @@ const CashFlowPanel: React.FC = () => {
                             {day.dailyTransactions
                               .sort((a, b) => new Date(a.criado_em).getTime() - new Date(b.criado_em).getTime())
                               .map((transaction) => {
+                                const isPending = transaction.status === 'pendente';
                                 return (
-                                  <div key={transaction.id} className={`flex justify-between items-center text-gray-800 rounded-lg shadow-md hover:shadow-lg transition-smooth border bg-white/90 border-white/60 hover:bg-white/95 backdrop-blur-sm touch-target ${isMobile ? 'text-xs p-3' : 'text-base p-4'} relative z-30`}>
+                                  <div key={transaction.id} className={`flex justify-between items-center text-gray-800 rounded-lg shadow-md hover:shadow-lg transition-smooth border hover:bg-white/95 backdrop-blur-sm touch-target ${
+                                    isPending
+                                      ? 'bg-yellow-50/90 border-yellow-300/60'
+                                      : 'bg-white/90 border-white/60'
+                                  } ${isMobile ? 'text-xs p-3' : 'text-base p-4'} relative z-30`}>
                                     <span className="flex-1 truncate mr-2">
                                       <span className="font-semibold text-gray-900 dark:text-white flex items-center gap-1">
                                         {transaction.descricao}
+                                        {isPending && <span className="text-xs text-yellow-700 font-medium">(Pendente)</span>}
                                       </span>
                                       <span className="text-gray-600 dark:text-gray-300 text-xs block">
                                         {getCategoryName(transaction.id_categoria)}
@@ -320,7 +350,7 @@ const CashFlowPanel: React.FC = () => {
                                     </span>
                                     <span className={`font-bold flex-shrink-0 drop-shadow-lg ${
                                       transaction.tipo === 'receita' ? 'text-green-600' : 'text-red-600'
-                                    } text-sm`}>
+                                    } ${isPending ? 'opacity-70' : ''} text-sm`}>
                                       {`${transaction.tipo === 'despesa' ? '-' : ''}${formatCurrency(transaction.valor)}`}
                                     </span>
                                   </div>
