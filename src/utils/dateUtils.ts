@@ -1,17 +1,17 @@
-export const addMonthsPreservingDay = (date: Date | string, monthsToAdd: number): Date => {
+export const addMonthsPreservingDay = (date: Date | string, monthsToAdd: number, originalDay?: number): Date => {
   const baseDate = typeof date === 'string' ? new Date(date) : new Date(date);
 
-  const originalDay = baseDate.getDate();
+  const dayToPreserve = originalDay !== undefined ? originalDay : baseDate.getDate();
   const originalMonth = baseDate.getMonth();
   const originalYear = baseDate.getFullYear();
 
   const targetMonth = originalMonth + monthsToAdd;
   const targetYear = originalYear + Math.floor(targetMonth / 12);
-  const adjustedMonth = targetMonth % 12;
+  const adjustedMonth = ((targetMonth % 12) + 12) % 12;
 
   const lastDayOfTargetMonth = new Date(targetYear, adjustedMonth + 1, 0).getDate();
 
-  const finalDay = Math.min(originalDay, lastDayOfTargetMonth);
+  const finalDay = Math.min(dayToPreserve, lastDayOfTargetMonth);
 
   return new Date(targetYear, adjustedMonth, finalDay);
 };
@@ -55,7 +55,7 @@ export const generateInstallmentDates = (
   const originalDay = baseDate.getDate();
 
   for (let i = 0; i < numberOfInstallments; i++) {
-    const installmentDate = addMonthsPreservingDay(startDate, i);
+    const installmentDate = addMonthsPreservingDay(startDate, i, originalDay);
     const adjustmentInfo = getDateAdjustmentInfo(originalDay, installmentDate);
 
     dates.push({

@@ -1408,10 +1408,19 @@ const AccountsPayable: React.FC = () => {
 
                   <div className="mt-4 p-3 bg-blue-100 rounded-lg">
                     <p className="text-sm text-blue-800">
-                      <strong>📋 Resumo:</strong> Serão criadas {formData.numero_parcelas} transações de {formatCurrency(simulacaoParcelas[0]?.valor || 0)} cada, 
-                      iniciando em {formData.data_inicio_recorrencia ? formatDate(formData.data_inicio_recorrencia) : '-'}, 
-                      com vencimento mensal.
+                      <strong>📋 Resumo:</strong> Serão criadas {formData.numero_parcelas} transações de {formatCurrency(simulacaoParcelas[0]?.valor || 0)} cada,
+                      iniciando em {formData.data_inicio_recorrencia ? formatDate(formData.data_inicio_recorrencia) : '-'},
+                      com vencimento mensal no dia {simulacaoParcelas[0]?.originalDay}.
                     </p>
+                    {simulacaoParcelas.some(p => p.wasAdjusted) && (
+                      <p className="text-sm text-yellow-800 mt-2 flex items-start">
+                        <span className="mr-1">⚠️</span>
+                        <span>
+                          <strong>Atenção:</strong> Algumas datas foram ajustadas automaticamente porque o mês não possui o dia {simulacaoParcelas[0]?.originalDay}.
+                          Por exemplo, se você escolheu dia 31, meses com 30 dias mostrarão dia 30, e fevereiro mostrará dia 28 ou 29.
+                        </span>
+                      </p>
+                    )}
                   </div>
                 </div>
               )}
