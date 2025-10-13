@@ -28,12 +28,12 @@ const CashFlowPanel: React.FC = () => {
       }
 
 
-      const [transactionsRes, categoriesRes] = await Promise.all([ // Fetch categories as well
+      const [transactionsRes, categoriesRes] = await Promise.all([
         supabase
           .from('transacoes')
           .select('*')
           .eq('id_empresa', profile.id_empresa)
-          .in('status', ['concluida', 'pago', 'recebido', 'concluída'])
+          .in('status', ['concluida', 'pago', 'recebido', 'concluída', 'pendente'])
           .order('data_transacao', { ascending: true }),
         supabase
           .from('categorias')
@@ -113,12 +113,30 @@ const CashFlowPanel: React.FC = () => {
   };
 
   const totals = useMemo(() => {
-    return cashFlowData.reduce((acc, day) => ({
-      income: acc.income + day.income,
-      expenses: acc.expenses + day.expenses,
-      balance: day.balance // último balance é o saldo final
-    }), { income: 0, expenses: 0, balance: 0 });
-  }, [cashFlowData]);
+    const realizedTotals = transactions
+      .filter(t => ['concluida', 'pago', 'recebido', 'concluída'].includes(t.status))
+      .reduce((acc, t) => {
+        if (t.tipo === 'receita') acc.income += t.valor;
+        else acc.expenses += t.valor;
+        return acc;
+      }, { income: 0, expenses: 0 });
+
+    const pendingTotals = transactions
+      .filter(t => t.status === 'pendente')
+      .reduce((acc, t) => {
+        if (t.tipo === 'receita') acc.income += t.valor;
+        else acc.expenses += t.valor;
+        return acc;
+      }, { income: 0, expenses: 0 });
+
+    return {
+      income: realizedTotals.income + pendingTotals.income,
+      expenses: realizedTotals.expenses + pendingTotals.expenses,
+      balance: cashFlowData.length > 0 ? cashFlowData[cashFlowData.length - 1].balance : 0,
+      realized: realizedTotals,
+      pending: pendingTotals
+    };
+  }, [cashFlowData, transactions]);
 
   return (
     <div className="card-premium rounded-2xl sm:rounded-3xl shadow-2xl border border-white/30 p-4 sm:p-8 hover-lift relative overflow-hidden animate-slide-in-from-right">
@@ -138,15 +156,27 @@ const CashFlowPanel: React.FC = () => {
             Fluxo de Caixa
           </h3>
         </div>
-        <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 text-center sm:text-right relative z-10 glass rounded-xl px-3 sm:px-4 py-2 font-semibold animate-slide-in-from-right">
-          <span className="hidden sm:inline">Todas as </span>Movimentações
+        <div className="flex flex-col sm:flex-row items-center gap-2 relative z-10">
+          <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 text-center sm:text-right glass rounded-xl px-3 sm:px-4 py-2 font-semibold animate-slide-in-from-right">
+            <span className="hidden sm:inline">Todas as </span>Movimentações
+          </div>
+          <div className="flex items-center gap-2 text-xs">
+            <div className="flex items-center gap-1 bg-white/80 px-2 py-1 rounded-lg border border-white/60">
+              <div className="w-3 h-3 bg-white border border-gray-300 rounded"></div>
+              <span className="text-gray-700 font-medium">Realizado</span>
+            </div>
+            <div className="flex items-center gap-1 bg-yellow-50/80 px-2 py-1 rounded-lg border border-yellow-300/60">
+              <div className="w-3 h-3 bg-yellow-50 border border-yellow-300 rounded"></div>
+              <span className="text-yellow-700 font-medium">Pendente</span>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Resumo Geral */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 mb-6 sm:mb-8 relative z-10">
         <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 sm:p-6 rounded-xl sm:rounded-2xl border-2 border-green-300 shadow-xl hover:shadow-2xl transition-all duration-500 hover-lift interactive-card animate-scale-in touch-target">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-2">
             <div className="min-w-0 flex-1">
               <p className="text-xs sm:text-base font-black text-green-800 tracking-wider uppercase truncate">Total Entradas</p>
               <p className="text-lg sm:text-3xl font-black text-green-900 drop-shadow-lg tracking-tight break-all">
@@ -157,10 +187,14 @@ const CashFlowPanel: React.FC = () => {
               <TrendingUp className="text-white drop-shadow-lg" size={20} />
             </div>
           </div>
+          <div className="flex justify-between text-xs border-t border-green-200 pt-2">
+            <span className="text-green-700">Realizado: {formatCurrency(totals.realized.income)}</span>
+            <span className="text-yellow-700">Pendente: {formatCurrency(totals.pending.income)}</span>
+          </div>
         </div>
 
         <div className="bg-gradient-to-br from-red-50 to-pink-50 p-4 sm:p-6 rounded-xl sm:rounded-2xl border-2 border-red-300 shadow-xl hover:shadow-2xl transition-all duration-500 hover-lift interactive-card animate-scale-in stagger-1 touch-target">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-2">
             <div className="min-w-0 flex-1">
               <p className="text-xs sm:text-base font-black text-red-800 tracking-wider uppercase truncate">Total Saídas</p>
               <p className="text-lg sm:text-3xl font-black text-red-900 drop-shadow-lg tracking-tight break-all">
@@ -171,11 +205,15 @@ const CashFlowPanel: React.FC = () => {
               <TrendingDown className="text-white drop-shadow-lg" size={20} />
             </div>
           </div>
+          <div className="flex justify-between text-xs border-t border-red-200 pt-2">
+            <span className="text-red-700">Realizado: {formatCurrency(totals.realized.expenses)}</span>
+            <span className="text-yellow-700">Pendente: {formatCurrency(totals.pending.expenses)}</span>
+          </div>
         </div>
 
         <div className={`p-4 sm:p-6 rounded-xl sm:rounded-2xl border-2 shadow-xl hover:shadow-2xl transition-all duration-500 hover-lift interactive-card animate-scale-in stagger-2 touch-target ${
-          totals.balance >= 0 
-            ? 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-300' 
+          totals.balance >= 0
+            ? 'bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-300'
             : 'bg-gradient-to-br from-orange-50 to-yellow-50 border-orange-300'
         }`}>
           <div className="flex items-center justify-between">
@@ -293,23 +331,31 @@ const CashFlowPanel: React.FC = () => {
                           } relative z-10`}>
                             {day.dailyTransactions
                               .sort((a, b) => new Date(a.criado_em).getTime() - new Date(b.criado_em).getTime())
-                              .map((transaction) => (
-                                <div key={transaction.id} className={`flex justify-between items-center text-gray-800 bg-white/90 rounded-lg shadow-md hover:shadow-lg transition-smooth border border-white/60 hover:bg-white/95 backdrop-blur-sm touch-target ${
-                                  isMobile ? 'text-xs p-3' : 'text-base p-4'
-                                } relative z-30`}>
-                                  <span className="flex-1 truncate mr-2">
-                                    <span className="font-semibold text-gray-900 dark:text-white">{transaction.descricao}</span>
-                                    <span className="text-gray-600 dark:text-gray-300 text-xs block">
-                                      {getCategoryName(transaction.id_categoria)}
+                              .map((transaction) => {
+                                const isPending = transaction.status === 'pendente';
+                                return (
+                                  <div key={transaction.id} className={`flex justify-between items-center text-gray-800 rounded-lg shadow-md hover:shadow-lg transition-smooth border hover:bg-white/95 backdrop-blur-sm touch-target ${
+                                    isPending
+                                      ? 'bg-yellow-50/90 border-yellow-300/60'
+                                      : 'bg-white/90 border-white/60'
+                                  } ${isMobile ? 'text-xs p-3' : 'text-base p-4'} relative z-30`}>
+                                    <span className="flex-1 truncate mr-2">
+                                      <span className="font-semibold text-gray-900 dark:text-white flex items-center gap-1">
+                                        {transaction.descricao}
+                                        {isPending && <span className="text-xs text-yellow-700 font-medium">(Pendente)</span>}
+                                      </span>
+                                      <span className="text-gray-600 dark:text-gray-300 text-xs block">
+                                        {getCategoryName(transaction.id_categoria)}
+                                      </span>
                                     </span>
-                                  </span>
-                                  <span className={`font-bold flex-shrink-0 drop-shadow-lg ${
-                                    transaction.tipo === 'receita' ? 'text-green-600' : 'text-red-600'
-                                  } text-sm`}>
-                                    {`${transaction.tipo === 'despesa' ? '-' : ''}${formatCurrency(transaction.valor)}`}
-                                  </span>
-                                </div>
-                              ))}
+                                    <span className={`font-bold flex-shrink-0 drop-shadow-lg ${
+                                      transaction.tipo === 'receita' ? 'text-green-600' : 'text-red-600'
+                                    } ${isPending ? 'opacity-70' : ''} text-sm`}>
+                                      {`${transaction.tipo === 'despesa' ? '-' : ''}${formatCurrency(transaction.valor)}`}
+                                    </span>
+                                  </div>
+                                );
+                              })}
                           </div>
                         </td>
                       </tr>
