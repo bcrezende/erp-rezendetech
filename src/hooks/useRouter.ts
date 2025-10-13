@@ -10,6 +10,20 @@ export interface RouteConfig {
   requiresEnterprisePlan?: boolean;
 }
 
+export const getDynamicTitle = (baseTitle: string, companyName?: string | null): string => {
+  if (!companyName) {
+    return baseTitle;
+  }
+
+  const parts = baseTitle.split(' - ');
+  if (parts.length > 1) {
+    parts[0] = companyName;
+    return parts.join(' - ');
+  }
+
+  return baseTitle;
+};
+
 export const routes: RouteConfig[] = [
   {
     path: '/',

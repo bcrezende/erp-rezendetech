@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './components/Auth/AuthProvider';
 import { AppProvider, useAppContext } from './contexts/AppContext';
 import { useDeviceDetection } from './hooks/useDeviceDetection';
-import { useRouter } from './hooks/useRouter';
+import { useRouter, getDynamicTitle } from './hooks/useRouter';
 import { useVersionCheck } from './hooks/useVersionCheck';
 import LoginForm from './components/Auth/LoginForm';
 import ResetPasswordForm from './components/Auth/ResetPasswordForm';
@@ -57,12 +57,14 @@ const AppContent: React.FC = () => {
   const isAuthPage = currentComponent === 'auth';
   const isPricingPage = currentComponent === 'pricing-plans';
 
-  // Update document title based on current route
+  // Update document title based on current route and company name
   React.useEffect(() => {
     if (currentRoute?.title) {
-      document.title = currentRoute.title;
+      const companyName = profile?.empresas?.nome;
+      const dynamicTitle = getDynamicTitle(currentRoute.title, companyName);
+      document.title = dynamicTitle;
     }
-  }, [currentRoute]);
+  }, [currentRoute, profile?.empresas?.nome]);
 
   // Force re-render when currentComponent changes
   React.useEffect(() => {
@@ -419,7 +421,10 @@ const AppContent: React.FC = () => {
     }
   };
 
-  const { title, subtitle } = currentRoute || { title: 'Sistema ERP', subtitle: 'Gestão empresarial completa' };
+  const baseRoute = currentRoute || { title: 'Sistema ERP', subtitle: 'Gestão empresarial completa' };
+  const companyName = profile?.empresas?.nome;
+  const title = getDynamicTitle(baseRoute.title, companyName);
+  const subtitle = baseRoute.subtitle;
 
   // Adicionar classes CSS baseadas no dispositivo
   const deviceClasses = [
