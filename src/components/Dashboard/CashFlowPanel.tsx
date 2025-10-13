@@ -190,20 +190,16 @@ const CashFlowPanel: React.FC = () => {
         </div>
 
         <div className="bg-gradient-to-br from-red-50 to-pink-50 p-4 sm:p-6 rounded-xl sm:rounded-2xl border-2 border-red-300 shadow-xl hover:shadow-2xl transition-all duration-500 hover-lift interactive-card animate-scale-in stagger-1 touch-target">
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
               <p className="text-xs sm:text-base font-black text-red-800 tracking-wider uppercase truncate">Total Saídas</p>
               <p className="text-lg sm:text-3xl font-black text-red-900 drop-shadow-lg tracking-tight break-all">
-                {formatCurrency(totals.expenses)}
+                {formatCurrency(totals.realized.expenses)}
               </p>
             </div>
             <div className="p-2 sm:p-3 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl sm:rounded-2xl shadow-xl hover-glow flex-shrink-0">
               <TrendingDown className="text-white drop-shadow-lg" size={20} />
             </div>
-          </div>
-          <div className="flex justify-between text-xs border-t border-red-200 pt-2">
-            <span className="text-red-700">Realizado: {formatCurrency(totals.realized.expenses)}</span>
-            <span className="text-yellow-700">Pendente: {formatCurrency(totals.pending.expenses)}</span>
           </div>
         </div>
 
